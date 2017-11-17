@@ -1,0 +1,23 @@
+{
+  "generator-gradle-plugin": {
+    "githubUser": "xvik",
+    "authorName": "Vyacheslav Rusakov",
+    "authorEmail": "vyarus@gmail.com",
+    "projectName": "gradle-use-python-plugin",
+    "projectGroup": "ru.vyarus",
+    "projectPackage": "ru.vyarus.gradle.plugin.python",
+    "projectVersion": "0.1.0",
+    "projectDesc": "Call python in gradle build",
+    "pluginPortalDesc": "Install pip dependencies and call python in gradle build",
+    "targetJava": "1.6",
+    "pluginPortalTags": "python",
+    "mirrorToJcenter": true,
+    "pluginPortalUseCustomGroup": true,
+    "bintrayUser": "vyarus",
+    "bintrayRepo": "xvik",
+    "bintrayTags": "gradle, python",
+    "bintraySignFiles": true,
+    "mavenCentralSync": true,
+    "usedGeneratorVersion": "1.5.0"
+  }
+}

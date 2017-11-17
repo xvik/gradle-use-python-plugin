@@ -1,0 +1,15 @@
+language: java
+jdk: oraclejdk7
+sudo: false
+before_install: chmod +x gradlew
+
+install: ./gradlew assemble --no-daemon
+script: travis_wait 20 ./gradlew check --no-daemon
+
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/

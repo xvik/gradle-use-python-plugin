@@ -9,22 +9,42 @@ import ru.vyarus.gradle.plugin.python.cmd.Pip
 import ru.vyarus.gradle.plugin.python.cmd.Python
 
 /**
+ * Install required modules (with correct versions) into python using pip.
+ * Default task is registered as pipInstall to install all modules declared in
+ * {@link ru.vyarus.gradle.plugin.python.PythonExtension#modules}.
+ * All {@link PythonTask}s are depend on pipInstall by default.
+ *
  * @author Vyacheslav Rusakov
  * @since 11.11.2017
  */
 class PipInstallTask extends ConventionTask {
 
+    /**
+     * Path to directory with python binary. When not set global python is used.
+     * By default use {@link ru.vyarus.gradle.plugin.python.PythonExtension#pythonPath} value.
+     */
     @Input
     @Optional
     String pythonPath
+    /**
+     * List of modules to install. Module declaration format: 'name:version'.
+     * For default pipInstall task modules are configured in
+     * {@link ru.vyarus.gradle.plugin.python.PythonExtension#modules}
+     */
     @Input
     @Optional
     List<String> modules = []
+    /**
+     * True to show list of all installed python modules (not only modules installed by plugin!).
+     * By default use {@link ru.vyarus.gradle.plugin.python.PythonExtension#showInstalledVersions} value.
+     */
     @Input
     @Console
     boolean showInstalledVersions
     /**
-     *
+     * True to always call 'pip install' for configured modules, otherwise pip install called only
+     * if module is not installed or different version installed.
+     * By default use {@link ru.vyarus.gradle.plugin.python.PythonExtension#showInstalledVersions} value.
      */
     @Input
     @Optional
@@ -42,9 +62,10 @@ class PipInstallTask extends ConventionTask {
         Pip pip = new Pip(project, getPythonPath())
         List<PipModule> mods = resolveModules()
         if (!mods.isEmpty()) {
+            // use list of installed modules to check if 'pip install' is required for module
             String installed = (isAlwaysInstallModules()
                     ? '' : python.readOutput('-m pip freeze')).toLowerCase()
-            boolean altered
+            boolean altered = false
             // install modules
             mods.each { PipModule mod ->
                 String pipDef = mod.toPipString()
@@ -54,8 +75,8 @@ class PipInstallTask extends ConventionTask {
                     altered = true
                 }
             }
-            if (!isAlwaysInstallModules() && !altered) {
-                logger.lifecycle("All required modules are already installed")
+            if (!altered) {
+                logger.lifecycle("All required modules are already installed with correct versions")
             }
         }
         if (isShowInstalledVersions()) {
@@ -64,10 +85,21 @@ class PipInstallTask extends ConventionTask {
         }
     }
 
+    /**
+     * Shortcut for {@link #pip(java.lang.Iterable)}.
+     *
+     * @param modules modules to install
+     */
     void pip(String... modules) {
         pip(Arrays.asList(modules))
     }
 
+    /**
+     * Add modules to install. Module format: 'name:version'. Duplicate declarations are allowed: in this case the
+     * latest declaration will be used.
+     *
+     * @param modules modules to install
+     */
     void pip(Iterable<String> modules) {
         getModules().addAll(modules)
     }

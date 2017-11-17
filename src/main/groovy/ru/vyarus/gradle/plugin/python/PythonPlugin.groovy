@@ -8,7 +8,13 @@ import ru.vyarus.gradle.plugin.python.task.PipInstallTask
 import ru.vyarus.gradle.plugin.python.task.PythonTask
 
 /**
- * use-python plugin.
+ * Use-python plugin. Plugin requires python installed globally or configured path to python binary.
+ * <p>
+ * Used to install required pip modules or revert installed versions if older required with {@code pipInstall} task
+ * (guarantee exact modules versions). And use python modules, scripts, commands during gradle build
+ * with {@link PythonTask}.
+ * <p>
+ * Also, plugin may be used as a base for building gradle plugin for specific python module.
  *
  * @author Vyacheslav Rusakov
  * @since 11.11.2017

@@ -3,6 +3,8 @@ package ru.vyarus.gradle.plugin.python.util
 import org.gradle.api.GradleException
 
 /**
+ * Thrown when python command execution failed. Message will contain entire command.
+ *
  * @author Vyacheslav Rusakov
  * @since 15.11.2017
  */

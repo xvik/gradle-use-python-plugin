@@ -4,10 +4,24 @@ import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.Project
 import org.gradle.api.logging.LogLevel
 import org.gradle.process.ExecResult
-import ru.vyarus.gradle.plugin.python.util.OutputLinesInterceptor
+import ru.vyarus.gradle.plugin.python.util.OutputLogger
 import ru.vyarus.gradle.plugin.python.util.PythonExecutionFailed
 
 /**
+ * Python commands execution utility. Use global python or binary in provided python path.
+ * <p>
+ * Usage: configure instance with builder style configuration
+ * methods and then execute commands. Command output may be redirected to gradle logger (with configurable
+ * level and prefix) or returned as result.
+ * <p>
+ * Arguments may be defined as:
+ * <ul>
+ *     <li>array or collection {@code ['arg', 'arg']}</li>
+ *     <li>pure string {@code 'arg arg --somekey'}</li>
+ * </ul>
+ * <p>
+ * See {@link Pip} as example of usage for package specific utility.
+ *
  * @author Vyacheslav Rusakov
  * @since 15.11.2017
  */
@@ -27,6 +41,10 @@ class Python {
         this.executable = getPythonBinary(pythonPath)
     }
 
+    /**
+     * @param workDir working directory (null value ignored for simplified usage)
+     * @return cli instance for chained calls
+     */
     Python workDir(String workDir) {
         if (workDir) {
             this.workDir = workDir
@@ -34,11 +52,24 @@ class Python {
         return this
     }
 
+    /**
+     * By default '\t' prefix used (to indent python command output).
+     *
+     * @param prefix prefix applied to python execution output (null mean no prefix)
+     * @return cli instance for chained calls
+     */
     Python outputPrefix(String prefix) {
         this.outputPrefix = prefix
         return this
     }
 
+    /**
+     * By default, {@link LogLevel#INFO} level is used (visible with gradle '-i' flag).
+     * For example, {@link Pip} use {@link LogLevel#LIFECYCLE} because pip logs must be always visible.
+     *
+     * @param level gradle log level to use for python output
+     * @return cli instance for chained calls
+     */
     Python logLevel(LogLevel level) {
         if (level) {
             this.logLevel = level
@@ -46,6 +77,13 @@ class Python {
         return this
     }
 
+    /**
+     * Useful if all called commands support common keys (usually this mean one module usage).
+     * Arguments are appended. To cleat existing arguments see {@link #clearExtraArgs()}.
+     *
+     * @param args extra arguments to apply to all processed commands
+     * @return cli instance for chained calls
+     */
     Python extraArgs(Object args) {
         if (args) {
             this.extraArgs.addAll(Arrays.asList(convertArgs(args)))
@@ -53,11 +91,24 @@ class Python {
         return this
     }
 
-    Python clearArgs() {
+    /**
+     * Removes all registered extra arguments.
+     *
+     * @return cli instance for chained calls
+     */
+    Python clearExtraArgs() {
         this.extraArgs.clear()
         return this
     }
 
+    /**
+     * Execute python command and return all output (without applying the prefix!).
+     * Very handy for short scripts evaluation. In case of error, all output is logged (with prefix).
+     *
+     * @param args command line arguments (array, collection or simple string)
+     * @return python command execution output
+     * @throws PythonExecutionFailed when process fails
+     */
     String readOutput(Object args) {
         return new ByteArrayOutputStream().withStream { os ->
             try {
@@ -74,16 +125,30 @@ class Python {
         }
     }
 
+    /**
+     * Execute python command. All output redirected to gradle log (line by line).
+     *
+     * @param args command line arguments (array, collection or simple string)
+     * @throws PythonExecutionFailed when process fails
+     */
     void exec(Object args) {
-        new OutputLinesInterceptor({ String line ->
-            project.logger.log(logLevel, outputPrefix ? "$outputPrefix $line" : line)
-        }).withStream { processExecution(args, it) }
+        new OutputLogger(project.logger, logLevel, outputPrefix).withStream { processExecution(args, it) }
     }
 
+    /**
+     * Calls command on module. Useful for integrations to avoid manual arguments merge for module.
+     *
+     * @param module called python module name
+     * @param args command line arguments (array, collection or simple string)
+     * @throws PythonExecutionFailed when process fails
+     */
     void callModule(String module, Object args) {
         exec(mergeArgs("-m $module", args))
     }
 
+    /**
+     * @return python home directory (works for global python too)
+     */
     String getHomeDir() {
         return readOutput('-c "import sys;\nprint(sys.prefix)"')
     }
@@ -151,6 +216,6 @@ class Python {
     }
 
     private String prefixOutput(String output) {
-        output.readLines().collect({ "$outputPrefix $it" }).join('\n')
+        outputPrefix ? output.readLines().collect({ "$outputPrefix $it" }).join('\n') : output
     }
 }

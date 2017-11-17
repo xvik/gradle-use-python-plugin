@@ -9,6 +9,13 @@ import org.gradle.api.tasks.TaskAction
 import ru.vyarus.gradle.plugin.python.cmd.Python
 
 /**
+ * Task to execute python command (call module, script) using globally installed python.
+ * All python tasks are called after default pipInstall task.
+ * <p>
+ * In essence, task duplicates {@link Python} utility configuration and use it for execution.
+ * <p>
+ * Task may be used as base class for specific modules tasks.
+ *
  * @author Vyacheslav Rusakov
  * @since 11.11.2017
  */
@@ -29,6 +36,12 @@ class PythonTask extends ConventionTask {
     @Optional
     String workDir
     /**
+     * Create work directory if it doesn't exist. Enabled by default.
+     */
+    @Input
+    @Optional
+    boolean createWorkDir = true
+    /**
      * Module name. If specified, "-m module " will be prepended to specified command (if command not specified then
      * modules will be called directly).
      */
@@ -37,12 +50,18 @@ class PythonTask extends ConventionTask {
     String module
     /**
      * Python command to execute. If module name set then it will be module specific command.
+     * Examples:
+     * <ul>
+     * <li>direct module call: {@code '-m mod cmd'}
+     * <li>code execution: {@code '-c import sys;\nsys...'}
+     * <li>file execution: {@code 'path/to/file.py} (relative to workDir)
+     * </ul>
      */
     @Input
     @Optional
     String command
     /**
-     * Python logs output level. By default its INFO (visible with -i gradle flag).
+     * Python logs output level. By default it's {@link LogLevel@INFO} (visible with '-i' gradle flag).
      */
     @Input
     @Optional
@@ -55,18 +74,11 @@ class PythonTask extends ConventionTask {
     @Optional
     List<String> extraArgs = []
     /**
-     * Prefix each line of python output.
+     * Prefix each line of python output. By default it's '\t' to indicate command output.
      */
     @Input
     @Optional
     String outputPrefix = '\t'
-
-    /**
-     * Create work directory if it doesn't exist.
-     */
-    @Input
-    @Optional
-    boolean createWorkDir = true
 
     PythonTask() {
         group = 'python'

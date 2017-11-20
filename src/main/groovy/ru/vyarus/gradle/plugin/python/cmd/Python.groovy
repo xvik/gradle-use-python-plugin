@@ -5,6 +5,7 @@ import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.Project
 import org.gradle.api.logging.LogLevel
 import org.gradle.process.ExecResult
+import ru.vyarus.gradle.plugin.python.util.CliUtils
 import ru.vyarus.gradle.plugin.python.util.OutputLogger
 import ru.vyarus.gradle.plugin.python.util.PythonExecutionFailed
 
@@ -30,9 +31,7 @@ import ru.vyarus.gradle.plugin.python.util.PythonExecutionFailed
 @SuppressWarnings('ConfusingMethodName')
 class Python {
 
-    private static final String[] EMPTY = []
     private static final String PYTHON = 'python'
-    private static final String SPACE = ' '
 
     private final Project project
     private final String executable
@@ -92,7 +91,7 @@ class Python {
      */
     Python extraArgs(Object args) {
         if (args) {
-            this.extraArgs.addAll(Arrays.asList(convertArgs(args)))
+            this.extraArgs.addAll(Arrays.asList(CliUtils.parseArgs(args)))
         }
         return this
     }
@@ -125,7 +124,7 @@ class Python {
                 // print process output, because it might contain important error details
                 String output = os.toString().trim()
                 if (output) {
-                    project.logger.error(prefixOutput(output))
+                    project.logger.error(CliUtils.prefixOutput(output, outputPrefix))
                 }
                 throw th
             }
@@ -150,7 +149,7 @@ class Python {
      * @throws PythonExecutionFailed when process fails
      */
     void callModule(String module, Object args) {
-        exec(mergeArgs("-m $module", args))
+        exec(CliUtils.mergeArgs("-m $module", args))
     }
 
     /**
@@ -161,11 +160,11 @@ class Python {
     }
 
     private processExecution(Object args, OutputStream os) {
-        String[] cmd = convertArgs(args)
+        String[] cmd = CliUtils.parseArgs(args)
         if (this.extraArgs) {
-            cmd = mergeArgs(cmd, extraArgs)
+            cmd = CliUtils.mergeArgs(cmd, extraArgs)
         }
-        String commandLine = "$executable ${cmd.join(SPACE)}"
+        String commandLine = "$executable ${cmd.join(' ')}"
         // prefix backslashes for prettier tostring
         project.logger.log(logLevel,
                 "[python] ${commandLine.replace('\\', '\\\\')}")
@@ -192,37 +191,5 @@ class Python {
             res = pythonPath + (pythonPath.endsWith('/') ? '' : '/') + PYTHON + (isWindows ? '.exe' : '')
         }
         return res
-    }
-
-    private String[] mergeArgs(Object args1, Object args2) {
-        String[] args = []
-        args += convertArgs(args1)
-        args += convertArgs(args2)
-        return args
-    }
-
-    @SuppressWarnings('Instanceof')
-    private String[] convertArgs(Object args) {
-        String[] res = EMPTY
-        if (args) {
-            if (args instanceof CharSequence) {
-                res = parseCommandLine(args.toString())
-            } else {
-                res = args as String[]
-            }
-        }
-        return res
-    }
-
-    private String[] parseCommandLine(String command) {
-        String cmd = command.trim()
-        return cmd ? cmd
-                .replaceAll('\\s{2,}', SPACE)
-                .split(SPACE)
-                : EMPTY
-    }
-
-    private String prefixOutput(String output) {
-        outputPrefix ? output.readLines().collect { "$outputPrefix $it" }.join('\n') : output
     }
 }

@@ -1,5 +1,6 @@
 package ru.vyarus.gradle.plugin.python.task
 
+import groovy.transform.CompileStatic
 import org.gradle.api.GradleException
 import org.gradle.api.internal.ConventionTask
 import org.gradle.api.logging.LogLevel
@@ -19,6 +20,7 @@ import ru.vyarus.gradle.plugin.python.cmd.Python
  * @author Vyacheslav Rusakov
  * @since 11.11.2017
  */
+@CompileStatic
 class PythonTask extends ConventionTask {
 
     /**
@@ -89,9 +91,9 @@ class PythonTask extends ConventionTask {
         String mod = getModule()
         String cmd = getCommand()
         if (!mod && !cmd) {
-            throw new GradleException("Module or command to execute must be defined")
+            throw new GradleException('Module or command to execute must be defined')
         }
-        createWorkDirIfRequired()
+        initWorkDirIfRequired()
 
         Python python = new Python(project, getPythonPath())
                 .logLevel(getLogLevel())
@@ -111,13 +113,14 @@ class PythonTask extends ConventionTask {
      *
      * @param args arguments
      */
+    @SuppressWarnings('ConfusingMethodName')
     void extraArgs(List<String> args) {
         if (args) {
             getExtraArgs().addAll(args)
         }
     }
 
-    private void createWorkDirIfRequired() {
+    private void initWorkDirIfRequired() {
         String dir = getWorkDir()
         if (dir && isCreateWorkDir()) {
             File docs = project.file(dir)

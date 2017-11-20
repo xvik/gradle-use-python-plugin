@@ -1,5 +1,6 @@
 package ru.vyarus.gradle.plugin.python.cmd
 
+import groovy.transform.CompileStatic
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.Project
 import org.gradle.api.logging.LogLevel
@@ -25,16 +26,20 @@ import ru.vyarus.gradle.plugin.python.util.PythonExecutionFailed
  * @author Vyacheslav Rusakov
  * @since 15.11.2017
  */
+@CompileStatic
+@SuppressWarnings('ConfusingMethodName')
 class Python {
 
     private static final String[] EMPTY = []
+    private static final String PYTHON = 'python'
+    private static final String SPACE = ' '
 
-    private Project project
-    private String executable
+    private final Project project
+    private final String executable
     private String workDir
     private String outputPrefix = '\t'
     private LogLevel logLevel = LogLevel.INFO
-    private List<String> extraArgs = []
+    private final List<String> extraArgs = []
 
     Python(Project project, String pythonPath) {
         this.project = project
@@ -110,6 +115,7 @@ class Python {
      * @return python command execution output
      * @throws PythonExecutionFailed when process fails
      */
+    @SuppressWarnings('CatchThrowable')
     String readOutput(Object args) {
         return new ByteArrayOutputStream().withStream { os ->
             try {
@@ -117,7 +123,7 @@ class Python {
                 return os.toString().trim()
             } catch (Throwable th) {
                 // print process output, because it might contain important error details
-                def output = os.toString().trim()
+                String output = os.toString().trim()
                 if (output) {
                     project.logger.error(prefixOutput(output))
                 }
@@ -159,13 +165,13 @@ class Python {
         if (this.extraArgs) {
             cmd = mergeArgs(cmd, extraArgs)
         }
-        String commandLine = "$executable ${cmd.join(' ')}"
+        String commandLine = "$executable ${cmd.join(SPACE)}"
         // prefix backslashes for prettier tostring
         project.logger.log(logLevel,
                 "[python] ${commandLine.replace('\\', '\\\\')}")
 
         ExecResult res = project.exec {
-            executable = this.executable
+            it.executable = this.executable
             it.args(cmd)
             standardOutput = os
             errorOutput = os
@@ -179,12 +185,11 @@ class Python {
         }
     }
 
-
     private String getPythonBinary(String pythonPath) {
-        String res = 'python'
+        String res = PYTHON
         if (pythonPath) {
             boolean isWindows = Os.isFamily(Os.FAMILY_WINDOWS)
-            res = pythonPath + (pythonPath.endsWith('/') ? '' : '/') + 'python' + (isWindows ? '.exe' : '')
+            res = pythonPath + (pythonPath.endsWith('/') ? '' : '/') + PYTHON + (isWindows ? '.exe' : '')
         }
         return res
     }
@@ -196,10 +201,11 @@ class Python {
         return args
     }
 
+    @SuppressWarnings('Instanceof')
     private String[] convertArgs(Object args) {
         String[] res = EMPTY
         if (args) {
-            if (args instanceof String || args instanceof GString) {
+            if (args instanceof CharSequence) {
                 res = parseCommandLine(args.toString())
             } else {
                 res = args as String[]
@@ -211,12 +217,12 @@ class Python {
     private String[] parseCommandLine(String command) {
         String cmd = command.trim()
         return cmd ? cmd
-                .replaceAll('\\s{2,}', ' ')
-                .split(' ')
+                .replaceAll('\\s{2,}', SPACE)
+                .split(SPACE)
                 : EMPTY
     }
 
     private String prefixOutput(String output) {
-        outputPrefix ? output.readLines().collect({ "$outputPrefix $it" }).join('\n') : output
+        outputPrefix ? output.readLines().collect { "$outputPrefix $it" }.join('\n') : output
     }
 }

@@ -1,5 +1,6 @@
 package ru.vyarus.gradle.plugin.python.util
 
+import groovy.transform.CompileStatic
 import org.apache.tools.ant.util.LineOrientedOutputStream
 import org.gradle.api.logging.LogLevel
 import org.gradle.api.logging.Logger
@@ -11,10 +12,11 @@ import org.gradle.api.logging.Logger
  * @author Vyacheslav Rusakov
  * @since 16.11.2017
  */
+@CompileStatic
 class OutputLogger extends LineOrientedOutputStream {
 
     private final Logger logger
-    private LogLevel level
+    private final LogLevel level
     private final String prefix
 
     OutputLogger(Logger logger, LogLevel level, String prefix) {
@@ -25,6 +27,7 @@ class OutputLogger extends LineOrientedOutputStream {
 
     @Override
     protected void processLine(String s) throws IOException {
-        logger.log(level, prefix ? "$prefix $s" : s)
+        String msg = prefix ? "$prefix $s" : s
+        logger.log(level, msg)
     }
 }

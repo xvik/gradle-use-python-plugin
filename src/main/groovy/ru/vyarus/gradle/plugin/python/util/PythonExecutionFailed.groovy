@@ -1,5 +1,6 @@
 package ru.vyarus.gradle.plugin.python.util
 
+import groovy.transform.CompileStatic
 import org.gradle.api.GradleException
 
 /**
@@ -8,6 +9,7 @@ import org.gradle.api.GradleException
  * @author Vyacheslav Rusakov
  * @since 15.11.2017
  */
+@CompileStatic
 class PythonExecutionFailed extends GradleException {
 
     PythonExecutionFailed(String message) {

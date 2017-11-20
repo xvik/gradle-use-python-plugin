@@ -1,5 +1,6 @@
 package ru.vyarus.gradle.plugin.python.cmd
 
+import groovy.transform.CompileStatic
 import org.gradle.api.Project
 import org.gradle.api.logging.LogLevel
 
@@ -9,6 +10,7 @@ import org.gradle.api.logging.LogLevel
  * @author Vyacheslav Rusakov
  * @since 15.11.2017
  */
+@CompileStatic
 class Pip {
 
     private final Python python

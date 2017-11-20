@@ -1,5 +1,6 @@
 package ru.vyarus.gradle.plugin.python.task
 
+import groovy.transform.CompileStatic
 import org.gradle.api.internal.ConventionTask
 import org.gradle.api.tasks.Console
 import org.gradle.api.tasks.Input
@@ -17,6 +18,7 @@ import ru.vyarus.gradle.plugin.python.cmd.Python
  * @author Vyacheslav Rusakov
  * @since 11.11.2017
  */
+@CompileStatic
 class PipInstallTask extends ConventionTask {
 
     /**
@@ -38,7 +40,6 @@ class PipInstallTask extends ConventionTask {
      * True to show list of all installed python modules (not only modules installed by plugin!).
      * By default use {@link ru.vyarus.gradle.plugin.python.PythonExtension#showInstalledVersions} value.
      */
-    @Input
     @Console
     boolean showInstalledVersions
     /**
@@ -57,7 +58,7 @@ class PipInstallTask extends ConventionTask {
     @TaskAction
     void run() {
         Python python = new Python(project, getPythonPath())
-        logger.lifecycle("Using python: {}", python.homeDir)
+        logger.lifecycle('Using python: {}', python.homeDir)
 
         Pip pip = new Pip(project, getPythonPath())
         List<PipModule> mods = resolveModules()
@@ -76,7 +77,7 @@ class PipInstallTask extends ConventionTask {
                 }
             }
             if (!altered) {
-                logger.lifecycle("All required modules are already installed with correct versions")
+                logger.lifecycle('All required modules are already installed with correct versions')
             }
         }
         if (isShowInstalledVersions()) {
@@ -110,7 +111,7 @@ class PipInstallTask extends ConventionTask {
      * @return pip modules to install
      */
     private List<PipModule> resolveModules() {
-        Map<String, PipModule> mods = new LinkedHashMap<>()
+        Map<String, PipModule> mods = [:] // linked map
         // sequential parsing in order to override duplicate definitions
         // (latter defined module overrides previous definition) and preserve definition order
         getModules().each {

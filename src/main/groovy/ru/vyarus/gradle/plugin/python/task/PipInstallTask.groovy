@@ -63,8 +63,8 @@ class PipInstallTask extends ConventionTask {
         List<PipModule> mods = resolveModules()
         if (!mods.isEmpty()) {
             // use list of installed modules to check if 'pip install' is required for module
-            String installed = (isAlwaysInstallModules()
-                    ? '' : python.readOutput('-m pip freeze')).toLowerCase()
+            List<String> installed = (isAlwaysInstallModules()
+                    ? '' : python.readOutput('-m pip freeze')).toLowerCase().readLines()
             boolean altered = false
             // install modules
             mods.each { PipModule mod ->

@@ -27,6 +27,6 @@ class PythonPluginKitTest extends AbstractKitTest {
 
         then: "task successful"
         result.task(':pipInstall').outcome == TaskOutcome.SUCCESS
-        result.output =~ /click\s+6.6/
+        result.output =~ /click\s+6.7/
     }
 }

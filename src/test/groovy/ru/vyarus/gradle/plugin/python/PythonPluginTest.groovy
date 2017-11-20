@@ -1,7 +1,7 @@
 package ru.vyarus.gradle.plugin.python
 
+import org.gradle.api.GradleException
 import org.gradle.api.Project
-import org.gradle.api.ProjectConfigurationException
 import org.gradle.testfixtures.ProjectBuilder
 
 /**
@@ -19,41 +19,53 @@ class PythonPluginTest extends AbstractTest {
         then: "extension registered"
         project.extensions.findByType(PythonExtension)
 
+        then: "pip task registered"
+        project.tasks.getByName('pipInstall')
     }
 
-    def "Check extension validation"() {
+    def "Check extension usage"() {
 
         when: "plugin configured"
         Project project = project {
             apply plugin: "ru.vyarus.use-python"
 
-            usePython {
-                foo '1'
-                bar '2'
+            python {
+                pythonPath = 'foo/bar'
+                pip 'sample:1', 'foo:2'
+                showInstalledVersions = false
+                alwaysInstallModules = true
             }
+
+            task('pyt', type: PythonTask) {}
         }
 
-        then: "validation pass"
-        def usePython = project.extensions.usePython;
-        usePython.foo == '1'
-        usePython.bar == '2'
+        then: "pip task configured"
+        def pipTask = project.tasks.getByName('pipInstall');
+        pipTask.pythonPath == 'foo/bar'
+        pipTask.modules == ['sample:1', 'foo:2']
+        !pipTask.showInstalledVersions
+        pipTask.alwaysInstallModules
+
+        then: "python task configured"
+        def pyTask = project.tasks.getByName('pyt');
+        pyTask.pythonPath == 'foo/bar'
+        pyTask.dependsOn.contains(project.tasks.getByName('pipInstall'))
     }
 
 
-    def "Check extension validation failure"() {
+    def "Check python task misconfiguration"() {
 
         when: "plugin configured"
         Project project = project {
             apply plugin: "ru.vyarus.use-python"
 
-            usePython {
-                foo '1'
-            }
+            task ('pyt', type: PythonTask) {}
         }
+        project.tasks.getByName('pyt').run()
 
         then: "validation failed"
-        def ex = thrown(ProjectConfigurationException)
-        ex.cause.message == 'usePython.bar configuration required'
+        def ex = thrown(GradleException)
+        ex.message == 'Module or command to execute must be defined'
     }
 
 }

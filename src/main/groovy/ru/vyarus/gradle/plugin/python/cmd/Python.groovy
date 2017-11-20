@@ -67,7 +67,7 @@ class Python {
      * By default, {@link LogLevel#INFO} level is used (visible with gradle '-i' flag).
      * For example, {@link Pip} use {@link LogLevel#LIFECYCLE} because pip logs must be always visible.
      *
-     * @param level gradle log level to use for python output
+     * @param level gradle log level to use for python output (null value ignored for simplified usage)
      * @return cli instance for chained calls
      */
     Python logLevel(LogLevel level) {
@@ -81,7 +81,8 @@ class Python {
      * Useful if all called commands support common keys (usually this mean one module usage).
      * Arguments are appended. To cleat existing arguments see {@link #clearExtraArgs()}.
      *
-     * @param args extra arguments to apply to all processed commands
+     * @param args extra arguments (array, collection or simple string) to apply to all processed commands
+     * (null value ignored for simplified usage)
      * @return cli instance for chained calls
      */
     Python extraArgs(Object args) {

@@ -19,6 +19,32 @@ class PythonPluginKitTest extends AbstractKitTest {
             python {
                 pip 'click:6.7'
             }
+            
+            task sample(type: PythonTask) {
+                command = '-c print(\\'samplee\\')'
+            }
+
+        """
+
+        when: "run task"
+        BuildResult result = run('sample')
+
+        then: "task successful"
+        result.task(':sample').outcome == TaskOutcome.SUCCESS
+        result.output =~ /click\s+6.7/
+        result.output.contains('samplee')
+    }
+
+    def "Check module override"() {
+        setup:
+        build """
+            plugins {
+                id 'ru.vyarus.use-python'
+            }
+
+            python {
+                pip 'click:6.7', 'click:6.6'
+            }
 
         """
 
@@ -27,6 +53,6 @@ class PythonPluginKitTest extends AbstractKitTest {
 
         then: "task successful"
         result.task(':pipInstall').outcome == TaskOutcome.SUCCESS
-        result.output =~ /click\s+6.7/
+        result.output =~ /click\s+6.6/
     }
 }

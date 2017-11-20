@@ -63,11 +63,11 @@ class PythonTask extends ConventionTask {
     @Optional
     String command
     /**
-     * Python logs output level. By default it's {@link LogLevel@INFO} (visible with '-i' gradle flag).
+     * Python logs output level. By default it's {@link LogLevel@LIFECYCLE} (visible with '-i' gradle flag).
      */
     @Input
     @Optional
-    LogLevel logLevel
+    LogLevel logLevel = LogLevel.LIFECYCLE
     /**
      * Extra arguments to append to every called command.
      * Useful for pre-configured options, applied to all executed commands
@@ -114,7 +114,7 @@ class PythonTask extends ConventionTask {
      * @param args arguments
      */
     @SuppressWarnings('ConfusingMethodName')
-    void extraArgs(List<String> args) {
+    void extraArgs(String... args) {
         if (args) {
             getExtraArgs().addAll(args)
         }

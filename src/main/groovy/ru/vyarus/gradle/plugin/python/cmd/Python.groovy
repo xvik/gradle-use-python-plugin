@@ -75,7 +75,7 @@ class Python {
      * @return cli instance for chained calls
      */
     Python logLevel(LogLevel level) {
-        if (level) {
+        if (level != null) {
             this.logLevel = level
         }
         return this

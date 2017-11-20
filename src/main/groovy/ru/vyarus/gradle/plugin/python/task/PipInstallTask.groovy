@@ -79,10 +79,11 @@ class PipInstallTask extends ConventionTask {
             if (!altered) {
                 logger.lifecycle('All required modules are already installed with correct versions')
             }
-        }
-        if (isShowInstalledVersions()) {
-            // show all installed modules versions (to help problems resolution)
-            pip.exec('list --format=columns')
+            // only if there are any required modules, otherwise no need
+            if (isShowInstalledVersions()) {
+                // show all installed modules versions (to help problems resolution)
+                pip.exec('list --format=columns')
+            }
         }
     }
 

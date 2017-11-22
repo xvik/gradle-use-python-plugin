@@ -65,4 +65,27 @@ class PipInstallTaskKitTest extends AbstractKitTest {
         result.output.contains('Requirement already satisfied: click==6.7')
         result.output.contains('python -m pip list')
     }
+
+    def "Check custom task"() {
+        setup:
+        build """
+            plugins {
+                id 'ru.vyarus.use-python'
+            }
+            
+            task customPip(type: PipInstallTask) {
+                pip 'click:6.7'
+                alwaysInstallModules = true
+            }
+
+        """
+
+        when: "run task"
+        BuildResult result = run('customPip')
+
+        then: "click install called"
+        result.task(':customPip').outcome == TaskOutcome.SUCCESS
+        result.output.contains('Requirement already satisfied: click==6.7')
+        result.output.contains('python -m pip list')
+    }
 }

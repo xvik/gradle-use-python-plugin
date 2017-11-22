@@ -138,4 +138,27 @@ class PythonTaskKitTest extends AbstractKitTest {
         result.task(':sample').outcome == TaskOutcome.SUCCESS
         result.output.contains('[python] python -m pip list --format=columns')
     }
+
+    def "Check script file call"() {
+        setup:
+        build """
+            plugins {
+                id 'ru.vyarus.use-python'
+            }
+
+            task script(type: PythonTask) {
+                command = 'sample.py'
+            }
+        """
+        file('sample.py') << "print('sample')"
+
+        when: "run task"
+        BuildResult result = run('script')
+
+        then: "executed"
+        result.task(':script').outcome == TaskOutcome.SUCCESS
+        result.output.contains('[python] python sample.py')
+        result.output.contains('\t sample')
+    }
+
 }

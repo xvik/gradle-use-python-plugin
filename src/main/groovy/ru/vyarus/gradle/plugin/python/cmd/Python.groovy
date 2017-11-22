@@ -176,7 +176,7 @@ class Python {
             errorOutput = os
             ignoreExitValue = true
             if (workDir) {
-                workingDir = workDir
+                setWorkingDir(workDir)
             }
         }
         if (res.exitValue != 0) {

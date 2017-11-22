@@ -68,4 +68,19 @@ class PythonPluginTest extends AbstractTest {
         ex.message == 'Module or command to execute must be defined'
     }
 
+    def "Check module declaration util"() {
+
+        when: "plugin configured"
+        Project project = project {
+            apply plugin: "ru.vyarus.use-python"
+
+            python.pip 'sample:1', 'foo:2'
+        }
+
+        then: "modules check correct"
+        def ext = project.extensions.getByType(PythonExtension)
+        ext.isModuleDeclared('sample')
+        ext.isModuleDeclared('foo')
+        !ext.isModuleDeclared('sampleee')
+    }
 }

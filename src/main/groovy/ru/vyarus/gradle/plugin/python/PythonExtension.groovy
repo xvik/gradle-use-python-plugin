@@ -22,7 +22,7 @@ class PythonExtension {
      * to pre-define some modules (for example, in plugin) and then override module version
      * by adding new declaration (with {@code pip ( .. )} method).
      * <p>
-     * Use {@code pip(..)} methods for modules declaration.
+     * Use {@code pip ( .. )} methods for modules declaration.
      */
     List<String> modules = []
 
@@ -61,5 +61,20 @@ class PythonExtension {
      */
     void pip(Iterable<String> modules) {
         this.modules.addAll(modules)
+    }
+
+    /**
+     * Checks if module is already declared. Could be used by other plugins to test if required module
+     * is manually declared or not (in order to apply defaults).
+     *
+     * @param name module name to check
+     * @return true of module already declared, false otherwise
+     */
+    boolean isModuleDeclared(String name) {
+        String nm = name.toLowerCase() + ':'
+        String res = modules.find {
+            it.toLowerCase().startsWith(nm)
+        }
+        return res != null
     }
 }

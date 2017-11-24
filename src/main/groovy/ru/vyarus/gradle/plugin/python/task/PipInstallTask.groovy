@@ -1,6 +1,7 @@
 package ru.vyarus.gradle.plugin.python.task
 
 import groovy.transform.CompileStatic
+import org.gradle.api.GradleException
 import org.gradle.api.internal.ConventionTask
 import org.gradle.api.tasks.Console
 import org.gradle.api.tasks.Input
@@ -8,6 +9,7 @@ import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 import ru.vyarus.gradle.plugin.python.cmd.Pip
 import ru.vyarus.gradle.plugin.python.cmd.Python
+import ru.vyarus.gradle.plugin.python.util.CliUtils
 
 /**
  * Install required modules (with correct versions) into python using pip.
@@ -20,6 +22,14 @@ import ru.vyarus.gradle.plugin.python.cmd.Python
  */
 @CompileStatic
 class PipInstallTask extends ConventionTask {
+
+    /**
+     * Minimal required python version.
+     * By default use {@link ru.vyarus.gradle.plugin.python.PythonExtension#minVersion} value.
+     */
+    @Input
+    @Optional
+    String minPythonVersion
 
     /**
      * Path to directory with python binary. When not set global python is used.
@@ -58,7 +68,7 @@ class PipInstallTask extends ConventionTask {
     @TaskAction
     void run() {
         Python python = new Python(project, getPythonPath())
-        logger.lifecycle('Using python: {}', python.homeDir)
+        validate(python)
 
         Pip pip = new Pip(project, getPythonPath())
         List<PipModule> mods = resolveModules()
@@ -104,6 +114,17 @@ class PipInstallTask extends ConventionTask {
      */
     void pip(Iterable<String> modules) {
         getModules().addAll(modules)
+    }
+
+    private void validate(Python python) {
+        String dir = python.homeDir
+        String version = python.version
+        String minVersion = getMinPythonVersion()
+        if (!CliUtils.isVersionMatch(version, minVersion)) {
+            throw new GradleException("Python ($dir) verion $version does not match minimal " +
+                    "required version: $minVersion")
+        }
+        logger.lifecycle('Using Python {} ({})', version, dir)
     }
 
     /**

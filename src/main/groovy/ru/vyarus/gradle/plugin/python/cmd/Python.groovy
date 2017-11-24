@@ -159,6 +159,14 @@ class Python {
         return readOutput('-c "import sys;\nprint(sys.prefix)"')
     }
 
+    /**
+     * @return python version in format major.minor.micro
+     */
+    String getVersion() {
+        return readOutput('-c "import sys;\nver = sys.version_info;\nprint(' +
+                'str(ver.major)+\'.\'+str(ver.minor)+\'.\'+str(ver.micro))"')
+    }
+
     private processExecution(Object args, OutputStream os) {
         String[] cmd = CliUtils.parseArgs(args)
         if (this.extraArgs) {

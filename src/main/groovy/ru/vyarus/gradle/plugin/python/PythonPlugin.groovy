@@ -47,6 +47,7 @@ class PythonPlugin implements Plugin<Project> {
         // apply defaults for all pip install tasks (custom pip installs may be used)
         project.tasks.withType(PipInstallTask) { task ->
             task.conventionMapping.with {
+                minPythonVersion = { extension.minVersion }
                 pythonPath = { extension.pythonPath }
                 showInstalledVersions = { extension.showInstalledVersions }
                 alwaysInstallModules = { extension.alwaysInstallModules }

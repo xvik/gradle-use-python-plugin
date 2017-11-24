@@ -26,6 +26,11 @@ class PythonCliTest extends AbstractTest {
         then: "ok"
         res != null
 
+        when: 'check version'
+        res = python.getVersion()
+        then: "ok"
+        res ==~ /\d+\.\d+\.\d+/
+
         when: 'check simple exec'
         python.exec('-c "print(\'hello\')"')
         then: "ok"

@@ -55,4 +55,24 @@ class PythonPluginKitTest extends AbstractKitTest {
         result.task(':pipInstall').outcome == TaskOutcome.SUCCESS
         result.output =~ /click\s+6.6/
     }
+
+    def "Check python version requirement"() {
+        setup:
+        build """
+            plugins {
+                id 'ru.vyarus.use-python'
+            }
+
+            python {
+                minVersion = '5'
+            }
+
+        """
+
+        when: "run task"
+        BuildResult result = runFailed('pipInstall')
+
+        then: "task successful"
+        result.output.contains('does not match minimal required version: 5')
+    }
 }

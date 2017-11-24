@@ -13,8 +13,8 @@ class CliUtilsTest extends Specification {
 
         expect: "arg parsing"
         CliUtils.parseArgs('one two   three') as List == ['one', 'two', 'three']
-        CliUtils.parseArgs(['one', 'two', 'three'] ) as List == ['one', 'two', 'three']
-        CliUtils.parseArgs(null ) as List == []
+        CliUtils.parseArgs(['one', 'two', 'three']) as List == ['one', 'two', 'three']
+        CliUtils.parseArgs(null) as List == []
     }
 
     def "Check args merge"() {
@@ -30,5 +30,21 @@ class CliUtilsTest extends Specification {
 
         expect: 'output prefixed'
         CliUtils.prefixOutput('sample\noutput', '  ') == '   sample\n   output'
+    }
+
+    def "Check version match check"() {
+
+        expect: 'matched'
+        CliUtils.isVersionMatch('2.2.3', null)
+        CliUtils.isVersionMatch('2.2.3', '1')
+        CliUtils.isVersionMatch('2.2.3', '2')
+        CliUtils.isVersionMatch('2.2.3', '2.1')
+        CliUtils.isVersionMatch('2.2.3', '2.2')
+        CliUtils.isVersionMatch('2.2.3', '2.2.1')
+        CliUtils.isVersionMatch('2.2.3', '2.2.3')
+
+        !CliUtils.isVersionMatch('2.2.3', '2.2.4')
+        !CliUtils.isVersionMatch('2.2.3', '2.3')
+        !CliUtils.isVersionMatch('2.2.3', '3')
     }
 }

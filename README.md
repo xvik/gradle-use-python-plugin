@@ -121,10 +121,22 @@ python {
 
 `pythonPath` must be set to directory containing python binary (e.g. 'path/to/python/binray/python.exe')
 
+##### Minimal python version
+
+To set python version constraint:
+
+```groovy
+python {
+    minVersion = '3.2'
+}
+```
+
+Python version format is: major.minor.micro.
+Constraint may include any number of levels: '3', '3.1', '2.7.5'
 
 ##### Pip
 
-By default, all installed python modules are print to console after pip installations 
+By default, all installed python modules are printed to console after pip installations 
 using `pip list` (of course, if at least one module were declared for installation).
 This should simplify problems resolution.
 
@@ -179,6 +191,7 @@ Configuration:
 
 | Property | Description |
 |----------|-------------|
+| minPythonVersion | Minimal required python version. By default used version declared in global configuration |
 | pythonPath | Path to python binary. By default used path declared in global configuration |
 | showInstalledVersions | Perform `pip list` after installation. By default use global configuration value |
 | alwaysInstallModules | Call `pip install module` for all declared modules, even if it is already installed with correct version. By default use global configuration value |

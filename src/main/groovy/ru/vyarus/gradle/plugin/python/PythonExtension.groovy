@@ -13,6 +13,12 @@ import groovy.transform.CompileStatic
 class PythonExtension {
 
     /**
+     * Minimal required python version. Full format: "major.minor.micro". Any precision could be used, for example:
+     * '3' (python 3 or above), '3.2' (python. 3.2 or above), '3.6.1' (python 3.6.1 or above).
+     */
+    String minVersion
+
+    /**
      * Path to python binary (folder where python executable is located). When not set, global python is called.
      */
     String pythonPath

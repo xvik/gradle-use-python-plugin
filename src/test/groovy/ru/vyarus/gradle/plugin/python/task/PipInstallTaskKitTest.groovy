@@ -1,4 +1,4 @@
-package ru.vyarus.gradle.plugin.python.test
+package ru.vyarus.gradle.plugin.python.task
 
 import org.gradle.testfixtures.ProjectBuilder
 import org.gradle.testkit.runner.BuildResult

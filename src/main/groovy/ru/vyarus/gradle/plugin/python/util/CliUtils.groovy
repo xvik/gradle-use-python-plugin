@@ -10,6 +10,7 @@ final class CliUtils {
 
     private static final String[] EMPTY = []
     private static final String SPACE = ' '
+    private static final VERSION_SPLIT = '\\.'
 
     private CliUtils() {
     }
@@ -70,5 +71,32 @@ final class CliUtils {
                 .replaceAll('\\s{2,}', SPACE)
                 .split(SPACE)
                 : EMPTY
+    }
+
+    /**
+     * @param version checked version in format major.minor.micro
+     * @param required version constraint (could be null)
+     * @return true if version matches requirement (>=)
+     */
+    static boolean isVersionMatch(String version, String required) {
+        boolean valid = true
+        if (required) {
+            String[] req = required.split(VERSION_SPLIT)
+            String[] ver = version.split(VERSION_SPLIT)
+            if (req.length > 3) {
+                throw new IllegalArgumentException(
+                        "Invalid version format: $required. Accepted format: major.minor.micro")
+            }
+            valid = isPositionMatch(ver, req, 0)
+        }
+        return valid
+    }
+
+    private static boolean isPositionMatch(String[] ver, String[] req, int pos) {
+        boolean valid = ver[pos] >= req[pos]
+        if (valid && ver[pos] == req[pos] && req.length > pos + 1) {
+            return isPositionMatch(ver, req, pos + 1)
+        }
+        return valid
     }
 }

@@ -32,6 +32,7 @@ import ru.vyarus.gradle.plugin.python.util.PythonExecutionFailed
 class Python {
 
     private static final String PYTHON = 'python'
+    private static final String SPACE = ' '
 
     private final Project project
     private final String executable
@@ -172,10 +173,10 @@ class Python {
         if (this.extraArgs) {
             cmd = CliUtils.mergeArgs(cmd, extraArgs)
         }
-        String commandLine = "$executable ${cmd.join(' ')}"
+        String commandLine = "$executable ${cmd.join(SPACE)}"
         // prefix backslashes for prettier tostring
         project.logger.log(logLevel,
-                "[python] ${commandLine.replace('\\', '\\\\')}")
+                "[python] ${commandLine.replace('\r', '').replace('\n', SPACE)}")
 
         ExecResult res = project.exec {
             it.executable = this.executable

@@ -168,7 +168,8 @@ class Python {
                 'str(ver.major)+\'.\'+str(ver.minor)+\'.\'+str(ver.micro))"')
     }
 
-    private processExecution(Object args, OutputStream os) {
+    @SuppressWarnings('UnnecessarySetter')
+    private void processExecution(Object args, OutputStream os) {
         String[] cmd = CliUtils.parseArgs(args)
         if (this.extraArgs) {
             cmd = CliUtils.mergeArgs(cmd, extraArgs)

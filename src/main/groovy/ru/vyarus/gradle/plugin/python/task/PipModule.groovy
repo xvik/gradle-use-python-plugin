@@ -38,7 +38,7 @@ class PipModule {
         return "$name==$version"
     }
 
-    boolean equals(o) {
+    boolean equals(Object o) {
         if (this.is(o)) {
             return true
         }

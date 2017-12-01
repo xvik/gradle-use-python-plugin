@@ -4,20 +4,16 @@
 
 ### About
 
-Plugin **does not install python** itself (because it's easier to do it manually and python have great 
+Plugin **does not install python and pip** itself (because it's easier to do it manually and python have great 
 compatibility so does not need to be installed often): by default, globally installed python used.
 
-The only plugin intention is to simplify python usage from gradle. 
+The only plugin intention is to simplify python usage from gradle.
 
 Features:
-* Install required python modules (guarantee exact versions, even if newer installed) using pip
+* Install required python modules (guarantee exact versions, even if newer installed) using pip 
 * Provides task to call python commands, modules or scripts (PythonTask)
 * Could be used as basement for building plugins for specific python modules (like 
 [mkdocs plugin](https://github.com/xvik/gradle-mkdocs-plugin))
-
-If you need automatic python installation, look JetBrain's 
-[python-envs plugin](https://github.com/JetBrains/gradle-python-envs) (note that on windows python could be 
-installed automatically just once and requires manual un-installation). Set `pythonPath` to automatically installed python path.
 
 ##### Summary
 
@@ -59,7 +55,7 @@ plugins {
 }
 ```
 
-#### Python
+#### Python & Pip
 
 Make sure python is installed:
 
@@ -70,6 +66,26 @@ python --version
 On most *nix distributions python is already installed. On windows 
 [download and install](https://www.python.org/downloads/windows/) python manually or use 
 [chocolately](https://chocolatey.org/packages/python/3.6.3) (`choco install python`)
+
+Pip is also assumed to be installed.
+
+```bash
+pip --version
+```
+
+##### Automatic python install
+
+I assume that automatic python management is important for python dev, but not for python modules usage.
+Install once (like java) and forget works perfectly.
+
+If you need automatic python installation, look JetBrain's 
+[python-envs plugin](https://github.com/JetBrains/gradle-python-envs) (note that on windows python could be 
+installed automatically just once and requires manual un-installation). 
+
+Another option is to use
+[pythonenv](https://packaging.python.org/guides/installing-using-pip-and-virtualenv/) 
+(or [pipenv](https://docs.pipenv.org/)) to separate
+different projects packages. You can even use custom `PythonTask`'s to automate virtualenv management and automatic switching.
 
 ### Usage
 

@@ -12,7 +12,8 @@ The only plugin intention is to simplify python usage from gradle.
 Features:
 * Install required python modules (guarantee exact versions, even if newer installed) using pip
 * Provides task to call python commands, modules or scripts (PythonTask)
-* Could be used as basement for building plugins for specific python modules
+* Could be used as basement for building plugins for specific python modules (like 
+[mkdocs plugin](https://github.com/xvik/gradle-mkdocs-plugin))
 
 If you need automatic python installation, look JetBrain's 
 [python-envs plugin](https://github.com/JetBrains/gradle-python-envs) (note that on windows python could be 
@@ -24,7 +25,7 @@ installed automatically just once and requires manual un-installation). Set `pyt
 * Tasks:
     - `pipInstall` - install declared pip modules
     - `type:PythonTask` - call python command/script/module
-    - `type:PipInstall` - may be used for custom pip modules installation workflow
+    - `type:PipInstallTask` - may be used for custom pip modules installation workflow
 
 
 ### Setup

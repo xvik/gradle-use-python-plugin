@@ -18,6 +18,15 @@ If you need automatic python installation, look JetBrain's
 [python-envs plugin](https://github.com/JetBrains/gradle-python-envs) (note that on windows python could be 
 installed automatically just once and requires manual un-installation). Set `pythonPath` to automatically installed python path.
 
+##### Summary
+
+* Configuration: `python`
+* Tasks:
+    - `pipInstall` - install declared pip modules
+    - `type:PythonTask` - call python command/script/module
+    - `type:PipInstall` - may be used for custom pip modules installation workflow
+
+
 ### Setup
 
 Releases are published to [bintray jcenter](https://bintray.com/vyarus/xvik/gradle-use-python-plugin/), 
@@ -47,6 +56,18 @@ plugins {
     id 'ru.vyarus.use-python' version '1.0.0'
 }
 ```
+
+#### Python
+
+Make sure python is installed:
+
+```bash
+python --version
+```
+
+On most *nix distributions python is already installed. On windows 
+[download and install](https://www.python.org/downloads/windows/) python manually or use 
+[chocolately](https://chocolatey.org/packages/python/3.6.3) (`choco install python`)
 
 ### Usage
 

@@ -1,5 +1,6 @@
 package ru.vyarus.gradle.plugin.python.task
 
+import ru.vyarus.gradle.plugin.python.task.pip.PipModule
 import spock.lang.Specification
 
 

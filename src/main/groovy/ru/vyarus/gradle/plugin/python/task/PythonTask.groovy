@@ -2,7 +2,6 @@ package ru.vyarus.gradle.plugin.python.task
 
 import groovy.transform.CompileStatic
 import org.gradle.api.GradleException
-import org.gradle.api.internal.ConventionTask
 import org.gradle.api.logging.LogLevel
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
@@ -21,16 +20,8 @@ import ru.vyarus.gradle.plugin.python.cmd.Python
  * @since 11.11.2017
  */
 @CompileStatic
-class PythonTask extends ConventionTask {
+class PythonTask extends BasePythonTask {
 
-    /**
-     * Path to directory with python executable. Not required if python installed globally.
-     * Automatically set from {@link ru.vyarus.gradle.plugin.python.PythonExtension#pythonPath}, but could
-     * be overridden manually.
-     */
-    @Input
-    @Optional
-    String pythonPath
     /**
      * Working directory. Not required, but could be useful for some modules (e.g. generators).
      */
@@ -82,10 +73,6 @@ class PythonTask extends ConventionTask {
     @Optional
     String outputPrefix = '\t'
 
-    PythonTask() {
-        group = 'python'
-    }
-
     @TaskAction
     void run() {
         String mod = getModule()
@@ -95,7 +82,7 @@ class PythonTask extends ConventionTask {
         }
         initWorkDirIfRequired()
 
-        Python python = new Python(project, getPythonPath())
+        Python python = python
                 .logLevel(getLogLevel())
                 .outputPrefix(getOutputPrefix())
                 .workDir(getWorkDir())

@@ -24,6 +24,7 @@ installed automatically just once and requires manual un-installation). Set `pyt
 * Configuration: `python`
 * Tasks:
     - `pipInstall` - install declared pip modules
+    - `pipUpdates` - show the latest available versions for the registered modules
     - `type:PythonTask` - call python command/script/module
     - `type:PipInstallTask` - may be used for custom pip modules installation workflow
 
@@ -97,6 +98,25 @@ python.pip 'module1:2.0', 'module2:1.0', 'module1:1.0'
 Will install version 1.0 of module1 because it was the latest declaration.
 
 Dependencies are installed with `pipInstall` task, called before any declared `PythonTask`.
+
+#### Check modules updates
+
+To quick check if new versions are available for the registered pip modules
+use `pipUpdates` task:
+
+```
+:pipUpdates
+The following modules could be updated:
+
+	package            version latest type 
+	------------------ ------- ------ -----
+	click              6.6     6.7    wheel
+```
+ 
+Note that it will not show versions for transitive modules, only
+for modules specified directly in `pythin.pip`.
+
+#### Call python
 
 Call python command:
 
@@ -224,6 +244,8 @@ And, as shown above, custom methods: `pip(String... modules)` and `pip(Iterable<
 
 Plugin supposed to be used as base for plugins for specific python modules. With it you don't need 
 to implement modules installation and could use provided abstractions to call python. 
+
+Example usage: [gradle-mkdocs-plugin](https://github.com/xvik/gradle-mkdocs-plugin).
 
 In your plugin, add plugin as dependency:
 

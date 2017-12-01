@@ -1,4 +1,4 @@
-package ru.vyarus.gradle.plugin.python.task
+package ru.vyarus.gradle.plugin.python.task.pip
 
 import groovy.transform.CompileStatic
 

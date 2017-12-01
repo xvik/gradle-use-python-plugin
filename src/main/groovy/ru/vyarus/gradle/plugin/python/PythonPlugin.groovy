@@ -4,8 +4,11 @@ import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import ru.vyarus.gradle.plugin.python.task.PipInstallTask
+import ru.vyarus.gradle.plugin.python.task.BasePythonTask
+import ru.vyarus.gradle.plugin.python.task.pip.BasePipTask
+import ru.vyarus.gradle.plugin.python.task.pip.PipInstallTask
 import ru.vyarus.gradle.plugin.python.task.PythonTask
+import ru.vyarus.gradle.plugin.python.task.pip.PipUpdatesTask
 
 /**
  * Use-python plugin. Plugin requires python installed globally or configured path to python binary.
@@ -34,21 +37,33 @@ class PythonPlugin implements Plugin<Project> {
         // default pip install task
         PipInstallTask installTask = project.tasks.create('pipInstall', PipInstallTask) {
             description = 'Install pip modules'
-            conventionMapping.modules = { extension.modules }
         }
 
-        // apply defaults for all python tasks
-        project.tasks.withType(PythonTask) { task ->
+        project.tasks.create('pipUpdates', PipUpdatesTask) {
+            description = 'Check if new versions available for declared pip modules'
+        }
+
+        project.tasks.withType(BasePythonTask) { task ->
+            // apply default path for all python tasks
             task.conventionMapping.pythonPath = { extension.pythonPath }
+        }
+
+        project.tasks.withType(PythonTask) { task ->
             // by default all python tasks must be executed after dependencies init
             task.dependsOn installTask
+        }
+
+        // apply defaults for pip tasks
+        project.tasks.withType(BasePipTask) { task ->
+            task.conventionMapping.with {
+                minPythonVersion = { extension.minVersion }
+                modules = { extension.modules }
+            }
         }
 
         // apply defaults for all pip install tasks (custom pip installs may be used)
         project.tasks.withType(PipInstallTask) { task ->
             task.conventionMapping.with {
-                minPythonVersion = { extension.minVersion }
-                pythonPath = { extension.pythonPath }
                 showInstalledVersions = { extension.showInstalledVersions }
                 alwaysInstallModules = { extension.alwaysInstallModules }
             }

@@ -21,6 +21,7 @@ class PythonPluginTest extends AbstractTest {
 
         then: "pip task registered"
         project.tasks.getByName('pipInstall')
+        project.tasks.getByName('pipUpdates')
     }
 
     def "Check extension usage"() {
@@ -39,7 +40,7 @@ class PythonPluginTest extends AbstractTest {
             task('pyt', type: PythonTask) {}
         }
 
-        then: "pip task configured"
+        then: "pip install task configured"
         def pipTask = project.tasks.getByName('pipInstall');
         pipTask.pythonPath == 'foo/bar'
         pipTask.modules == ['sample:1', 'foo:2']
@@ -50,6 +51,11 @@ class PythonPluginTest extends AbstractTest {
         def pyTask = project.tasks.getByName('pyt');
         pyTask.pythonPath == 'foo/bar'
         pyTask.dependsOn.contains(project.tasks.getByName('pipInstall'))
+
+        then: "pip updtaes task configured"
+        def pipUpdates = project.tasks.getByName('pipInstall');
+        pipUpdates.pythonPath == 'foo/bar'
+        pipUpdates.modules == ['sample:1', 'foo:2']
     }
 
 

@@ -101,6 +101,7 @@ or
 python {
     pip 'module1:1.0'
     pip 'module2:1.0'
+}
 ```
 
 Module format is: `name:version` (will mean "name==version" in pip notion). Non strict version definition is not allowed (for obvious reasons).
@@ -130,7 +131,7 @@ The following modules could be updated:
 ```
  
 Note that it will not show versions for transitive modules, only
-for modules specified directly in `pythin.pip`.
+for modules specified directly in `python.pip`.
 
 #### Call python
 

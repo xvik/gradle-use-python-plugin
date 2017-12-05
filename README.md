@@ -57,26 +57,22 @@ plugins {
 
 #### Python & Pip
 
-Make sure python is installed:
+Make sure python and pip are installed:
 
 ```bash
 python --version
-```
-
-On most *nix distributions python is already installed. On windows 
-[download and install](https://www.python.org/downloads/windows/) python manually or use 
-[chocolately](https://chocolatey.org/packages/python/3.6.3) (`choco install python`)
-
-Pip is also assumed to be installed.
-
-```bash
 pip --version
 ```
 
+On most *nix distributions python is already installed. In some cases, pip may require [installation](https://pip.pypa.io/en/stable/installing/). 
+
+On windows [download and install](https://www.python.org/downloads/windows/) python manually or use 
+[chocolately](https://chocolatey.org/packages/python/3.6.3) (`choco install python`)
+
 ##### Automatic python install
 
-I assume that automatic python management is important for python dev, but not for python modules usage.
-Install once (like java) and forget works perfectly.
+I assume that automatic python management is important for development with python, but not for python modules usage.
+So "install once and forget" (like java) works perfectly.
 
 If you need automatic python installation, look JetBrain's 
 [python-envs plugin](https://github.com/JetBrains/gradle-python-envs) (note that on windows python could be 
@@ -197,7 +193,7 @@ Constraint may include any number of levels: '3', '3.1', '2.7.5'
 
 By default, all installed python modules are printed to console after pip installations 
 using `pip list` (of course, if at least one module were declared for installation).
-This should simplify problems resolution.
+This should simplify problems resolution (show used transitive dependencies versions).
 
 To switch off:
 
@@ -237,7 +233,7 @@ extraArgs property).
 
 #### PipInstallTask
 
-Default pip installation task is registered as `pipInstall' and used to install modules, declared in global configuration. 
+Default pip installation task is registered as `pipInstall` and used to install modules, declared in global configuration. 
 Custom task(s) may be used, if required:
 
 ```groovy
@@ -321,6 +317,9 @@ task modCmd(type: SomeModuleTask) {
 
 called: `python -m somemodule module arfs --option` 
 
+In some cases, you can use `BasePythonTask` which is super class of `PythonTask` and provides
+only automatic `pythonPath` property setting from global configuration. 
+
 #### Completely custom task
 
 Plugin provides `ru.vyarus.gradle.plugin.python.cmd.Python` utility class, which could be used directly in custom task 
@@ -364,7 +363,7 @@ class Pip {
     // declare module specific commands
     
     void install(String module) {
-        exec("install $module")
+        python.callModule('pip', "install $module")
     }
 }
 ```
@@ -382,6 +381,19 @@ afterEvaluate {
     }
 }
 ```
+
+Or always declare default modules (before configuration):
+
+```groovy
+PythonExtension ext = project.extensions.getByType(PythonExtension)
+ext.pip 'sommeodule:1', 'othermodule:2'
+```
+
+User will be able to override default versions by direct module declaration (even downgrade version):
+
+```groovy
+python.pip 'sommodule:0.9'
+``` 
 
 ### Might also like
 

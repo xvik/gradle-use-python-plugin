@@ -34,7 +34,7 @@ class PythonExtension {
 
     /**
      * Calls 'pip list' to show all installed python modules (for problem investigations).
-     * Enabled by default for faster problems detection.
+     * Enabled by default for faster problems detection (mostly to highlight used transitive dependencies versions).
      */
     boolean showInstalledVersions = true
 

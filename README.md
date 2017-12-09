@@ -19,6 +19,7 @@ Features:
 
 * Configuration: `python`
 * Tasks:
+    - `checkPython` - validate python installation 
     - `pipInstall` - install declared pip modules
     - `pipUpdates` - show the latest available versions for the registered modules
     - `type:PythonTask` - call python command/script/module
@@ -80,8 +81,7 @@ installed automatically just once and requires manual un-installation).
 
 Another option is to use
 [pythonenv](https://packaging.python.org/guides/installing-using-pip-and-virtualenv/) 
-(or [pipenv](https://docs.pipenv.org/)) to separate
-different projects packages. You can even use custom `PythonTask`'s to automate virtualenv management and automatic switching.
+(or [pipenv](https://docs.pipenv.org/)) to separate different projects packages. 
 
 ### Usage
 
@@ -100,7 +100,7 @@ python {
 }
 ```
 
-Module format is: `name:version` (will mean "name==version" in pip notion). Non strict version definition is not allowed (for obvious reasons).
+Module format is: `name:version` (will mean `name==version` in pip notion). Non strict version definition is not allowed (for obvious reasons).
 Dependencies are installed in declaration order. If duplicate declaration specified then only the latest declaration
 will be used:
 
@@ -110,7 +110,7 @@ python.pip 'module1:2.0', 'module2:1.0', 'module1:1.0'
 
 Will install version 1.0 of module1 because it was the latest declaration.
 
-Dependencies are installed with `pipInstall` task, called before any declared `PythonTask`.
+Dependencies are installed with `pipInstall` task which is called before any declared `PythonTask`.
 
 #### Check modules updates
 

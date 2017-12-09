@@ -2,13 +2,11 @@ package ru.vyarus.gradle.plugin.python.task.pip
 
 import groovy.transform.CompileStatic
 import groovy.transform.Memoized
-import org.gradle.api.GradleException
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import ru.vyarus.gradle.plugin.python.cmd.Pip
 import ru.vyarus.gradle.plugin.python.task.BasePythonTask
-import ru.vyarus.gradle.plugin.python.util.CliUtils
 
 /**
  * Base task for pip tasks.
@@ -18,14 +16,6 @@ import ru.vyarus.gradle.plugin.python.util.CliUtils
  */
 @CompileStatic
 class BasePipTask extends BasePythonTask {
-
-    /**
-     * Minimal required python version.
-     * By default use {@link ru.vyarus.gradle.plugin.python.PythonExtension#minVersion} value.
-     */
-    @Input
-    @Optional
-    String minPythonVersion
 
     /**
      * List of modules to install. Module declaration format: 'name:version'.
@@ -53,17 +43,6 @@ class BasePipTask extends BasePythonTask {
      */
     void pip(Iterable<String> modules) {
         getModules().addAll(modules)
-    }
-
-    protected void validatePython() {
-        String dir = python.homeDir
-        String version = python.version
-        String minVersion = getMinPythonVersion()
-        if (!CliUtils.isVersionMatch(version, minVersion)) {
-            throw new GradleException("Python ($dir) verion $version does not match minimal " +
-                    "required version: $minVersion")
-        }
-        logger.lifecycle('Using Python {} ({})', version, dir)
     }
 
     /**

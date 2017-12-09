@@ -5,6 +5,7 @@ import groovy.transform.TypeCheckingMode
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import ru.vyarus.gradle.plugin.python.task.BasePythonTask
+import ru.vyarus.gradle.plugin.python.task.CheckPythonTask
 import ru.vyarus.gradle.plugin.python.task.pip.BasePipTask
 import ru.vyarus.gradle.plugin.python.task.pip.PipInstallTask
 import ru.vyarus.gradle.plugin.python.task.PythonTask
@@ -34,6 +35,12 @@ class PythonPlugin implements Plugin<Project> {
         project.extensions.extraProperties.set(PipInstallTask.simpleName, PipInstallTask)
         project.extensions.extraProperties.set(PythonTask.simpleName, PythonTask)
 
+        // validate installed python
+        CheckPythonTask checkTask = project.tasks.create('checkPython', CheckPythonTask) {
+            description = 'Validate python environment'
+            conventionMapping.minPythonVersion = { extension.minVersion }
+        }
+
         // default pip install task
         PipInstallTask installTask = project.tasks.create('pipInstall', PipInstallTask) {
             description = 'Install pip modules'
@@ -55,10 +62,7 @@ class PythonPlugin implements Plugin<Project> {
 
         // apply defaults for pip tasks
         project.tasks.withType(BasePipTask) { task ->
-            task.conventionMapping.with {
-                minPythonVersion = { extension.minVersion }
-                modules = { extension.modules }
-            }
+            task.conventionMapping.modules = { extension.modules }
         }
 
         // apply defaults for all pip install tasks (custom pip installs may be used)
@@ -67,6 +71,7 @@ class PythonPlugin implements Plugin<Project> {
                 showInstalledVersions = { extension.showInstalledVersions }
                 alwaysInstallModules = { extension.alwaysInstallModules }
             }
+            dependsOn checkTask
         }
     }
 }

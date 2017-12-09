@@ -18,6 +18,24 @@ class PipInstallTaskKitTest extends AbstractKitTest {
         new Pip(ProjectBuilder.builder().build(), null).install('click==6.7')
     }
 
+    def "Check no declared modules"() {
+
+        setup:
+        build """
+            plugins {
+                id 'ru.vyarus.use-python'
+            }
+
+        """
+
+        when: "run task"
+        BuildResult result = run('pipInstall')
+
+        then: "no all modules list printed"
+        result.task(':checkPython').outcome == TaskOutcome.SUCCESS
+        result.task(':pipInstall').outcome == TaskOutcome.SKIPPED
+    }
+
     def "Check no modules list"() {
 
         setup:
@@ -37,9 +55,16 @@ class PipInstallTaskKitTest extends AbstractKitTest {
         BuildResult result = run('pipInstall')
 
         then: "no all modules list printed"
+        result.task(':checkPython').outcome == TaskOutcome.SUCCESS
         result.task(':pipInstall').outcome == TaskOutcome.SUCCESS
         !result.output.contains('python -m pip install click')
         !result.output.contains('python -m pip list')
+
+        when: "run one more time"
+        result = run('pipInstall')
+
+        then: "up to date"
+        result.task(':pipInstall').outcome == TaskOutcome.UP_TO_DATE
     }
 
     def "Check always install"() {
@@ -61,6 +86,7 @@ class PipInstallTaskKitTest extends AbstractKitTest {
         BuildResult result = run('pipInstall')
 
         then: "click install called"
+        result.task(':checkPython').outcome == TaskOutcome.SUCCESS
         result.task(':pipInstall').outcome == TaskOutcome.SUCCESS
         result.output.contains('Requirement already satisfied: click==6.7')
         result.output.contains('python -m pip list')
@@ -84,6 +110,7 @@ class PipInstallTaskKitTest extends AbstractKitTest {
         BuildResult result = run('customPip')
 
         then: "click install called"
+        result.task(':checkPython').outcome == TaskOutcome.SUCCESS
         result.task(':customPip').outcome == TaskOutcome.SUCCESS
         result.output.contains('Requirement already satisfied: click==6.7')
         result.output.contains('python -m pip list')

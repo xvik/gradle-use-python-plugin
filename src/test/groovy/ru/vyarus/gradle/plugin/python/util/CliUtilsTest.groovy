@@ -18,6 +18,9 @@ class CliUtilsTest extends Specification {
         CliUtils.parseArgs('one \'two three\' four') as List == ['one', '\'two three\'', 'four']
         CliUtils.parseArgs(['one', 'two', 'three']) as List == ['one', 'two', 'three']
         CliUtils.parseArgs(null) as List == []
+
+        CliUtils.parseArgs('-c exec("import sys;")') as List == ['-c', 'exec("import sys;")']
+        CliUtils.parseArgs('-c exec("import sys;print(\"some\")")') as List == ['-c', 'exec("import sys;print(\"some\")")']
     }
 
     def "Check args merge"() {

@@ -80,7 +80,7 @@ final class CliUtils {
                 }
                 if (it in ['"', '\'']) {
                     // only look quotes after separator/line start
-                    if (!scope && tmp.length() == 0) {
+                    if (!scope) {
                         //start quote
                         scope = it
                     } else if (scope == it) {

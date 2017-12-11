@@ -24,7 +24,7 @@ dependencies {
 }
 
 group = 'ru.vyarus'
-description = 'Call python in gradle build'
+description = 'Use python modules in gradle build'
 
 github {
     user 'xvik'
@@ -68,7 +68,7 @@ bintray {
 }
 
 pluginBundle {
-    description = 'Install pip dependencies and call python in gradle build'
+    description = 'Manage pip dependencies and use python in gradle build'
     tags = ['python']
 
     plugins {

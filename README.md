@@ -136,21 +136,21 @@ Call python command:
 
 ```groovy
 task cmd(type: PythonTask) {
-    command = "-c print('sample')"
+    command = "-c exec(\"print('sample')\")"
 }
 ```
 
-called: `python -c print('sample')`
+called: `python -c exec("print('sample')")` (exec used for win/*nix compatibility)
 
 Call multi-line command:
 
 ```groovy
 task cmd(type: PythonTask) {
-    command = "-c 'import sys; print(sys.prefix)'"
+    command = "-c exec(\"import sys; print(sys.prefix)\")"
 }
 ```
 
-called: `python -c 'import sys; print(sys.prefix)'`
+called: `python -c exec("import sys; print(sys.prefix)")`
 
 Call module:
 

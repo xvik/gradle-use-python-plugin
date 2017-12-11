@@ -17,14 +17,14 @@ class PythonCliTest extends AbstractTest {
         when: "Use default configuration"
         Project project = ProjectBuilder.builder().build()
         Python python = new Python(project)
-        def res = python.readOutput('-c print(\'hello\')')
+        def res = python.readOutput('-c exec("print(\'hello\')")')
         then: "ok"
         res == 'hello'
 
         when: 'check home dir'
         res = python.getHomeDir()
         then: "ok"
-        res != null
+        res
 
         when: 'check version'
         res = python.getVersion()

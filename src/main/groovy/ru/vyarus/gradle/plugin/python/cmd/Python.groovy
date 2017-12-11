@@ -164,7 +164,7 @@ class Python {
      */
     @Memoized
     String getHomeDir() {
-        return readOutput('-c "import sys;print(sys.prefix)"')
+        return readOutput('-c exec("import sys;print(sys.prefix)")')
     }
 
     /**
@@ -172,8 +172,8 @@ class Python {
      */
     @Memoized
     String getVersion() {
-        return readOutput('-c "import sys;ver = sys.version_info;print(' +
-                'str(ver.major)+\'.\'+str(ver.minor)+\'.\'+str(ver.micro))"')
+        return readOutput('-c exec("import sys;ver=sys.version_info;' +
+                'print(str(ver.major)+\'.\'+str(ver.minor)+\'.\'+str(ver.micro))")')
     }
 
     @SuppressWarnings('UnnecessarySetter')

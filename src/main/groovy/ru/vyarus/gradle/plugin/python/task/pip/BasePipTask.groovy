@@ -67,6 +67,6 @@ class BasePipTask extends BasePythonTask {
     @Memoized
     @SuppressWarnings('UnnecessaryGetter')
     protected Pip getPip() {
-        return new Pip(project, getPythonPath())
+        return new Pip(project, getPythonPath(), getPythonBinary())
     }
 }

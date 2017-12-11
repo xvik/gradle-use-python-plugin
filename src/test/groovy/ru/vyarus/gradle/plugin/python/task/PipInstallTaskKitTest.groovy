@@ -15,7 +15,7 @@ class PipInstallTaskKitTest extends AbstractKitTest {
     @Override
     def setup() {
         // make sure correct version installed
-        new Pip(ProjectBuilder.builder().build(), null).install('click==6.7')
+        new Pip(ProjectBuilder.builder().build()).install('click==6.7')
     }
 
     def "Check no declared modules"() {

@@ -14,7 +14,7 @@ class PipCliTest extends AbstractTest {
 
         when: "call pip"
         Project project = ProjectBuilder.builder().build()
-        Pip pip = new Pip(project, null)
+        Pip pip = new Pip(project)
         pip.exec('list')
         then: 'ok'
         true

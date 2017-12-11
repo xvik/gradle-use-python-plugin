@@ -10,7 +10,7 @@ class PipExecTest extends AbstractCliMockSupport {
 
     @Override
     void setup() {
-        pip = new Pip(project, null)
+        pip = new Pip(project)
     }
 
     def "Check execution"() {

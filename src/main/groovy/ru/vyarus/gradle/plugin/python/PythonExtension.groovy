@@ -23,6 +23,13 @@ class PythonExtension {
      */
     String pythonPath
     /**
+     * Python binary name to use. By default, for linux it would be python3 (if installed) or python and
+     * for windows - python.
+     * <p>
+     * Useful when you want to force python 2 usage on linux or python binary name differs.
+     */
+    String pythonBinary
+    /**
      * Pip modules to install. Modules are installed in the declaration order.
      * Duplicates are allowed: only the latest declaration will be used. So it is possible
      * to pre-define some modules (for example, in plugin) and then override module version

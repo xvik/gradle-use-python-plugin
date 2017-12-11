@@ -15,8 +15,12 @@ class Pip {
 
     private final Python python
 
-    Pip(Project project, String pythonPath) {
-        python = new Python(project, pythonPath)
+    Pip(Project project) {
+        this(project, null, null)
+    }
+
+    Pip(Project project, String pythonPath, String binary) {
+        python = new Python(project, pythonPath, binary)
                 .logLevel(LogLevel.LIFECYCLE)
     }
 

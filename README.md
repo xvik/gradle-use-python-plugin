@@ -65,7 +65,8 @@ python --version
 pip --version
 ```
 
-On most *nix distributions python is already installed. In some cases, pip may require [installation](https://pip.pypa.io/en/stable/installing/). 
+On most *nix distributions python is already installed. In some cases, pip may require [installation](https://pip.pypa.io/en/stable/installing/) 
+(in most cases, `sudo apt-get install python3-pip`). 
 
 On windows [download and install](https://www.python.org/downloads/windows/) python manually or use 
 [chocolately](https://chocolatey.org/packages/python/3.6.3) (`choco install python`)
@@ -141,6 +142,16 @@ task cmd(type: PythonTask) {
 
 called: `python -c print('sample')`
 
+Call multi-line command:
+
+```groovy
+task cmd(type: PythonTask) {
+    command = "-c 'import sys; print(sys.prefix)'"
+}
+```
+
+called: `python -c 'import sys; print(sys.prefix)'`
+
 Call module:
 
 ```groovy
@@ -165,6 +176,16 @@ called: `python path/to/script.py 1 2` (arguments are optional, just for demo)
 #### Configuration
 
 ##### Python location
+
+On linux, plugin will use python3 if available. To use different binary use:
+
+```groovy
+python {
+    pythonBinary = 'python'
+}
+```
+
+This will force to use python (2) for linux. Also, this may be hady if pythin binary is named differently. 
 
 To use non global python:
 
@@ -220,6 +241,7 @@ PythonTask configuration:
 | Property | Description |
 |---------|--------------|
 | pythonPath | Path to python binary. By default used path declared in global configuration |
+| pythonBinary | Python binary name. By default, python3 on linux and python otherwise. |
 | workDir | Working directory (important if called script/module do file operations). By default, it's a project root |
 | createWorkDir | Automatically create working directory if does not exist. Enabled by default |
 | module | Module name to call command on (if command not set module called directly). Useful for derived tasks. |
@@ -247,6 +269,7 @@ Configuration:
 | Property | Description |
 |----------|-------------|
 | pythonPath | Path to python binary. By default used path declared in global configuration |
+| pythonBinary | Python binary name. By default, python3 on linux and python otherwise. |
 | modules | Modules to install. In most cases configured indirectly with `pip(..)` task methods. By default, modules from global configuration. |
 | showInstalledVersions | Perform `pip list` after installation. By default use global configuration value |
 | alwaysInstallModules | Call `pip install module` for all declared modules, even if it is already installed with correct version. By default use global configuration value |
@@ -318,7 +341,7 @@ task modCmd(type: SomeModuleTask) {
 called: `python -m somemodule module arfs --option` 
 
 In some cases, you can use `BasePythonTask` which is a super class of `PythonTask` and provides
-only automatic `pythonPath` property set from global configuration. 
+only automatic `pythonPath` and `pythonBinary` properties set from global configuration. 
 
 #### Completely custom task
 
@@ -328,7 +351,7 @@ Plugin provides `ru.vyarus.gradle.plugin.python.cmd.Python` utility class, which
 Example usage:
 
 ```groovy
-Python python = new Python(project, getPythonPath())
+Python python = new Python(project, getPythonPath(), getPythonBinary())
             .logLevel(getLogLevel())
             .outputPrefix(getOutputPrefix())
             .workDir(getWorkDir())
@@ -354,9 +377,9 @@ class Pip {
 
     private final Python python
 
-    Pip(Project project, String pythonPath) {
+    Pip(Project project, String pythonPath, String binary) {
         // configure custom python execution util 
-        python = new Python(project, pythonPath)
+        python = new Python(project, pythonPath, binary)
                 .logLevel(LogLevel.LIFECYCLE)
     }
     

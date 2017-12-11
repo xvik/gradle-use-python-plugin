@@ -13,7 +13,7 @@ class PythonExecTest extends AbstractCliMockSupport {
 
     @Override
     void setup() {
-        python = new Python(project, null)
+        python = new Python(project)
     }
 
     def "Check success"() {
@@ -82,7 +82,7 @@ class PythonExecTest extends AbstractCliMockSupport {
 
         setup:
         mockExec(project, 'sample output', 0)
-        python = new Python(project, 'some/path')
+        python = new Python(project, 'some/path', null)
 
         when: "call module"
         python.exec('mmm')

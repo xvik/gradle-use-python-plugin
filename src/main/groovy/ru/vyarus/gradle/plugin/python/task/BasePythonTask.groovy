@@ -26,6 +26,15 @@ class BasePythonTask extends ConventionTask {
     @Optional
     String pythonPath
 
+    /**
+     * Python binary name. When empty: use python3 or python for linux and python for windows.
+     * Automatically set from {@link ru.vyarus.gradle.plugin.python.PythonExtension#pythonBinary}, but could
+     * be overridden manually.
+     */
+    @Input
+    @Optional
+    String pythonBinary
+
     protected BasePythonTask() {
         group = 'python'
     }
@@ -33,6 +42,6 @@ class BasePythonTask extends ConventionTask {
     @Internal
     @Memoized
     protected Python getPython() {
-        new Python(project, getPythonPath())
+        new Python(project, getPythonPath(), getPythonBinary())
     }
 }

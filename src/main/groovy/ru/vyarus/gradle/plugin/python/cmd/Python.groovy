@@ -1,6 +1,7 @@
 package ru.vyarus.gradle.plugin.python.cmd
 
 import groovy.transform.CompileStatic
+import groovy.transform.Memoized
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.Project
 import org.gradle.api.logging.LogLevel
@@ -32,6 +33,7 @@ import ru.vyarus.gradle.plugin.python.util.PythonExecutionFailed
 class Python {
 
     private static final String PYTHON = 'python'
+    private static final String PYTHON3 = 'python3'
     private static final String SPACE = ' '
 
     private final Project project
@@ -41,9 +43,13 @@ class Python {
     private LogLevel logLevel = LogLevel.INFO
     private final List<String> extraArgs = []
 
-    Python(Project project, String pythonPath) {
+    Python(Project project) {
+        this(project, null, null)
+    }
+
+    Python(Project project, String pythonPath, String binary) {
         this.project = project
-        this.executable = getPythonBinary(pythonPath)
+        this.executable = getPythonBinary(project, pythonPath, binary)
     }
 
     /**
@@ -156,15 +162,17 @@ class Python {
     /**
      * @return python home directory (works for global python too)
      */
+    @Memoized
     String getHomeDir() {
-        return readOutput('-c "import sys;\nprint(sys.prefix)"')
+        return readOutput('-c "import sys;print(sys.prefix)"')
     }
 
     /**
      * @return python version in format major.minor.micro
      */
+    @Memoized
     String getVersion() {
-        return readOutput('-c "import sys;\nver = sys.version_info;\nprint(' +
+        return readOutput('-c "import sys;ver = sys.version_info;print(' +
                 'str(ver.major)+\'.\'+str(ver.minor)+\'.\'+str(ver.micro))"')
     }
 
@@ -175,9 +183,8 @@ class Python {
             cmd = CliUtils.mergeArgs(cmd, extraArgs)
         }
         String commandLine = "$executable ${cmd.join(SPACE)}"
-        // prefix backslashes for prettier tostring
-        project.logger.log(logLevel,
-                "[python] ${commandLine.replace('\r', '').replace('\n', SPACE)}")
+        String formattedCommand = commandLine.replace('\r', '').replace('\n', SPACE)
+        project.logger.log(logLevel, "[python] $formattedCommand")
 
         ExecResult res = project.exec {
             it.executable = this.executable
@@ -190,15 +197,29 @@ class Python {
             }
         }
         if (res.exitValue != 0) {
-            throw new PythonExecutionFailed("Python call failed: $commandLine")
+            throw new PythonExecutionFailed("Python call failed: $formattedCommand")
         }
     }
 
-    private String getPythonBinary(String pythonPath) {
-        String res = PYTHON
+    @Memoized
+    private static String getPythonBinary(Project project, String pythonPath, String binary) {
+        String res = binary ?: PYTHON
+        boolean isWindows = Os.isFamily(Os.FAMILY_WINDOWS)
         if (pythonPath) {
-            boolean isWindows = Os.isFamily(Os.FAMILY_WINDOWS)
             res = pythonPath + (pythonPath.endsWith('/') ? '' : '/') + PYTHON + (isWindows ? '.exe' : '')
+        } else if (!binary && !isWindows) {
+            // check if python3 available
+            new ByteArrayOutputStream().withStream { os ->
+                ExecResult ret = project.exec {
+                    standardOutput = os
+                    errorOutput = os
+                    ignoreExitValue = true
+                    commandLine PYTHON3, '--version'
+                }
+                if (ret.exitValue == 0) {
+                    res = PYTHON3
+                }
+            }
         }
         return res
     }

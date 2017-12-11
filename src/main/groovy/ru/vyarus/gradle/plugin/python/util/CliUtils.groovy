@@ -67,10 +67,35 @@ final class CliUtils {
      */
     static String[] parseCommandLine(String command) {
         String cmd = command.trim()
-        return cmd ? cmd
-                .replaceAll('\\s{2,}', SPACE)
-                .split(SPACE)
-                : EMPTY
+        if (cmd) {
+            cmd = cmd.replaceAll('\\s{2,}', SPACE)
+            List<String> res = []
+            String scope
+            StringBuilder tmp = new StringBuilder()
+            cmd.each {
+                if (it == SPACE && !scope) {
+                    res << tmp.toString()
+                    tmp = new StringBuilder()
+                    return
+                }
+                if (it in ['"', '\'']) {
+                    if (!scope) {
+                        //start quote
+                        scope = it
+                    } else if (scope == it) {
+                        // end quote
+                        scope = null
+                    }
+                }
+                tmp.append(it)
+            }
+            // last arg
+            if (tmp.length() > 0) {
+                res << tmp.toString()
+            }
+            return res
+        }
+        return EMPTY
     }
 
     /**

@@ -60,7 +60,7 @@ final class CliUtils {
     }
 
     /**
-     * Parse arguments from simple string.
+     * Parse arguments from simple string. Support quotes (but not nested).
      *
      * @param command arguments string
      * @return parsed arguments
@@ -79,7 +79,8 @@ final class CliUtils {
                     return
                 }
                 if (it in ['"', '\'']) {
-                    if (!scope) {
+                    // only look quotes after separator/line start
+                    if (!scope && tmp.length() == 0) {
                         //start quote
                         scope = it
                     } else if (scope == it) {

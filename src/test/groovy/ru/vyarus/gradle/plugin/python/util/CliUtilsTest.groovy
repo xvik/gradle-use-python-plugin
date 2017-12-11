@@ -14,6 +14,7 @@ class CliUtilsTest extends Specification {
         expect: "arg parsing"
         CliUtils.parseArgs('one two   three') as List == ['one', 'two', 'three']
         CliUtils.parseArgs('one "two three"') as List == ['one', '\"two three\"']
+        CliUtils.parseArgs('one th"ree') as List == ['one', 'th\"ree']
         CliUtils.parseArgs('one \'two three\' four') as List == ['one', '\'two three\'', 'four']
         CliUtils.parseArgs(['one', 'two', 'three']) as List == ['one', 'two', 'three']
         CliUtils.parseArgs(null) as List == []

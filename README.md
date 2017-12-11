@@ -246,8 +246,8 @@ Configuration:
 
 | Property | Description |
 |----------|-------------|
-| minPythonVersion | Minimal required python version. By default used version declared in global configuration |
 | pythonPath | Path to python binary. By default used path declared in global configuration |
+| modules | Modules to install. In most cases configured indirectly with `pip(..)` task methods. By default, modules from global configuration. |
 | showInstalledVersions | Perform `pip list` after installation. By default use global configuration value |
 | alwaysInstallModules | Call `pip install module` for all declared modules, even if it is already installed with correct version. By default use global configuration value |
 
@@ -317,8 +317,8 @@ task modCmd(type: SomeModuleTask) {
 
 called: `python -m somemodule module arfs --option` 
 
-In some cases, you can use `BasePythonTask` which is super class of `PythonTask` and provides
-only automatic `pythonPath` property setting from global configuration. 
+In some cases, you can use `BasePythonTask` which is a super class of `PythonTask` and provides
+only automatic `pythonPath` property set from global configuration. 
 
 #### Completely custom task
 
@@ -375,7 +375,7 @@ In your plugin you could apply default modules like this:
 ```groovy
 afterEvaluate {
     PythonExtension ext = project.extensions.getByType(PythonExtension)
-    // declare default module(s) if it was not declared by user manually
+    // delayed default module(s) declaration based on user configuration
     if (!ext.isModuleDeclared('somemodule')) {
         ext.pip 'sommemodule:1'
     }

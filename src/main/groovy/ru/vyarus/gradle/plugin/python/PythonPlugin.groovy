@@ -50,11 +50,12 @@ class PythonPlugin implements Plugin<Project> {
             description = 'Check if new versions available for declared pip modules'
         }
 
-        configureDefaults(project, checkTask, installTask)
+        configureDefaults(project, extension, checkTask, installTask)
     }
 
     @CompileStatic(TypeCheckingMode.SKIP)
-    private void configureDefaults(Project project, CheckPythonTask checkTask, PipInstallTask installTask) {
+    private void configureDefaults(Project project, PythonExtension extension,
+                                   CheckPythonTask checkTask, PipInstallTask installTask) {
 
         project.tasks.withType(BasePythonTask) { task ->
             // apply default path for all python tasks

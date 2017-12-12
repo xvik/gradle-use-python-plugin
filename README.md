@@ -96,7 +96,22 @@ Make sure the latest pip installed (required to overcome some older pip problems
 ```bash
 pip3 install -U pip
 ```
- 
+
+##### Travis configuration
+
+To make plugin work on [travis](https://travis-ci.org/) you'll require `sudo` and install pip [manually](.travis.yml):
+
+```yaml
+language: java
+jdk: oraclejdk8
+
+sudo: required
+before_install:
+  - sudo apt-get -y install python3-pip
+  - sudo pip3 install -U pip
+``` 
+
+It will be python 3.4 by default.
 
 ##### Automatic python install
 
@@ -110,6 +125,7 @@ installed automatically just once and requires manual un-installation).
 Another option is to use
 [virtualenv](https://packaging.python.org/guides/installing-using-pip-and-virtualenv/) 
 (or [pipenv](https://docs.pipenv.org/)) to separate different projects packages. 
+
 
 ### Usage
 

@@ -99,7 +99,7 @@ class PythonExecTest extends AbstractCliMockSupport {
         when: "call module"
         python.exec('mmm')
         then: "ok"
-        logger.res == "[python] py${Os.isFamily(Os.FAMILY_WINDOWS)?'.exe':''} mmm\n\t sample output\n"
+        logger.res == "[python] py mmm\n\t sample output\n"
     }
 
     def "Check custom path and binary"() {

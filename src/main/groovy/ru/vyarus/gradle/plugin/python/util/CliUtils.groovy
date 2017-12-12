@@ -1,5 +1,7 @@
 package ru.vyarus.gradle.plugin.python.util
 
+import org.apache.tools.ant.taskdefs.condition.Os
+
 /**
  * Cli helper utilities.
  *
@@ -120,14 +122,15 @@ final class CliUtils {
     }
 
     /**
-     * Wraps command ('-c print('smth')') to be cross-platform. The problem is: '-c "print('smth')"' will not be
-     * called on linux at all (when used from java). To overcome this, expression is wrapped into exec().
+     * Wraps command ('-c print('smth')') into exec() for linux: '-c "print('smth')"' will not be
+     * called on linux at all (when used from java).
      *
      * @param command command expression to wrap
      * @return wrapped expression or original command if its already exec()
      */
     static String wrapCommand(String command) {
-        if (command.startsWith('exec(')) {
+        boolean isWindows = Os.isFamily(Os.FAMILY_WINDOWS)
+        if (isWindows || command.startsWith('exec(')) {
             return command
         }
         String cmd = command.replaceAll(/^"|"$/, '')

@@ -1,5 +1,6 @@
 package ru.vyarus.gradle.plugin.python.util
 
+import org.apache.tools.ant.taskdefs.condition.Os
 import spock.lang.Specification
 
 
@@ -56,11 +57,13 @@ class CliUtilsTest extends Specification {
 
     def "Check command wrapping"() {
 
+        boolean isWindows = Os.isFamily(Os.FAMILY_WINDOWS)
+
         expect: 'wrapped'
-        CliUtils.wrapCommand('print(\'sample\')') == 'exec("print(\'sample\')")'
-        CliUtils.wrapCommand('"print(\'sample\')"') == 'exec("print(\'sample\')")'
+        CliUtils.wrapCommand('print(\'sample\')') == (isWindows ? 'print(\'sample\')': 'exec("print(\'sample\')")')
+        CliUtils.wrapCommand('"print(\'sample\')"') == (isWindows ? '"print(\'sample\')"': 'exec("print(\'sample\')")')
         CliUtils.wrapCommand('exec("print(\'sample\')")') == 'exec("print(\'sample\')")'
-        CliUtils.wrapCommand('import sys;print(sys.prefix)') == 'exec("import sys;print(sys.prefix)")'
-        CliUtils.wrapCommand('"import sys;print(sys.prefix+\"smaple\")"') == 'exec("import sys;print(sys.prefix+"smaple")")'
+        CliUtils.wrapCommand('import sys;print(sys.prefix)') == (isWindows? 'import sys;print(sys.prefix)': 'exec("import sys;print(sys.prefix)")')
+        CliUtils.wrapCommand('"import sys;print(sys.prefix+\"smaple\")"') == (isWindows ? '"import sys;print(sys.prefix+"smaple")"' :'exec("import sys;print(sys.prefix+"smaple")")')
     }
 }

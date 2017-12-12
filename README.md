@@ -202,7 +202,7 @@ task cmd(type: PythonTask) {
 }
 ```
 
-called: `python -c exec("print('sample')")` (exec applied automatically for compatibility)
+called: `python -c print('sample')` on win and `python -c exec("print('sample')")` on *nix (exec applied automatically for compatibility)
 
 Call multi-line command:
 
@@ -212,7 +212,9 @@ task cmd(type: PythonTask) {
 }
 ```
 
-called: `python -c exec("import sys; print(sys.prefix)")`
+called: `python -c "import sys; print(sys.prefix)"` on win and `python -c exec("import sys; print(sys.prefix)")` on *nix
+
+NOTE: it is important to wrap script with space in quotes (otherwise parser will incorrectly parse arguments).
 
 Call module:
 
@@ -234,6 +236,14 @@ task script(type: PythonTask) {
 ```
 
 called: `python path/to/script.py 1 2` (arguments are optional, just for demo)
+
+String command is used for simplicity, but it could be array/collection of args:
+
+```groovy
+task script(type: PythonTask) { 
+    command = ['path/to/script.py', '1', '2'] 
+}
+```
 
 #### Configuration
 
@@ -328,7 +338,7 @@ PythonTask configuration:
 | workDir | Working directory (important if called script/module do file operations). By default, it's a project root |
 | createWorkDir | Automatically create working directory if does not exist. Enabled by default |
 | module | Module name to call command on (if command not set module called directly). Useful for derived tasks. |
-| command | Python command to execute |
+| command | Python command to execute (string, array, iterable) |
 | logLevel | Logging level for python output. By default is `LIFECYCLE` (visible in console). To hide output use `LogLevel.INFO` |
 | extraArgs | Extra arguments applied at the end of declared command. Useful for derived tasks to declare default options |
 | outputPrefix | Prefix, applied for each line of python output. By default is '\t' to identify output for called gradle command |

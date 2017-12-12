@@ -6,7 +6,6 @@ environment:
           PYTHON: "C:\\Python34-x64"
 
 install:
-  - ps: choco install python
   - python --version
   - pip --version
 

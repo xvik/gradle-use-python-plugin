@@ -72,7 +72,10 @@ class PythonPlugin implements Plugin<Project> {
 
         // apply defaults for pip tasks
         project.tasks.withType(BasePipTask) { task ->
-            task.conventionMapping.modules = { extension.modules }
+            task.conventionMapping.with {
+                modules = { extension.modules }
+                userScope = { extension.userScope }
+            }
         }
 
         // apply defaults for all pip install tasks (custom pip installs may be used)

@@ -30,6 +30,12 @@ class PythonExtension {
      */
     String pythonBinary
     /**
+     * Install packages only for the current user (pip --user option). On linux this is often important
+     * to overcome permission problems.
+     * When false installs globally.
+     */
+    boolean userScope = true
+    /**
      * Pip modules to install. Modules are installed in the declaration order.
      * Duplicates are allowed: only the latest declaration will be used. So it is possible
      * to pre-define some modules (for example, in plugin) and then override module version

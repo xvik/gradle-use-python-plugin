@@ -61,15 +61,42 @@ plugins {
 Make sure python and pip are installed:
 
 ```bash
-python --version
+python --version  
 pip --version
 ```
 
-On most *nix distributions python is already installed. In some cases, pip may require [installation](https://pip.pypa.io/en/stable/installing/) 
-(in most cases, `sudo apt-get install python3-pip`). 
+On *nix `python` usually reference python2. For python3:
 
-On windows [download and install](https://www.python.org/downloads/windows/) python manually or use 
-[chocolately](https://chocolatey.org/packages/python/3.6.3) (`choco install python`)
+```bash
+python3 --version  
+pip3 --version
+```
+
+##### Windows install
+
+[Download and install](https://www.python.org/downloads/windows/) python manually or use 
+[chocolately](https://chocolatey.org/packages/python/3.6.3): 
+
+```bash
+choco install python
+```
+
+##### Linux/Macos install
+
+On most *nix distributions python is already installed, but often without pip.
+ 
+[Install](https://pip.pypa.io/en/stable/installing/) pip if required (ubuntu example):
+
+```bash
+sudo apt-get install python3-pip
+```
+
+Make sure the latest pip installed (required to overcome some older pip problems):
+
+```bash
+pip3 install -U pip
+```
+ 
 
 ##### Automatic python install
 
@@ -81,7 +108,7 @@ If you need automatic python installation, look JetBrain's
 installed automatically just once and requires manual un-installation). 
 
 Another option is to use
-[pythonenv](https://packaging.python.org/guides/installing-using-pip-and-virtualenv/) 
+[virtualenv](https://packaging.python.org/guides/installing-using-pip-and-virtualenv/) 
 (or [pipenv](https://docs.pipenv.org/)) to separate different projects packages. 
 
 ### Usage
@@ -113,6 +140,13 @@ Will install version 1.0 of module1 because it was the latest declaration.
 
 Dependencies are installed with `pipInstall` task which is called before any declared `PythonTask`.
 
+By default, all modules are installed for current user only (`--user` flag) in order to avoid
+permission problems (for *nux). To enable global scope:
+
+```groovy
+python.userScope = false
+``` 
+
 #### Check modules updates
 
 To quick check if new versions are available for the registered pip modules
@@ -130,23 +164,35 @@ The following modules could be updated:
 Note that it will not show versions for transitive modules, only
 for modules specified directly in `python.pip`.
 
+NOTE: If you see an error like 
+
+```
+TypeError: '>' not supported between instances of 'Version' and 'SetuptoolsVersion'
+```
+
+then [update pip](https://pip.pypa.io/en/stable/installing/#upgrading-pip):
+
+```
+pip install -U pip
+```
+
 #### Call python
 
 Call python command:
 
 ```groovy
 task cmd(type: PythonTask) {
-    command = "-c exec(\"print('sample')\")"
+    command = "-c print('sample')"
 }
 ```
 
-called: `python -c exec("print('sample')")` (exec used for win/*nix compatibility)
+called: `python -c exec("print('sample')")` (exec applied automatically for compatibility)
 
 Call multi-line command:
 
 ```groovy
 task cmd(type: PythonTask) {
-    command = "-c exec(\"import sys; print(sys.prefix)\")"
+    command = "-c \"import sys; print(sys.prefix)\""
 }
 ```
 
@@ -177,7 +223,7 @@ called: `python path/to/script.py 1 2` (arguments are optional, just for demo)
 
 ##### Python location
 
-On linux, plugin will use python3 if available. To use different binary use:
+On linux, plugin will use `python3` if available (and fall back to `python` if not). To use different binary use:
 
 ```groovy
 python {
@@ -185,7 +231,7 @@ python {
 }
 ```
 
-This will force to use python (2) for linux. Also, this may be hady if pythin binary is named differently. 
+This will force python 2 for linux. Also, this may be handy if python binary is named differently. 
 
 To use non global python:
 
@@ -234,6 +280,27 @@ python {
 }
 ```
 
+##### Reference
+
+All configuration options with default values:
+
+```groovy
+python {
+   // path to python binary (global by defualt)
+   pythonPath
+   // python binary name (python or python3 by default)
+   pythonBinary
+   // minimal required python version (m.m.m)
+   minVersion
+   // install modules for current user only (--user)
+   userScope = true
+   // show all installed modules versions after pip installation
+   showInstalledVersions = true
+   // always call module install, even if correct version is already installed
+   alwaysInstallModules = flase
+}
+```
+
 #### PythonTask
 
 PythonTask configuration:
@@ -271,6 +338,7 @@ Configuration:
 | pythonPath | Path to python binary. By default used path declared in global configuration |
 | pythonBinary | Python binary name. By default, python3 on linux and python otherwise. |
 | modules | Modules to install. In most cases configured indirectly with `pip(..)` task methods. By default, modules from global configuration. |
+| userScope | Use current user scope (`--user` flag). Enabled by default to avoid permission problems on *nix (global configuration). |
 | showInstalledVersions | Perform `pip list` after installation. By default use global configuration value |
 | alwaysInstallModules | Call `pip install module` for all declared modules, even if it is already installed with correct version. By default use global configuration value |
 
@@ -370,7 +438,7 @@ python.exec(cmd)
 This could be used directly in the completely custom task.
 
 Specific utility for target module could be defined, see 
-`ru.vyarus.gradle.plugin.python.cmd.Pip` util as an example:
+`ru.vyarus.gradle.plugin.python.cmd.Pip` util as an example (simplified):
 
 ```groovy
 class Pip {

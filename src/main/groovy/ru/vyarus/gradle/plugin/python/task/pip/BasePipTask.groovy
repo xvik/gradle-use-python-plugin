@@ -27,6 +27,15 @@ class BasePipTask extends BasePythonTask {
     List<String> modules = []
 
     /**
+     * Work with packages in user scope (--user pip option). When false - work with global scope.
+     * Note that on linux it is better to work with user scope to overcome permission problems.
+     * Enabled by default (see {@link ru.vyarus.gradle.plugin.python.PythonExtension#userScope})
+     */
+    @Input
+    @Optional
+    boolean userScope
+
+    /**
      * Shortcut for {@link #pip(java.lang.Iterable)}.
      *
      * @param modules modules to install
@@ -63,10 +72,22 @@ class BasePipTask extends BasePythonTask {
         return new ArrayList(mods.values())
     }
 
+    /**
+     * @return configured pip utility instance
+     */
     @Internal
     @Memoized
     @SuppressWarnings('UnnecessaryGetter')
     protected Pip getPip() {
-        return new Pip(project, getPythonPath(), getPythonBinary())
+        return new Pip(project, getPythonPath(), getPythonBinary(), getUserScope())
+    }
+
+    /**
+     * Use in custom python commands: {@code python.callModule('pip', "list $userFlag")}.
+     * @return user flag if user scope configured or empty string
+     */
+    @Internal
+    protected String getUserFlag() {
+        return getUserScope() ? ' --user' : ''
     }
 }

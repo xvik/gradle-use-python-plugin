@@ -65,6 +65,7 @@ final class CliUtils {
      * @param command arguments string
      * @return parsed arguments
      */
+    @SuppressWarnings('CouldBeElvis')
     static String[] parseCommandLine(String command) {
         String cmd = command.trim()
         if (cmd) {
@@ -116,6 +117,21 @@ final class CliUtils {
             valid = isPositionMatch(ver, req, 0)
         }
         return valid
+    }
+
+    /**
+     * Wraps command ('-c print('smth')') to be cross-platform. The problem is: '-c "print('smth')"' will not be
+     * called on linux at all (when used from java). To overcome this, expression is wrapped into exec().
+     *
+     * @param command command expression to wrap
+     * @return wrapped expression or original command if its already exec()
+     */
+    static String wrapCommand(String command) {
+        if (command.startsWith('exec(')) {
+            return command
+        }
+        String cmd = command.replaceAll(/^"|"$/, '')
+        return "exec(\"$cmd\")"
     }
 
     private static boolean isPositionMatch(String[] ver, String[] req, int pos) {

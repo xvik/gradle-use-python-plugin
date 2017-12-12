@@ -32,7 +32,6 @@ import ru.vyarus.gradle.plugin.python.util.PythonExecutionFailed
 @SuppressWarnings('ConfusingMethodName')
 class Python {
 
-    private static final String PYTHON = 'python'
     private static final String PYTHON3 = 'python3'
     private static final String SPACE = ' '
 
@@ -164,7 +163,7 @@ class Python {
      */
     @Memoized
     String getHomeDir() {
-        return readOutput('-c exec("import sys;print(sys.prefix)")')
+        return readOutput('-c "import sys;print(sys.prefix)"')
     }
 
     /**
@@ -172,16 +171,13 @@ class Python {
      */
     @Memoized
     String getVersion() {
-        return readOutput('-c exec("import sys;ver=sys.version_info;' +
-                'print(str(ver.major)+\'.\'+str(ver.minor)+\'.\'+str(ver.micro))")')
+        return readOutput('-c "import sys;ver=sys.version_info;' +
+                'print(str(ver.major)+\'.\'+str(ver.minor)+\'.\'+str(ver.micro))"')
     }
 
     @SuppressWarnings('UnnecessarySetter')
     private void processExecution(Object args, OutputStream os) {
-        String[] cmd = CliUtils.parseArgs(args)
-        if (this.extraArgs) {
-            cmd = CliUtils.mergeArgs(cmd, extraArgs)
-        }
+        String[] cmd = prepareArgs(args)
         String commandLine = "$executable ${cmd.join(SPACE)}"
         String formattedCommand = commandLine.replace('\r', '').replace('\n', SPACE)
         project.logger.log(logLevel, "[python] $formattedCommand")
@@ -203,10 +199,10 @@ class Python {
 
     @Memoized
     private static String getPythonBinary(Project project, String pythonPath, String binary) {
-        String res = binary ?: PYTHON
+        String res = binary ?: 'python'
         boolean isWindows = Os.isFamily(Os.FAMILY_WINDOWS)
         if (pythonPath) {
-            res = pythonPath + (pythonPath.endsWith('/') ? '' : '/') + PYTHON + (isWindows ? '.exe' : '')
+            res = pythonPath + (pythonPath.endsWith('/') ? '' : '/') + res + (isWindows ? '.exe' : '')
         } else if (!binary && !isWindows) {
             // check if python3 available
             new ByteArrayOutputStream().withStream { os ->
@@ -222,5 +218,25 @@ class Python {
             }
         }
         return res
+    }
+
+    @SuppressWarnings('Instanceof')
+    private String[] prepareArgs(Object args) {
+        String[] cmd = CliUtils.parseArgs(args)
+        if (args instanceof CharSequence) {
+            // important to easily spot args parsing problems
+            project.logger.info("Parsed arguments line '{}': {}", args, cmd)
+        }
+        cmd.eachWithIndex { String arg, int i ->
+            if (arg == '-c' && i + 1 < cmd.length) {
+                // wrap command to grant cross-platform compatibility
+                // (e.g. simple -c "string" is not always executed)
+                cmd[i + 1] = CliUtils.wrapCommand(cmd[i + 1])
+            }
+        }
+        if (this.extraArgs) {
+            cmd = CliUtils.mergeArgs(cmd, extraArgs)
+        }
+        return cmd
     }
 }

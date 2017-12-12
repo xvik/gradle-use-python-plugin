@@ -23,5 +23,10 @@ class PipCliTest extends AbstractTest {
         pip.install('click==6.7')
         then: "ok"
         true
+
+        when: "pip uninstall"
+        pip.uninstall('click')
+        then: "ok"
+        true
     }
 }

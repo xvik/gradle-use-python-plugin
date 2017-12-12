@@ -89,7 +89,7 @@ class PipInstallTaskKitTest extends AbstractKitTest {
         result.task(':checkPython').outcome == TaskOutcome.SUCCESS
         result.task(':pipInstall').outcome == TaskOutcome.SUCCESS
         result.output.contains('Requirement already satisfied: click==6.7')
-        result.output.contains('python -m pip list')
+        result.output =~ /python(3)? -m pip list/
     }
 
     def "Check custom task"() {
@@ -113,6 +113,6 @@ class PipInstallTaskKitTest extends AbstractKitTest {
         result.task(':checkPython').outcome == TaskOutcome.SUCCESS
         result.task(':customPip').outcome == TaskOutcome.SUCCESS
         result.output.contains('Requirement already satisfied: click==6.7')
-        result.output.contains('python -m pip list')
+        result.output =~ /python(3)? -m pip list/
     }
 }

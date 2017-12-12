@@ -20,6 +20,7 @@ class PythonPluginTest extends AbstractTest {
         project.extensions.findByType(PythonExtension)
 
         then: "pip task registered"
+        project.tasks.getByName('checkPython')
         project.tasks.getByName('pipInstall')
         project.tasks.getByName('pipUpdates')
     }
@@ -32,6 +33,8 @@ class PythonPluginTest extends AbstractTest {
 
             python {
                 pythonPath = 'foo/bar'
+                pythonBinary = 'py'
+                userScope = false
                 pip 'sample:1', 'foo:2'
                 showInstalledVersions = false
                 alwaysInstallModules = true
@@ -43,6 +46,8 @@ class PythonPluginTest extends AbstractTest {
         then: "pip install task configured"
         def pipTask = project.tasks.getByName('pipInstall');
         pipTask.pythonPath == 'foo/bar'
+        pipTask.pythonBinary == 'py'
+        !pipTask.userScope
         pipTask.modules == ['sample:1', 'foo:2']
         !pipTask.showInstalledVersions
         pipTask.alwaysInstallModules
@@ -50,11 +55,14 @@ class PythonPluginTest extends AbstractTest {
         then: "python task configured"
         def pyTask = project.tasks.getByName('pyt');
         pyTask.pythonPath == 'foo/bar'
+        pyTask.pythonBinary == 'py'
         pyTask.dependsOn.contains(project.tasks.getByName('pipInstall'))
 
-        then: "pip updtaes task configured"
-        def pipUpdates = project.tasks.getByName('pipInstall');
+        then: "pip updates task configured"
+        def pipUpdates = project.tasks.getByName('pipUpdates');
         pipUpdates.pythonPath == 'foo/bar'
+        pipUpdates.pythonBinary == 'py'
+        !pipUpdates.userScope
         pipUpdates.modules == ['sample:1', 'foo:2']
     }
 

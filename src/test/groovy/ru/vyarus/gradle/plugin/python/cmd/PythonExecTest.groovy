@@ -29,7 +29,7 @@ class PythonExecTest extends AbstractCliMockSupport {
         logger.reset()
         python.exec('no matter')
         then: "ok"
-        logger.res == '[python] python no matter\n\t sample output\n'
+        logger.res =~ /(?m)\[python] python(3)? no matter\n\t sample output\n/
     }
 
     def "Check fail"() {
@@ -40,16 +40,16 @@ class PythonExecTest extends AbstractCliMockSupport {
         python.exec('no matter')
         then: "fail"
         def ex = thrown(PythonExecutionFailed)
-        ex.message.contains('python no matter')
-        logger.res == '[python] python no matter\n\t sample output\n'
+        ex.message =~ /python(3)? no matter/
+        logger.res =~ /(?m)\[python] python(3)? no matter\n\t sample output\n/
 
         when: "check failed read output"
         logger.reset()
         python.exec('no matter')
         then: "fail"
         ex = thrown(PythonExecutionFailed)
-        ex.message.contains('python no matter')
-        logger.res == '[python] python no matter\n\t sample output\n'
+        ex.message =~ /python(3)? no matter/
+        logger.res =~ /(?m)\[python] python(3)? no matter\n\t sample output\n/
     }
 
     def "Check extra args"() {
@@ -61,7 +61,7 @@ class PythonExecTest extends AbstractCliMockSupport {
         logger.reset()
         python.exec('no matter')
         then: "ok"
-        logger.res == '[python] python no matter --one --two\n\t sample output\n'
+        logger.res =~ /(?m)\[python] python(3)? no matter --one --two\n\t sample output\n/
 
         cleanup:
         python.clearExtraArgs()
@@ -75,7 +75,7 @@ class PythonExecTest extends AbstractCliMockSupport {
         when: "call module"
         python.callModule('mmm', '--ha --ha')
         then: "ok"
-        logger.res == '[python] python -m mmm --ha --ha\n\t sample output\n'
+        logger.res =~ /(?m)\[python] python(3)? -m mmm --ha --ha\n\t sample output\n/
     }
 
     def "Check python path appliance"() {
@@ -88,5 +88,29 @@ class PythonExecTest extends AbstractCliMockSupport {
         python.exec('mmm')
         then: "ok"
         logger.res == "[python] some/path/python${Os.isFamily(Os.FAMILY_WINDOWS)?'.exe':''} mmm\n\t sample output\n"
+    }
+
+    def "Check python binary change"() {
+
+        setup:
+        mockExec(project, 'sample output', 0)
+        python = new Python(project, null, 'py')
+
+        when: "call module"
+        python.exec('mmm')
+        then: "ok"
+        logger.res == "[python] py${Os.isFamily(Os.FAMILY_WINDOWS)?'.exe':''} mmm\n\t sample output\n"
+    }
+
+    def "Check custom path and binary"() {
+
+        setup:
+        mockExec(project, 'sample output', 0)
+        python = new Python(project, 'some/path', 'py')
+
+        when: "call module"
+        python.exec('mmm')
+        then: "ok"
+        logger.res == "[python] some/path/py${Os.isFamily(Os.FAMILY_WINDOWS)?'.exe':''} mmm\n\t sample output\n"
     }
 }

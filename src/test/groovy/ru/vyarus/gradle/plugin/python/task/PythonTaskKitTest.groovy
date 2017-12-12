@@ -49,7 +49,7 @@ class PythonTaskKitTest extends AbstractKitTest {
         BuildResult result = runFailed('sample')
 
         then: "python failed to start"
-        result.output.contains('net.rubygrapefruit.platform.NativeException: Could not start \'python\'')
+        result.output =~ /net\.rubygrapefruit\.platform\.NativeException: Could not start 'python(3)?'/
     }
 
     def "Check module command"() {
@@ -61,7 +61,7 @@ class PythonTaskKitTest extends AbstractKitTest {
 
             task sample(type: PythonTask) {
                 module = 'pip'
-                command = 'list'
+                command = 'list --user'
             }
         """
 
@@ -70,7 +70,7 @@ class PythonTaskKitTest extends AbstractKitTest {
 
         then: "executed"
         result.task(':sample').outcome == TaskOutcome.SUCCESS
-        result.output.contains('[python] python -m pip list')
+        result.output =~ /\[python] python(3)? -m pip list --user/
     }
 
     def "Check log level change"() {
@@ -127,7 +127,7 @@ class PythonTaskKitTest extends AbstractKitTest {
             task sample(type: PythonTask) {
                 module = 'pip'
                 command = 'list'
-                extraArgs '--format=columns'
+                extraArgs '--format=columns', '--user'
             }
         """
 
@@ -136,7 +136,7 @@ class PythonTaskKitTest extends AbstractKitTest {
 
         then: "executed"
         result.task(':sample').outcome == TaskOutcome.SUCCESS
-        result.output.contains('[python] python -m pip list --format=columns')
+        result.output =~ /\[python] python(3)? -m pip list --format=columns --user/
     }
 
     def "Check script file call"() {
@@ -157,7 +157,7 @@ class PythonTaskKitTest extends AbstractKitTest {
 
         then: "executed"
         result.task(':script').outcome == TaskOutcome.SUCCESS
-        result.output.contains('[python] python sample.py')
+        result.output =~ /\[python] python(3)? sample.py/
         result.output.contains('\t sample')
     }
 

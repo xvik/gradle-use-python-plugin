@@ -20,12 +20,12 @@ class PipExecTest extends AbstractCliMockSupport {
         when: "call install module"
         pip.install('mod')
         then: "ok"
-        logger.res == '[python] python -m pip install mod\n\t sample output\n'
+        logger.res =~ /\[python] python(3)? -m pip install mod --user\n\t sample output\n/
 
         when: "call pip cmd"
         logger.reset()
         pip.exec('list --format')
         then: "ok"
-        logger.res == '[python] python -m pip list --format\n\t sample output\n'
+        logger.res =~ /\[python] python(3)? -m pip list --format --user\n\t sample output\n/
     }
 }

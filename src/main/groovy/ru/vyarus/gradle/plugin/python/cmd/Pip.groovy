@@ -13,15 +13,20 @@ import org.gradle.api.logging.LogLevel
 @CompileStatic
 class Pip {
 
+    public static final String USER = '--user'
+    private static final List<String> USER_AWARE_COMMANDS = ['install', 'list', 'freeze']
+
     private final Python python
+    final boolean userScope
 
     Pip(Project project) {
-        this(project, null, null)
+        this(project, null, null, true)
     }
 
-    Pip(Project project, String pythonPath, String binary) {
+    Pip(Project project, String pythonPath, String binary, boolean userScope) {
         python = new Python(project, pythonPath, binary)
                 .logLevel(LogLevel.LIFECYCLE)
+        this.userScope = userScope
     }
 
     /**
@@ -34,11 +39,25 @@ class Pip {
     }
 
     /**
+     * Uninstall module.
+     *
+     * @param module module name
+     */
+    void uninstall(String module) {
+        exec("uninstall $module -y -q")
+    }
+
+    /**
      * Execute command on pip module. E.g. 'install some==12.3'.
      *
      * @param cmd pip command to execute
      */
     void exec(String cmd) {
+        // automatically apply user scope
+        if (!cmd.contains(USER) && userScope &&
+                USER_AWARE_COMMANDS.contains(cmd.split(' ')[0].toLowerCase())) {
+            cmd += " $USER"
+        }
         python.callModule('pip', cmd)
     }
 

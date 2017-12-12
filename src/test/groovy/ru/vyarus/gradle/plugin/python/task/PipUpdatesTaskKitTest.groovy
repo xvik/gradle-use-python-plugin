@@ -60,7 +60,7 @@ class PipUpdatesTaskKitTest extends AbstractKitTest {
 
         setup:
         // use the latest version
-        new Python(ProjectBuilder.builder().build()).callModule('pip', 'install click --upgrade')
+        new Python(ProjectBuilder.builder().build()).callModule('pip', 'install click --upgrade --user')
 
         build """
             plugins {

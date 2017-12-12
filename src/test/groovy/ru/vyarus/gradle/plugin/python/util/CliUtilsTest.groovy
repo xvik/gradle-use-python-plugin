@@ -53,4 +53,14 @@ class CliUtilsTest extends Specification {
         !CliUtils.isVersionMatch('2.2.3', '2.3')
         !CliUtils.isVersionMatch('2.2.3', '3')
     }
+
+    def "Check command wrapping"() {
+
+        expect: 'wrapped'
+        CliUtils.wrapCommand('print(\'sample\')') == 'exec("print(\'sample\')")'
+        CliUtils.wrapCommand('"print(\'sample\')"') == 'exec("print(\'sample\')")'
+        CliUtils.wrapCommand('exec("print(\'sample\')")') == 'exec("print(\'sample\')")'
+        CliUtils.wrapCommand('import sys;print(sys.prefix)') == 'exec("import sys;print(sys.prefix)")'
+        CliUtils.wrapCommand('"import sys;print(sys.prefix+\"smaple\")"') == 'exec("import sys;print(sys.prefix+"smaple")")'
+    }
 }

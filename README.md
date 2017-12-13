@@ -310,7 +310,7 @@ python {
 }
 ```
 
-`pythonPath` must be set to directory containing python binary (e.g. 'path/to/python/binray/python.exe')
+`pythonPath` must be set to directory containing python binary (e.g. 'path/to/python/binray/python')
 
 NOTE: `pythonPath` is ignored when virtualenv used.
 

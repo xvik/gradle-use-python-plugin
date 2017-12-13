@@ -1,11 +1,6 @@
 language: java
 jdk: oraclejdk8
 sudo: required
-
-os:
-  - linux
-  - osx
-
 before_install:
   - chmod +x gradlew
   - sudo apt-get -y install python3-pip

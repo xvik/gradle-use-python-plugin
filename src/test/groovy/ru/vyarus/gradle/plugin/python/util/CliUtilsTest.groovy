@@ -53,6 +53,7 @@ class CliUtilsTest extends Specification {
         !CliUtils.isVersionMatch('2.2.3', '2.2.4')
         !CliUtils.isVersionMatch('2.2.3', '2.3')
         !CliUtils.isVersionMatch('2.2.3', '3')
+        !CliUtils.isVersionMatch('9.0.1', '10.1')
     }
 
     def "Check command wrapping"() {

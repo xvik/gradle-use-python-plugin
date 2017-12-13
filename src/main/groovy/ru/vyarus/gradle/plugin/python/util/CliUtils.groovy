@@ -138,7 +138,7 @@ final class CliUtils {
     }
 
     private static boolean isPositionMatch(String[] ver, String[] req, int pos) {
-        boolean valid = ver[pos] >= req[pos]
+        boolean valid = (ver[pos] as  Integer) >= (req[pos] as Integer)
         if (valid && ver[pos] == req[pos] && req.length > pos + 1) {
             return isPositionMatch(ver, req, pos + 1)
         }

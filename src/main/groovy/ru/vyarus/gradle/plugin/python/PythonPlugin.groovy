@@ -6,9 +6,9 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import ru.vyarus.gradle.plugin.python.task.BasePythonTask
 import ru.vyarus.gradle.plugin.python.task.CheckPythonTask
+import ru.vyarus.gradle.plugin.python.task.PythonTask
 import ru.vyarus.gradle.plugin.python.task.pip.BasePipTask
 import ru.vyarus.gradle.plugin.python.task.pip.PipInstallTask
-import ru.vyarus.gradle.plugin.python.task.PythonTask
 import ru.vyarus.gradle.plugin.python.task.pip.PipUpdatesTask
 
 /**
@@ -38,7 +38,6 @@ class PythonPlugin implements Plugin<Project> {
         // validate installed python
         CheckPythonTask checkTask = project.tasks.create('checkPython', CheckPythonTask) {
             description = 'Validate python environment'
-            conventionMapping.minPythonVersion = { extension.minVersion }
         }
 
         // default pip install task

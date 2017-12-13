@@ -163,7 +163,9 @@ class Python {
      */
     @Memoized
     String getHomeDir() {
-        return readOutput('-c "import sys;print(sys.prefix)"')
+        withHiddenLog {
+            return readOutput('-c "import sys;print(sys.prefix)"')
+        }
     }
 
     /**
@@ -171,8 +173,32 @@ class Python {
      */
     @Memoized
     String getVersion() {
-        return readOutput('-c "import sys;ver=sys.version_info;' +
-                'print(str(ver.major)+\'.\'+str(ver.minor)+\'.\'+str(ver.micro))"')
+        withHiddenLog {
+            return readOutput('-c "import sys;ver=sys.version_info;' +
+                    'print(str(ver.major)+\'.\'+str(ver.minor)+\'.\'+str(ver.micro))"')
+        }
+    }
+
+    /**
+     * Used to call python instance methods with hidden log (set to INFO).
+     *
+     * @param closure closure with python commands to execute
+     */
+    public <T> T withHiddenLog(Closure closure) {
+        LogLevel level = logLevel
+        logLevel(LogLevel.DEBUG)
+        try {
+            closure.call()
+        } finally {
+            logLevel(level)
+        }
+    }
+
+    /**
+     * @return python binary used
+     */
+    String getUsedBinary() {
+        this.executable
     }
 
     @SuppressWarnings('UnnecessarySetter')

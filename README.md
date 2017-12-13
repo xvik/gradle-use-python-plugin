@@ -270,18 +270,26 @@ python {
 
 `pythonPath` must be set to directory containing python binary (e.g. 'path/to/python/binray/python.exe')
 
-##### Minimal python version
+##### Minimal python and pip versions
 
 To set python version constraint:
 
 ```groovy
 python {
-    minVersion = '3.2'
+    minPythonVersion = '3.2'
 }
 ```
 
 Python version format is: major.minor.micro.
 Constraint may include any number of levels: '3', '3.1', '2.7.5'
+
+The same way pip version could be restricted:
+
+```groovy
+python {
+    minPipVersion = '9.0.1'
+}
+```
 
 ##### Pip
 
@@ -318,7 +326,9 @@ python {
    // python binary name (python or python3 by default)
    pythonBinary
    // minimal required python version (m.m.m)
-   minVersion
+   minPythonVersion
+   // minimal required pip version (m.m.m)
+   minPipVersion = '9'
    // install modules for current user only (--user)
    userScope = true
    // show all installed modules versions after pip installation

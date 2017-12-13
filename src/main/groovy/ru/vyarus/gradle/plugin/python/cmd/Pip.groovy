@@ -1,6 +1,7 @@
 package ru.vyarus.gradle.plugin.python.cmd
 
 import groovy.transform.CompileStatic
+import groovy.transform.Memoized
 import org.gradle.api.Project
 import org.gradle.api.logging.LogLevel
 
@@ -68,5 +69,25 @@ class Pip {
      */
     Python getPython() {
         return python
+    }
+
+    /**
+     * @return pip version string (minor.major.micro)
+     */
+    @Memoized
+    String getVersion() {
+        python.withHiddenLog {
+            python.readOutput('-c "import pip; print(pip.__version__)"')
+        }
+    }
+
+    /**
+     * @return pip --version output
+     */
+    @Memoized
+    String getVersionLine() {
+        python.withHiddenLog {
+            python.readOutput('-m pip --version')
+        }
     }
 }

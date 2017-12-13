@@ -16,7 +16,12 @@ class PythonExtension {
      * Minimal required python version. Full format: "major.minor.micro". Any precision could be used, for example:
      * '3' (python 3 or above), '3.2' (python. 3.2 or above), '3.6.1' (python 3.6.1 or above).
      */
-    String minVersion
+    String minPythonVersion
+    /**
+     * Minimal required pip version. Format is teh same as python version: "major.minor.micro". Any precision could
+     * be used (9, 8.2, etc). By default pip 9 is required.
+     */
+    String minPipVersion = '9'
 
     /**
      * Path to python binary (folder where python executable is located). When not set, global python is called.

@@ -228,7 +228,7 @@ class Python {
         String res = binary ?: 'python'
         boolean isWindows = Os.isFamily(Os.FAMILY_WINDOWS)
         if (pythonPath) {
-            res = pythonPath + (pythonPath.endsWith('/') ? '' : '/') + res
+            res = pythonPath + (pythonPath.endsWith('/') ? '' : '/') + res + (isWindows ? '.exe' : '')
         } else if (!binary && !isWindows) {
             // check if python3 available
             new ByteArrayOutputStream().withStream { os ->

@@ -2,6 +2,7 @@ package ru.vyarus.gradle.plugin.python.task
 
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
+import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.TaskAction
 import org.gradle.process.internal.ExecException
@@ -41,8 +42,9 @@ class CheckPythonTask extends BasePipTask {
         }
 
         if (virtual) {
+            boolean isWindows = Os.isFamily(Os.FAMILY_WINDOWS)
             // switch environment and check again
-            ext.pythonPath = "$ext.envPath/bin"
+            ext.pythonPath = isWindows ? "$ext.envPath/Scripts": "$ext.envPath/bin"
             checkPython(ext)
             checkPip(ext)
         }

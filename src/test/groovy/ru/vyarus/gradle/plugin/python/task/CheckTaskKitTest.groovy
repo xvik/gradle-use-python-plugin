@@ -9,6 +9,26 @@ import ru.vyarus.gradle.plugin.python.AbstractKitTest
  */
 class CheckTaskKitTest extends AbstractKitTest {
 
+    def "Check no python"() {
+        setup:
+        build """
+            plugins {
+                id 'ru.vyarus.use-python'
+            }
+
+            python {
+                pythonPath = 'somewhere'
+            }
+
+        """
+
+        when: "run task"
+        BuildResult result = runFailed('checkPython')
+
+        then: "task successful"
+        result.output.contains('Python not found: somewhere/python')
+    }
+
     def "Check python version requirement"() {
         setup:
         build """

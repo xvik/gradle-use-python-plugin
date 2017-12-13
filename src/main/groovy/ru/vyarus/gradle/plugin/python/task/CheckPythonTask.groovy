@@ -7,9 +7,10 @@ import org.gradle.process.internal.ExecException
 import ru.vyarus.gradle.plugin.python.PythonExtension
 import ru.vyarus.gradle.plugin.python.task.pip.BasePipTask
 import ru.vyarus.gradle.plugin.python.util.CliUtils
+import ru.vyarus.gradle.plugin.python.util.PythonExecutionFailed
 
 /**
- * Task validates python installation (will fail if python not found or minimal version doesn't match).
+ * Task validates python installation (will fail if python or pip not found or minimal version doesn't match).
  * Task called before any {@link ru.vyarus.gradle.plugin.python.task.pip.PipInstallTask}
  * (by default, before pipInstall).
  *
@@ -28,6 +29,7 @@ class CheckPythonTask extends BasePipTask {
         checkPythonVersion(ext)
 
         if (!getModules().empty) {
+            checkPipInstalled()
             checkPipVersion(ext)
         }
     }
@@ -37,8 +39,8 @@ class CheckPythonTask extends BasePipTask {
             python.exec('--version')
         } catch (ExecException ex) {
             throw new GradleException("Python not found: $python.usedBinary. " +
-                    "Please install it (https://pip.pypa.io/en/stable/installing/) " +
-                    "or configure correct location with 'python.pythonPath'.", ex)
+                    'Please install it (http://docs.python-guide.org/en/latest/starting/installation/) ' +
+                    'or configure correct location with \'python.pythonPath\'.', ex)
         }
     }
 
@@ -50,6 +52,15 @@ class CheckPythonTask extends BasePipTask {
                     "required version: $minVersion")
         }
         logger.lifecycle('Using python {} from {} ({})', python.version, python.homeDir, python.usedBinary)
+    }
+
+    private void checkPipInstalled() {
+        try {
+            pip.versionLine
+        } catch (PythonExecutionFailed ex) {
+            throw new GradleException('Pip is not installed. Please install it ' +
+                    '(https://pip.pypa.io/en/stable/installing/).', ex)
+        }
     }
 
     private void checkPipVersion(PythonExtension ext) {

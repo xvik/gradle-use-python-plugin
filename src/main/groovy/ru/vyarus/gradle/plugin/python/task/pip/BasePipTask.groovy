@@ -29,7 +29,7 @@ class BasePipTask extends BasePythonTask {
     /**
      * Work with packages in user scope (--user pip option). When false - work with global scope.
      * Note that on linux it is better to work with user scope to overcome permission problems.
-     * Enabled by default (see {@link ru.vyarus.gradle.plugin.python.PythonExtension#userScope})
+     * Enabled by default (see {@link ru.vyarus.gradle.plugin.python.PythonExtension#scope})
      */
     @Input
     @Optional
@@ -87,6 +87,7 @@ class BasePipTask extends BasePythonTask {
      * @return user flag if user scope configured or empty string
      */
     @Internal
+    @Memoized
     protected String getUserFlag() {
         return getUserScope() ? ' --user' : ''
     }

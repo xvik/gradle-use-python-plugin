@@ -5,14 +5,15 @@
 
 ### About
 
-Plugin **does not install python and pip** itself (because it's easier to do it manually and python have great 
-compatibility so does not need to be installed often): by default, globally installed python used.
+Plugin **does not install python and pip** itself and use globally installed python (by default). 
+It's easier to prepare python manually and python have good compatibility (from user perspective) and does not need to 
+be installed often).
 
 The only plugin intention is to simplify python usage from gradle.
 
 Features:
-* Install required python modules (guarantee exact versions, even if newer installed) using pip 
-* Provides task to call python commands, modules or scripts (PythonTask)
+* Install required python modules using pip (per project (virtualenv), os user or gobal ) 
+* Provides task to call python commands, modules or scripts (`PythonTask`)
 * Could be used as basement for building plugins for specific python modules (like 
 [mkdocs plugin](https://github.com/xvik/gradle-mkdocs-plugin))
 
@@ -20,7 +21,7 @@ Features:
 
 * Configuration: `python`
 * Tasks:
-    - `checkPython` - validate python installation 
+    - `checkPython` - validate python installation (and create virtualenv if required)
     - `pipInstall` - install declared pip modules
     - `pipUpdates` - show the latest available versions for the registered modules
     - `type:PythonTask` - call python command/script/module
@@ -98,9 +99,40 @@ Make sure the latest pip installed (required to overcome some older pip problems
 pip3 install -U pip
 ```
 
-##### Travis configuration
+#### Virtualenv
 
-To make plugin work on [travis](https://travis-ci.org/) you'll require `sudo` and install pip [manually](.travis.yml):
+If you want to install pip modules per project (not global), then [install `virtualenv`](https://virtualenv.pypa.io/en/stable/):
+
+```bash
+pip3 install virtualenv 
+```
+
+By default, plugin detects if `virtualenv` module installed and creates new env (.gradle/python).
+If not installed, `--user` scope will be used (to force virtualenv use `python.scope = VIRTUALENV`). 
+
+If you already use virtualenv in your project, then simply point plugin to use it:
+
+```groovy
+python.envPath = 'path/to/your/env'
+```
+
+It will automatically change `pythonPath` configuration accordingly.
+
+#### Automatic python install
+
+Python is assumed to be used as java: install and forget. It perfectly fits user
+use case: install python once and plugin will replace all manual work. 
+
+It is also easy to configure python on CI (like travis).    
+
+If you want automatic python installation, try looking on JetBrain's 
+[python-envs plugin](https://github.com/JetBrains/gradle-python-envs). But be careful because 
+it has some caveats (for example, on windows python could be installed automatically just once 
+and requires manual un-installation). 
+
+#### Travis configuration
+
+To make plugin work on [travis](https://travis-ci.org/) you'll need `sudo` and install pip [manually](.travis.yml):
 
 ```yaml
 language: java
@@ -112,21 +144,7 @@ before_install:
   - sudo pip3 install -U pip
 ``` 
 
-It will be python 3.4 by default.
-
-##### Automatic python install
-
-I assume that automatic python management is important for development with python, but not for python modules usage.
-So "install once and forget" (like java) works perfectly.
-
-If you need automatic python installation, look JetBrain's 
-[python-envs plugin](https://github.com/JetBrains/gradle-python-envs) (note that on windows python could be 
-installed automatically just once and requires manual un-installation). 
-
-Another option is to use
-[virtualenv](https://packaging.python.org/guides/installing-using-pip-and-virtualenv/) 
-(or [pipenv](https://docs.pipenv.org/)) to separate different projects packages. 
-
+It will be python 3.4 by default. Virtualenv is not required, because travis already use it.
 
 ### Usage
 
@@ -157,12 +175,36 @@ Will install version 1.0 of module1 because it was the latest declaration.
 
 Dependencies are installed with `pipInstall` task which is called before any declared `PythonTask`.
 
-By default, all modules are installed for current user only (`--user` flag) in order to avoid
-permission problems (for *nux). To enable global scope:
+#### Scope
+
+Pip dependencies could be installed per project, for current user (~/) or globally.
+
+Default behaviour:
+ 
+* if you have [`virtualenv`](https://virtualenv.pypa.io/en/stable/) module installed: manage pip dependencies per project (env `.gradle/python` created)
+* if no virtualenv - use user scope ([`--user`](https://pip.pypa.io/en/stable/user_guide/#user-installs) pip flag): 
+pip modules are installed only for current user (this avoid permission problems on linux)
+
+To change defaults:
 
 ```groovy
-python.userScope = false
+python.scope = VIRTUALENV
 ``` 
+
+* `GLOBAL` - install modules globally (this may not work on linux due to permissions)
+* `USER` - use `--user` flag to install for current user only
+* `VIRTUALENV_OR_USER` - default
+* `VIRTUALENV` - use `virtualenv` (if module not installed - error thrown)
+
+Note that values maybe declared wihtout quotes because it's an enum which values are 
+declared as project ext properties (`ext.USER==ru.vyarus.gradle.plugin.python.PythonExtension.Scope.USER`).
+
+When `virtualenv` used, `pythonPath` is automatically configured to env.
+If you want to change virtualenv location (for example, to use already created one):
+
+```groovy
+python.envPath = 'some/other/path' // relative to project root
+```
 
 #### Check modules updates
 
@@ -270,6 +312,8 @@ python {
 
 `pythonPath` must be set to directory containing python binary (e.g. 'path/to/python/binray/python.exe')
 
+NOTE: `pythonPath` is ignored when virtualenv used.
+
 ##### Minimal python and pip versions
 
 To set python version constraint:
@@ -325,16 +369,21 @@ python {
    pythonPath
    // python binary name (python or python3 by default)
    pythonBinary
+   
    // minimal required python version (m.m.m)
    minPythonVersion
    // minimal required pip version (m.m.m)
-   minPipVersion = '9'
-   // install modules for current user only (--user)
-   userScope = true
+   minPipVersion = '9'   
+   
    // show all installed modules versions after pip installation
    showInstalledVersions = true
    // always call module install, even if correct version is already installed
-   alwaysInstallModules = flase
+   alwaysInstallModules = false
+   
+    // pip modules installation scope (project local, os user dir, global) 
+   scope = VIRTUALENV_OR_USER   
+   // used virtualenv path (if virtualenv used, see 'scope')
+   envPath = '.gradle/python'
 }
 ```
 

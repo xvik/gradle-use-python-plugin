@@ -9,7 +9,7 @@ import org.gradle.testkit.runner.TaskOutcome
  */
 class PythonPluginKitTest extends AbstractKitTest {
 
-    def "Check plugin execution"() {
+    def "Check simple plugin execution"() {
         setup:
         build """
             plugins {
@@ -17,6 +17,34 @@ class PythonPluginKitTest extends AbstractKitTest {
             }
 
             python {
+                scope = USER
+                pip 'click:6.7'
+            }
+            
+            task sample(type: PythonTask) {
+                command = '-c print(\\'samplee\\')'
+            }
+
+        """
+
+        when: "run task"
+        BuildResult result = run('sample')
+
+        then: "task successful"
+        result.task(':sample').outcome == TaskOutcome.SUCCESS
+        result.output =~ /click\s+6.7/
+        result.output.contains('samplee')
+    }
+
+    def "Check env plugin execution"() {
+        setup:
+        build """
+            plugins {
+                id 'ru.vyarus.use-python'
+            }
+
+            python {
+                scope = VIRTUALENV
                 pip 'click:6.7'
             }
             

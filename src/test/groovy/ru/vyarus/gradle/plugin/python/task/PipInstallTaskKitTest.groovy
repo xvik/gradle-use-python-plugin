@@ -25,6 +25,8 @@ class PipInstallTaskKitTest extends AbstractKitTest {
             plugins {
                 id 'ru.vyarus.use-python'
             }
+            
+            python.scope = USER
 
         """
 
@@ -46,6 +48,7 @@ class PipInstallTaskKitTest extends AbstractKitTest {
 
             python {
                 pip 'click:6.7'
+                scope = USER
                 showInstalledVersions = false
             }
 
@@ -76,6 +79,7 @@ class PipInstallTaskKitTest extends AbstractKitTest {
             }
 
             python {
+                scope = USER
                 pip 'click:6.7'
                 alwaysInstallModules = true
             }
@@ -99,7 +103,9 @@ class PipInstallTaskKitTest extends AbstractKitTest {
                 id 'ru.vyarus.use-python'
             }
             
-            task customPip(type: PipInstallTask) {
+            python.scope = USER
+            
+            task customPip(type: PipInstallTask) {                
                 pip 'click:6.7'
                 alwaysInstallModules = true
             }

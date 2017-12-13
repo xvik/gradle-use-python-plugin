@@ -34,7 +34,7 @@ class PythonPluginTest extends AbstractTest {
             python {
                 pythonPath = 'foo/bar'
                 pythonBinary = 'py'
-                userScope = false
+                scope = GLOBAL
                 pip 'sample:1', 'foo:2'
                 showInstalledVersions = false
                 alwaysInstallModules = true
@@ -73,7 +73,7 @@ class PythonPluginTest extends AbstractTest {
         Project project = project {
             apply plugin: "ru.vyarus.use-python"
 
-            task ('pyt', type: PythonTask) {}
+            task('pyt', type: PythonTask) {}
         }
         project.tasks.getByName('pyt').run()
 

@@ -1,10 +1,14 @@
 package ru.vyarus.gradle.plugin.python.task
 
 import groovy.transform.CompileStatic
+import groovy.transform.TypeCheckingMode
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.TaskAction
 import org.gradle.process.internal.ExecException
 import ru.vyarus.gradle.plugin.python.PythonExtension
+import ru.vyarus.gradle.plugin.python.cmd.Pip
+import ru.vyarus.gradle.plugin.python.cmd.Python
+import ru.vyarus.gradle.plugin.python.cmd.Virtualenv
 import ru.vyarus.gradle.plugin.python.task.pip.BasePipTask
 import ru.vyarus.gradle.plugin.python.util.CliUtils
 import ru.vyarus.gradle.plugin.python.util.PythonExecutionFailed
@@ -20,21 +24,34 @@ import ru.vyarus.gradle.plugin.python.util.PythonExecutionFailed
 @CompileStatic
 class CheckPythonTask extends BasePipTask {
 
+    private boolean virtual = false
+
     @TaskAction
     @SuppressWarnings('UnnecessaryGetter')
     void run() {
         PythonExtension ext = project.extensions.findByType(PythonExtension)
-
-        checkPythonInstalled()
-        checkPythonVersion(ext)
+        checkPython(ext)
 
         if (!getModules().empty) {
-            checkPipInstalled()
-            checkPipVersion(ext)
+
+            checkPip(ext)
+            if (ext.scope >= PythonExtension.Scope.VIRTUALENV_OR_USER) {
+                virtual = checkEnv(ext)
+            }
         }
+
+        if (virtual) {
+            // switch environment and check again
+            ext.pythonPath = "$ext.envPath/bin"
+            checkPython(ext)
+            checkPip(ext)
+        }
+        alterPipTasks()
     }
 
-    private void checkPythonInstalled() {
+    private void checkPython(PythonExtension ext) {
+        // important because python could change on second execution
+        Python python = new Python(project, pythonPath, pythonBinary)
         try {
             python.exec('--version')
         } catch (ExecException ex) {
@@ -42,9 +59,10 @@ class CheckPythonTask extends BasePipTask {
                     'Please install it (http://docs.python-guide.org/en/latest/starting/installation/) ' +
                     'or configure correct location with \'python.pythonPath\'.', ex)
         }
+        checkPythonVersion(python, ext)
     }
 
-    private void checkPythonVersion(PythonExtension ext) {
+    private void checkPythonVersion(Python python, PythonExtension ext) {
         String version = python.version
         String minVersion = ext.minPythonVersion
         if (!CliUtils.isVersionMatch(version, minVersion)) {
@@ -54,16 +72,19 @@ class CheckPythonTask extends BasePipTask {
         logger.lifecycle('Using python {} from {} ({})', python.version, python.homeDir, python.usedBinary)
     }
 
-    private void checkPipInstalled() {
+    private void checkPip(PythonExtension ext) {
+        // important because python could change on second execution
+        Pip pip = new Pip(project, ext.pythonPath, ext.pythonBinary, false)
         try {
             pip.versionLine
         } catch (PythonExecutionFailed ex) {
             throw new GradleException('Pip is not installed. Please install it ' +
                     '(https://pip.pypa.io/en/stable/installing/).', ex)
         }
+        checkPipVersion(pip, ext)
     }
 
-    private void checkPipVersion(PythonExtension ext) {
+    private void checkPipVersion(Pip pip, PythonExtension ext) {
         String version = pip.version
         String minVersion = ext.minPipVersion
         if (!CliUtils.isVersionMatch(version, minVersion)) {
@@ -71,5 +92,34 @@ class CheckPythonTask extends BasePipTask {
                     "required version: $minVersion. Use 'pip install -U pip' to upgrade pip.")
         }
         logger.lifecycle('Using {}', pip.versionLine)
+    }
+
+    private boolean checkEnv(PythonExtension ext) {
+        Virtualenv env = new Virtualenv(project, ext.pythonPath, ext.pythonBinary, ext.envPath)
+        try {
+            env.version
+        } catch (PythonExecutionFailed ex) {
+            if (ext.scope == PythonExtension.Scope.VIRTUALENV) {
+                throw new GradleException('Virtualenv is not installed. Please install it ' +
+                        '(https://virtualenv.pypa.io/en/stable/installation/) or change target pip ' +
+                        "scope 'python.scope' from ${PythonExtension.Scope.VIRTUALENV}", ex)
+            }
+            // not found, but ok (fallback to USER scope)
+            return false
+        }
+
+        logger.lifecycle("Using virtualenv $env.version ($ext.envPath)")
+        env.create()
+        return true
+    }
+
+    @CompileStatic(TypeCheckingMode.SKIP)
+    private void alterPipTasks() {
+        if (virtual) {
+            // disable user scope (not allowed in virtualenv)
+            project.tasks.withType(BasePipTask) { task ->
+                task.userScope = false
+            }
+        }
     }
 }

@@ -34,6 +34,8 @@ class PythonPlugin implements Plugin<Project> {
         // simplify direct tasks usage
         project.extensions.extraProperties.set(PipInstallTask.simpleName, PipInstallTask)
         project.extensions.extraProperties.set(PythonTask.simpleName, PythonTask)
+        // configuration shortcut
+        PythonExtension.Scope.values().each { project.extensions.extraProperties.set(it.name(), it) }
 
         // validate installed python
         CheckPythonTask checkTask = project.tasks.create('checkPython', CheckPythonTask) {
@@ -73,7 +75,8 @@ class PythonPlugin implements Plugin<Project> {
         project.tasks.withType(BasePipTask) { task ->
             task.conventionMapping.with {
                 modules = { extension.modules }
-                userScope = { extension.userScope }
+                // in case of virtualenv checkPython will manually disable
+                userScope = { extension.scope != PythonExtension.Scope.GLOBAL }
             }
         }
 

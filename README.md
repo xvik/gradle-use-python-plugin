@@ -99,6 +99,10 @@ Make sure the latest pip installed (required to overcome some older pip problems
 pip3 install -U pip
 ```
 
+Note that on ubuntu pip installed with `python3-pip` package is 9.0.1, but it did not(!) downgrade
+module versions (e.g. `pip install click 6.6` when click 6.7 is installed will do nothing). 
+Maybe there are other differences, so it's highly recommended to upgrade pip with `pip3 install -U pip`.
+
 #### Virtualenv
 
 If you want to install pip modules per project (not global), then [install `virtualenv`](https://virtualenv.pypa.io/en/stable/):

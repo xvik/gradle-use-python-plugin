@@ -1,5 +1,6 @@
 package ru.vyarus.gradle.plugin.python
 
+import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.Rule
@@ -14,6 +15,8 @@ import spock.lang.Specification
  * @since 11.11.2017
  */
 abstract class AbstractKitTest extends Specification {
+
+    boolean isWin = Os.isFamily(Os.FAMILY_WINDOWS)
 
     @Rule
     final TemporaryFolder testProjectDir = new TemporaryFolder()

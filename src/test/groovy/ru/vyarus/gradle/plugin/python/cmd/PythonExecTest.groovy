@@ -1,6 +1,5 @@
 package ru.vyarus.gradle.plugin.python.cmd
 
-import org.apache.tools.ant.taskdefs.condition.Os
 import ru.vyarus.gradle.plugin.python.util.PythonExecutionFailed
 
 /**
@@ -83,11 +82,13 @@ class PythonExecTest extends AbstractCliMockSupport {
         setup:
         mockExec(project, 'sample output', 0)
         python = new Python(project, 'some/path', null)
+        file('some/path').mkdirs()
+        file('some/path/python.exe').createNewFile()
 
         when: "call module"
         python.exec('mmm')
         then: "ok"
-        logger.res == "[python] some/path/python${Os.isFamily(Os.FAMILY_WINDOWS)?'.exe':''} mmm\n\t sample output\n"
+        logger.res == (isWin ? "[python] cmd /c some\\path\\python.exe mmm\n\t sample output\n" : "[python] some/path/python mmm\n\t sample output\n")
     }
 
     def "Check python binary change"() {
@@ -107,10 +108,12 @@ class PythonExecTest extends AbstractCliMockSupport {
         setup:
         mockExec(project, 'sample output', 0)
         python = new Python(project, 'some/path', 'py')
+        file('some/path').mkdirs()
+        file('some/path/py.exe').createNewFile()
 
         when: "call module"
         python.exec('mmm')
         then: "ok"
-        logger.res == "[python] some/path/py${Os.isFamily(Os.FAMILY_WINDOWS)?'.exe':''} mmm\n\t sample output\n"
+        logger.res == (isWin ? "[python] cmd /c some\\path\\py.exe mmm\n\t sample output\n" : "[python] some/path/py mmm\n\t sample output\n")
     }
 }

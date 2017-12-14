@@ -26,7 +26,7 @@ class CheckTaskKitTest extends AbstractKitTest {
         BuildResult result = runFailed('checkPython')
 
         then: "task successful"
-        result.output.contains('Python not found: somewhere/python')
+        result.output.contains("Python not found: somewhere${isWin ? '\\python.exe' : '/python'}")
     }
 
     def "Check python version requirement"() {

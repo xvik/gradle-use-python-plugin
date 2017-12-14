@@ -1,6 +1,7 @@
 package ru.vyarus.gradle.plugin.python.util
 
 import org.apache.tools.ant.taskdefs.condition.Os
+import org.gradle.process.internal.ExecException
 
 /**
  * Cli helper utilities.
@@ -137,8 +138,27 @@ final class CliUtils {
         return "exec(\"$cmd\")"
     }
 
+    /**
+     * Prepare arguments to call python with cmd.
+     *
+     * @param executable python executable
+     * @param projectHome project home directory
+     * @param args python arguments
+     * @return arguments for cmd
+     */
+    static String[] wincmdArgs(String executable, File projectHome, String[] args, boolean workDirUsed) {
+        File file = new File(projectHome, executable)
+        // manual check to unify win/linux behaviour
+        if (!file.exists()) {
+            throw new ExecException("Cannot run program \"$executable\": error=2, No such file or directory")
+        }
+        // when work dir not used we can use relative path, but with work dir only absolute path
+        String exec = workDirUsed ? file.canonicalPath : executable
+        return mergeArgs(['/c', exec.contains(SPACE) ? "\"\"$exec\"\"" : exec], args)
+    }
+
     private static boolean isPositionMatch(String[] ver, String[] req, int pos) {
-        boolean valid = (ver[pos] as  Integer) >= (req[pos] as Integer)
+        boolean valid = (ver[pos] as Integer) >= (req[pos] as Integer)
         if (valid && ver[pos] == req[pos] && req.length > pos + 1) {
             return isPositionMatch(ver, req, pos + 1)
         }

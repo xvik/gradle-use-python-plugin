@@ -34,6 +34,7 @@ class Python {
 
     private static final String PYTHON3 = 'python3'
     private static final String SPACE = ' '
+    private static final String SLASH = '/'
 
     private final Project project
     private final String executable
@@ -42,6 +43,11 @@ class Python {
     private LogLevel logLevel = LogLevel.INFO
     private final List<String> extraArgs = []
 
+    // run through cmd on win (when direct executable called)
+    private final boolean withCmd
+    // set when calling custom binary by path instead of global (required to rewrite path to absolute)
+    private final boolean customBinaryPath
+
     Python(Project project) {
         this(project, null, null)
     }
@@ -49,6 +55,10 @@ class Python {
     Python(Project project, String pythonPath, String binary) {
         this.project = project
         this.executable = getPythonBinary(project, pythonPath, binary)
+        // direct executable must be called with cmd (https://docs.gradle.org/4.1/dsl/org.gradle.api.tasks.Exec.html)
+        this.withCmd = pythonPath && Os.isFamily(Os.FAMILY_WINDOWS)
+        // custom python path used (which may be relative and conflict with workDir)
+        this.customBinaryPath = pythonPath as boolean
     }
 
     /**
@@ -203,13 +213,21 @@ class Python {
 
     @SuppressWarnings('UnnecessarySetter')
     private void processExecution(Object args, OutputStream os) {
-        String[] cmd = prepareArgs(args)
-        String commandLine = "$executable ${cmd.join(SPACE)}"
+        boolean wrkDirUsed = workDir as boolean
+        // on win non global python could be called only through cmd
+        String exec = withCmd ? 'cmd'
+                // use absolute python path if work dir set (relative will simply not work)
+                : (wrkDirUsed && customBinaryPath ? project.file(executable).canonicalPath : executable)
+        String[] cmd = withCmd ?
+                CliUtils.wincmdArgs(executable, project.rootDir, prepareArgs(args), wrkDirUsed)
+                : prepareArgs(args)
+
+        String commandLine = "$exec ${cmd.join(SPACE)}"
         String formattedCommand = commandLine.replace('\r', '').replace('\n', SPACE)
         project.logger.log(logLevel, "[python] $formattedCommand")
 
         ExecResult res = project.exec {
-            it.executable = this.executable
+            it.executable = exec
             it.args(cmd)
             standardOutput = os
             errorOutput = os
@@ -228,7 +246,9 @@ class Python {
         String res = binary ?: 'python'
         boolean isWindows = Os.isFamily(Os.FAMILY_WINDOWS)
         if (pythonPath) {
-            res = pythonPath + (pythonPath.endsWith('/') ? '' : '/') + res + (isWindows ? '.exe' : '')
+            String path = pythonPath + (pythonPath.endsWith(SLASH) ? '' : SLASH)
+            // $pythonPath/$binaryName(.exe)
+            res = isWindows ? "${path.replace(SLASH, '\\')}${res}.exe" : "$path$res"
         } else if (!binary && !isWindows) {
             // check if python3 available
             new ByteArrayOutputStream().withStream { os ->

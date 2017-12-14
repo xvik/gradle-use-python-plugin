@@ -44,7 +44,7 @@ class CheckPythonTask extends BasePipTask {
         if (virtual) {
             boolean isWindows = Os.isFamily(Os.FAMILY_WINDOWS)
             // switch environment and check again
-            ext.pythonPath = isWindows ? "$ext.envPath/Scripts": "$ext.envPath/bin"
+            ext.pythonPath = isWindows ? "$ext.envPath/Scripts" : "$ext.envPath/bin"
             checkPython(ext)
             checkPip(ext)
         }
@@ -57,9 +57,12 @@ class CheckPythonTask extends BasePipTask {
         try {
             python.exec('--version')
         } catch (ExecException ex) {
-            throw new GradleException("Python not found: $python.usedBinary. " +
-                    'Please install it (http://docs.python-guide.org/en/latest/starting/installation/) ' +
-                    'or configure correct location with \'python.pythonPath\'.', ex)
+            throw new GradleException("Python not found: $python.usedBinary. " + (virtual ?
+                    'This must be a bug of virtualenv support, please report it ' +
+                            '(https://github.com/xvik/gradle-use-python-plugin/issues). You can disable ' +
+                            'virtualenv usage with \'python.scope = USER\'.'
+                    : 'Please install it (http://docs.python-guide.org/en/latest/starting/installation/) ' +
+                    'or configure correct location with \'python.pythonPath\'.'), ex)
         }
         checkPythonVersion(python, ext)
     }
@@ -80,8 +83,8 @@ class CheckPythonTask extends BasePipTask {
         try {
             pip.versionLine
         } catch (PythonExecutionFailed ex) {
-            throw new GradleException('Pip is not installed. Please install it ' +
-                    '(https://pip.pypa.io/en/stable/installing/).', ex)
+            throw new GradleException("Pip is not installed${virtual ? " on virtualenv $ext.envPath" : ''}. " +
+                    'Please install it (https://pip.pypa.io/en/stable/installing/).', ex)
         }
         checkPipVersion(pip, ext)
     }

@@ -2,6 +2,7 @@ package ru.vyarus.gradle.plugin.python.cmd
 
 import groovy.transform.CompileStatic
 import groovy.transform.Memoized
+import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.Project
 import org.gradle.api.logging.LogLevel
 
@@ -59,5 +60,13 @@ class Virtualenv {
             return
         }
         python.callModule('virtualenv', path)
+    }
+
+    /**
+     * @return python path to use for environment
+     */
+    @Memoized
+    String getPythonPath() {
+        return Os.isFamily(Os.FAMILY_WINDOWS) ? "$path/Scripts" : "$path/bin"
     }
 }

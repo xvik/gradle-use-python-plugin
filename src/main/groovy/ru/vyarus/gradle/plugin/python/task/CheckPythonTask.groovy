@@ -1,8 +1,6 @@
 package ru.vyarus.gradle.plugin.python.task
 
 import groovy.transform.CompileStatic
-import groovy.transform.TypeCheckingMode
-import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.TaskAction
 import org.gradle.process.internal.ExecException
@@ -15,9 +13,14 @@ import ru.vyarus.gradle.plugin.python.util.CliUtils
 import ru.vyarus.gradle.plugin.python.util.PythonExecutionFailed
 
 /**
- * Task validates python installation (will fail if python or pip not found or minimal version doesn't match).
+ * Task validates python installation. Will fail if python or pip not found or minimal version doesn't match.
  * Task called before any {@link ru.vyarus.gradle.plugin.python.task.pip.PipInstallTask}
  * (by default, before pipInstall).
+ * <p>
+ * If existing virtualenv is detected then plugin immediately switches to use it (without checking global python).
+ * When virtualenv not exists, then global python checked. If pip modules required, pip existence checked and
+ * then virtualenv existence checked (if scope allows). With default scope, when virtualenv module not found,
+ * plugin fall back to os user dir. If virtualenv is strictly required (by scope) then build will fail.
  *
  * @author Vyacheslav Rusakov
  * @since 08.12.2017
@@ -31,24 +34,27 @@ class CheckPythonTask extends BasePipTask {
     @SuppressWarnings('UnnecessaryGetter')
     void run() {
         PythonExtension ext = project.extensions.findByType(PythonExtension)
-        checkPython(ext)
+        Virtualenv env = new Virtualenv(project, ext.pythonPath, ext.pythonBinary, ext.envPath)
 
-        if (!getModules().empty) {
+        if (env.exists()) {
+            // use env right ahead (global python could even not exists)
+            virtual = true
+        } else {
+            // normal flow: check global installation - try to create virtualenv (if modules required)
 
-            checkPip(ext)
-            if (ext.scope >= PythonExtension.Scope.VIRTUALENV_OR_USER) {
-                virtual = checkEnv(ext)
+            checkPython(ext)
+
+            if (!getModules().empty) {
+                checkPip(ext)
+                if (ext.scope >= PythonExtension.Scope.VIRTUALENV_OR_USER) {
+                    virtual = checkEnv(env, ext)
+                }
             }
         }
 
         if (virtual) {
-            boolean isWindows = Os.isFamily(Os.FAMILY_WINDOWS)
-            // switch environment and check again
-            ext.pythonPath = isWindows ? "$ext.envPath/Scripts" : "$ext.envPath/bin"
-            checkPython(ext)
-            checkPip(ext)
+            switchEnvironment(env, ext)
         }
-        alterPipTasks()
     }
 
     private void checkPython(PythonExtension ext) {
@@ -99,8 +105,7 @@ class CheckPythonTask extends BasePipTask {
         logger.lifecycle('Using {}', pip.versionLine)
     }
 
-    private boolean checkEnv(PythonExtension ext) {
-        Virtualenv env = new Virtualenv(project, ext.pythonPath, ext.pythonBinary, ext.envPath)
+    private boolean checkEnv(Virtualenv env, PythonExtension ext) {
         try {
             env.version
         } catch (PythonExecutionFailed ex) {
@@ -118,13 +123,19 @@ class CheckPythonTask extends BasePipTask {
         return true
     }
 
-    @CompileStatic(TypeCheckingMode.SKIP)
-    private void alterPipTasks() {
-        if (virtual) {
-            // disable user scope (not allowed in virtualenv)
-            project.tasks.withType(BasePipTask) { task ->
-                task.userScope = false
-            }
+    @SuppressWarnings('UnnecessaryGetter')
+    private void switchEnvironment(Virtualenv env, PythonExtension ext) {
+        // switch environment and check again
+        ext.pythonPath = env.pythonPath
+        checkPython(ext)
+        // only if pip required
+        if (!getModules().empty) {
+            checkPip(ext)
+        }
+
+        // disable user scope (not allowed in virtualenv)
+        project.tasks.withType(BasePipTask) { BasePipTask task ->
+            task.userScope = false
         }
     }
 }

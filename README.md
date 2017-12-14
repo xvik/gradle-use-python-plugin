@@ -122,6 +122,10 @@ python.envPath = 'path/to/your/env'
 
 It will automatically change `pythonPath` configuration accordingly.
 
+NOTE: plugin will not create virtualenv if you don't use any modules. If you still want to use virtualenv
+then create it manually: `virtualenv .gradle/python` (default location). Plugin will recognize
+existing env and use it.
+
 #### Automatic python install
 
 Python is assumed to be used as java: install and forget. It perfectly fits user

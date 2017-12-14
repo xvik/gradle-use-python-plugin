@@ -17,6 +17,8 @@ class Virtualenv {
 
     private final Python python
 
+    // module name
+    final String name = 'virtualenv'
     final String path
     final File location
 
@@ -40,7 +42,7 @@ class Virtualenv {
     @Memoized
     String getVersion() {
         python.withHiddenLog {
-            python.readOutput('-m virtualenv --version')
+            python.readOutput("-m $name --version")
         }
     }
 
@@ -59,7 +61,7 @@ class Virtualenv {
         if (exists()) {
             return
         }
-        python.callModule('virtualenv', path)
+        python.callModule(name, path)
     }
 
     /**

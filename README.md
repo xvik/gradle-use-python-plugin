@@ -12,7 +12,7 @@ be installed often).
 The only plugin intention is to simplify python usage from gradle.
 
 Features:
-* Install required python modules using pip (per project (virtualenv), os user or gobal ) 
+* Install required python modules using pip (per project (virtualenv, default), os user (--user) or globally ) 
 * Provides task to call python commands, modules or scripts (`PythonTask`)
 * Could be used as basement for building plugins for specific python modules (like 
 [mkdocs plugin](https://github.com/xvik/gradle-mkdocs-plugin))
@@ -103,29 +103,6 @@ Note that on ubuntu pip installed with `python3-pip` package is 9.0.1, but it di
 module versions (e.g. `pip install click 6.6` when click 6.7 is installed will do nothing). 
 Maybe there are other differences, so it's highly recommended to upgrade pip with `pip3 install -U pip`.
 
-#### Virtualenv
-
-If you want to install pip modules per project (not global), then [install `virtualenv`](https://virtualenv.pypa.io/en/stable/):
-
-```bash
-pip3 install virtualenv 
-```
-
-By default, plugin detects if `virtualenv` module installed and creates new env (.gradle/python).
-If not installed, `--user` scope will be used (to force virtualenv use `python.scope = VIRTUALENV`). 
-
-If you already use virtualenv in your project, then simply point plugin to use it:
-
-```groovy
-python.envPath = 'path/to/your/env'
-```
-
-It will automatically change `pythonPath` configuration accordingly.
-
-NOTE: plugin will not create virtualenv if you don't use any modules. If you still want to use virtualenv
-then create it manually: `virtualenv .gradle/python` (default location). Plugin will recognize
-existing env and use it.
-
 #### Automatic python install
 
 Python is assumed to be used as java: install and forget. It perfectly fits user
@@ -183,13 +160,51 @@ Will install version 1.0 of module1 because it was the latest declaration.
 
 Dependencies are installed with `pipInstall` task which is called before any declared `PythonTask`.
 
+#### Virtualenv
+
+When you declare any pip modules, plugin will try to use [virtualenv](https://virtualenv.pypa.io/en/stable/) 
+in order to install required modules locally (for current project only).
+
+If virtualenv is not installed - it will be installed automatically in `--user` scope. If you don't want automatic 
+installation then disable it:
+
+```groovy
+python.installVirtualenv = false
+```
+
+In any case, plugin checks if virtualenv is already installed and use it to create local environment 
+(if not, then fall back to  `--user` scope by default). Virtualenv usage is driven by declared scope, so if you don't want to use it set:
+
+```groovy
+python.scope = USER // or GLOBAL
+```
+
+With USER (or GLOBAL) scope, virtualenv will not be used, event if it's already created in project (plugin will ignore it and use global python).
+
+If you already use virtualenv in your project (have created environment), then simply point plugin to use it:
+
+```groovy
+python.envPath = 'path/to/your/env'
+```
+
+It will automatically change `pythonPath` configuration accordingly.
+
+NOTE: plugin will not create environment if you don't use any modules. If you still want to use project specific environment
+(without declared pip modules) then create it manually: `virtualenv .gradle/python` (default location). Plugin will recognize
+existing env and use it.
+
+IMPORTANT: virtualenv creates local python copy (by default in `.gradle/python`). Copy is created from global python and
+later used *instead* of global python (global python may be even removed). If you want to change used python version in the environment, 
+then manually remove `.gradle/python` so it could be created again (from global python).
+
 #### Scope
 
 Pip dependencies could be installed per project, for current user (~/) or globally.
 
 Default behaviour:
  
-* if you have [`virtualenv`](https://virtualenv.pypa.io/en/stable/) module installed: manage pip dependencies per project (env `.gradle/python` created)
+* if [`virtualenv`](https://virtualenv.pypa.io/en/stable/) module installed (or automatically installed, see above): 
+manage pip dependencies per project (env `.gradle/python` created)
 * if no virtualenv - use user scope ([`--user`](https://pip.pypa.io/en/stable/user_guide/#user-installs) pip flag): 
 pip modules are installed only for current user (this avoid permission problems on linux)
 
@@ -204,15 +219,8 @@ python.scope = VIRTUALENV
 * `VIRTUALENV_OR_USER` - default
 * `VIRTUALENV` - use `virtualenv` (if module not installed - error thrown)
 
-Note that values maybe declared wihtout quotes because it's an enum which values are 
+Note that values may be declared without quotes because it's an enum which values are 
 declared as project ext properties (`ext.USER==ru.vyarus.gradle.plugin.python.PythonExtension.Scope.USER`).
-
-When `virtualenv` used, `pythonPath` is automatically configured to env.
-If you want to change virtualenv location (for example, to use already created one):
-
-```groovy
-python.envPath = 'some/other/path' // relative to project root
-```
 
 #### Check modules updates
 
@@ -389,7 +397,9 @@ python {
    alwaysInstallModules = false
    
     // pip modules installation scope (project local, os user dir, global) 
-   scope = VIRTUALENV_OR_USER   
+   scope = VIRTUALENV_OR_USER
+   // automatically install virtualenv module (if pip modules declared and scope allows)   
+   installVirtualenv = true
    // used virtualenv path (if virtualenv used, see 'scope')
    envPath = '.gradle/python'
 }

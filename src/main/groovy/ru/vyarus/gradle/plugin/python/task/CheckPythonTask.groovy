@@ -34,10 +34,11 @@ class CheckPythonTask extends BasePipTask {
     @SuppressWarnings('UnnecessaryGetter')
     void run() {
         PythonExtension ext = project.extensions.findByType(PythonExtension)
-        Virtualenv env = new Virtualenv(project, ext.pythonPath, ext.pythonBinary, ext.envPath)
+        boolean envRequested = ext.scope >= PythonExtension.Scope.VIRTUALENV_OR_USER
+        Virtualenv env = envRequested ? new Virtualenv(project, ext.pythonPath, ext.pythonBinary, ext.envPath) : null
 
-        if (env.exists()) {
-            // use env right ahead (global python could even not exists)
+        // use env right ahead (global python could even not exists), but only if allowed by scope
+        if (envRequested && env.exists()) {
             virtual = true
         } else {
             // normal flow: check global installation - try to create virtualenv (if modules required)
@@ -46,7 +47,8 @@ class CheckPythonTask extends BasePipTask {
 
             if (!getModules().empty) {
                 checkPip(ext)
-                if (ext.scope >= PythonExtension.Scope.VIRTUALENV_OR_USER) {
+                // only if virtualenv usage requested
+                if (envRequested) {
                     virtual = checkEnv(env, ext)
                 }
             }
@@ -106,16 +108,23 @@ class CheckPythonTask extends BasePipTask {
     }
 
     private boolean checkEnv(Virtualenv env, PythonExtension ext) {
-        try {
-            env.version
-        } catch (PythonExecutionFailed ex) {
-            if (ext.scope == PythonExtension.Scope.VIRTUALENV) {
+        Pip pip = new Pip(project, ext.pythonPath, ext.pythonBinary, true)
+        if (!pip.isInstalled(env.name)) {
+
+            if (ext.installVirtualenv) {
+                // automatically install virtualenv if allowed (in --user)
+                pip.install(env.name)
+
+            } else if (ext.scope == PythonExtension.Scope.VIRTUALENV) {
+                // virtualenv strictly required - fail
                 throw new GradleException('Virtualenv is not installed. Please install it ' +
                         '(https://virtualenv.pypa.io/en/stable/installation/) or change target pip ' +
-                        "scope 'python.scope' from ${PythonExtension.Scope.VIRTUALENV}", ex)
+                        "scope 'python.scope' from ${PythonExtension.Scope.VIRTUALENV}")
+
+            } else {
+                // not found, but ok (fallback to USER scope)
+                return false
             }
-            // not found, but ok (fallback to USER scope)
-            return false
         }
 
         logger.lifecycle("Using virtualenv $env.version ($ext.envPath)")

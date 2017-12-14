@@ -64,6 +64,12 @@ class PythonExtension {
      */
     Scope scope = Scope.VIRTUALENV_OR_USER
     /**
+     * Automatically install virtualenv (if pip modules used). Will install for current user only (--user).
+     * Installed virtualenv will not be modified later, so you will need to manually update it in case of problems.
+     * When disabled, plugin will still check if virtualenv is available, but will not try to install it if not.
+     */
+    boolean installVirtualenv = true
+    /**
      * Virtual environment path to use. Used only when {@link #scope} is configured to use virtualenv.
      * Virtualenv will be created automatically if not yet exists.
      */

@@ -4,6 +4,7 @@ import groovy.transform.CompileStatic
 import groovy.transform.Memoized
 import org.gradle.api.Project
 import org.gradle.api.logging.LogLevel
+import ru.vyarus.gradle.plugin.python.util.PythonExecutionFailed
 
 /**
  * Pip commands execution utility. Use {@link Python} internally.
@@ -46,6 +47,22 @@ class Pip {
      */
     void uninstall(String module) {
         exec("uninstall $module -y -q")
+    }
+
+    /**
+     * @param module module to check
+     * @return true if module installed
+     */
+    boolean isInstalled(String module) {
+        python.withHiddenLog {
+            try {
+                // has no output on error, so nothing will appear in log
+                python.readOutput("-m pip show $module")
+            } catch (PythonExecutionFailed ignored) {
+                return false
+            }
+            return true
+        }
     }
 
     /**

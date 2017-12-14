@@ -129,7 +129,7 @@ before_install:
   - sudo pip3 install -U pip
 ``` 
 
-It will be python 3.4 by default. Virtualenv is not required, because travis already use it.
+It will be python 3.4 by default.
 
 ### Usage
 
@@ -179,7 +179,7 @@ In any case, plugin checks if virtualenv is already installed and use it to crea
 python.scope = USER // or GLOBAL
 ```
 
-With USER (or GLOBAL) scope, virtualenv will not be used, event if it's already created in project (plugin will ignore it and use global python).
+With USER (or GLOBAL) scope, virtualenv will not be used, even if it's already created in project (plugin will ignore it and use global python).
 
 If you already use virtualenv in your project (have created environment), then simply point plugin to use it:
 

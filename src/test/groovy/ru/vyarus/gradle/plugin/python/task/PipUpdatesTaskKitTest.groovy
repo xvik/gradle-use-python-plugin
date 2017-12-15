@@ -34,7 +34,7 @@ class PipUpdatesTaskKitTest extends AbstractKitTest {
         when: "run task"
         BuildResult result = run('pipUpdates')
 
-        then: "click install called"
+        then: "click update detected"
         result.task(':pipUpdates').outcome == TaskOutcome.SUCCESS
         result.output.contains('The following modules could be updated:')
         result.output =~ /click\s+6.6/
@@ -61,7 +61,7 @@ class PipUpdatesTaskKitTest extends AbstractKitTest {
         when: "run task"
         BuildResult result = run('pipUpdates')
 
-        then: "click install called"
+        then: "click update detected"
         result.task(':pipUpdates').outcome == TaskOutcome.SUCCESS
         result.output.contains('The following modules could be updated:')
         result.output =~ /click\s+6.6/
@@ -79,7 +79,7 @@ class PipUpdatesTaskKitTest extends AbstractKitTest {
         when: "run task"
         BuildResult result = run('pipUpdates')
 
-        then: "click install called"
+        then: "nothing declared"
         result.task(':pipUpdates').outcome == TaskOutcome.SUCCESS
         result.output.contains('No modules declared')
     }
@@ -105,8 +105,63 @@ class PipUpdatesTaskKitTest extends AbstractKitTest {
         when: "run task"
         BuildResult result = run('pipUpdates')
 
-        then: "click install called"
+        then: "nothing to update"
         result.task(':pipUpdates').outcome == TaskOutcome.SUCCESS
         result.output.contains('All modules use the most recent versions')
+    }
+
+    def "Check updates for all"() {
+
+        setup:
+        // use the latest version
+        new Pip(ProjectBuilder.builder().build()).install('click==6.6')
+
+        build """
+            plugins {
+                id 'ru.vyarus.use-python'
+            }
+
+            python {
+                scope = USER
+            }
+            
+            pipUpdates.all = true
+
+        """
+
+        when: "run task"
+        BuildResult result = run('pipUpdates')
+
+        then: "nothing to update"
+        result.task(':pipUpdates').outcome == TaskOutcome.SUCCESS
+        !result.output.contains('All modules use the most recent versions')
+    }
+
+
+    def "Check no updates"() {
+
+        setup:
+        // empty environment
+        env().create(false, true)
+
+        build """
+            plugins {
+                id 'ru.vyarus.use-python'
+            }
+
+            python {
+                scope = USER
+            }
+            
+            pipUpdates.all = true
+
+        """
+
+        when: "run task"
+        BuildResult result = run('pipUpdates')
+
+        then: "nothing to update"
+        result.task(':pipUpdates').outcome == TaskOutcome.SUCCESS
+        !result.output.contains('All modules use the most recent versions')
     }
 }

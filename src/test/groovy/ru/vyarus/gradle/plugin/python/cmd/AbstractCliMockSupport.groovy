@@ -41,7 +41,9 @@ abstract class AbstractCliMockSupport extends Specification {
         project.exec(_) >> {Closure spec ->
             DefaultExecAction act = ConfigureUtil.configure(spec, new DefaultExecAction(Stub(PathToFileResolver)))
             OutputStream os = act.standardOutput
-            os.write(output.bytes)
+            if (output) {
+                os.write(output.bytes)
+            }
             return new ExecRes(res)
         }
     }

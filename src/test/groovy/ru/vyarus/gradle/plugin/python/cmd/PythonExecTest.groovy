@@ -116,4 +116,29 @@ class PythonExecTest extends AbstractCliMockSupport {
         then: "ok"
         logger.res == (isWin ? "[python] cmd /c some\\path\\py.exe mmm\n\t sample output\n" : "[python] some/path/py mmm\n\t sample output\n")
     }
+
+    def "Check hidden logs"() {
+
+        setup:
+        mockExec(project, null, 0)
+        project.logger.appendLevel = true
+        python = new Python(project)
+
+        when: "call module"
+        python.exec('mmm')
+        then: "ok"
+        logger.res =~ /INFO \[python] python(3)? mmm/
+
+        when: "call hidden"
+        python.withHiddenLog {
+            python.exec('hid')
+        }
+        then: "changed log"
+        logger.res =~ /DEBUG \[python] python(3)? hid/
+
+        when: "normal call after"
+        python.exec('aft')
+        then: "changed log"
+        logger.res =~ /INFO \[python] python(3)? aft/
+    }
 }

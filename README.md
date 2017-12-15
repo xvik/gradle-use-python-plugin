@@ -247,7 +247,7 @@ The following modules could be updated:
 Note that it will not show versions for transitive modules, only
 for modules specified directly in `python.pip`.
 
-To see updates all available updates (wihout filtering):
+To see all available updates (wihout filtering):
 
 ```groovy
 pipUpdates.all = true

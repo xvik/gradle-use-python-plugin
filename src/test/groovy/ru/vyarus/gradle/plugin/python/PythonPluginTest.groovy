@@ -13,7 +13,7 @@ class PythonPluginTest extends AbstractTest {
     def "Check extension registration"() {
 
         when: "plugin applied"
-        Project project = ProjectBuilder.builder().build()
+        Project project = project()
         project.plugins.apply "ru.vyarus.use-python"
 
         then: "extension registered"

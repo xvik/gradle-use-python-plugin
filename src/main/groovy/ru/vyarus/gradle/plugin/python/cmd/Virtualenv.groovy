@@ -15,10 +15,12 @@ import org.gradle.api.logging.LogLevel
 @CompileStatic
 class Virtualenv {
 
+    public static final String PIP_NAME = 'virtualenv'
+
     private final Python python
 
     // module name
-    final String name = 'virtualenv'
+    final String name = PIP_NAME
     final String path
     final File location
 

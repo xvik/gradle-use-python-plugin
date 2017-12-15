@@ -15,7 +15,7 @@ class PythonCliTest extends AbstractTest {
     def "Check python execution"() {
 
         when: "Use default configuration"
-        Project project = ProjectBuilder.builder().build()
+        Project project = project()
         Python python = new Python(project)
         def res = python.readOutput('-c "print(\'hello\')"')
         then: "ok"
@@ -40,7 +40,7 @@ class PythonCliTest extends AbstractTest {
     def "Check error reporting"() {
 
         when: "call bad command"
-        Project project = ProjectBuilder.builder().build()
+        Project project = project()
         Python python = new Python(project)
         python.readOutput('-c "import fsdfdsfsd;"')
         then: "error"
@@ -55,7 +55,7 @@ class PythonCliTest extends AbstractTest {
     def "Check configuration"() {
 
         setup:
-        Project project = ProjectBuilder.builder().build()
+        Project project = project()
         Python python = new Python(project)
 
         when: "set output prefix"

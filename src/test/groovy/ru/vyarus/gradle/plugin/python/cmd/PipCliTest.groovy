@@ -13,7 +13,7 @@ class PipCliTest extends AbstractTest {
     def "Check pip cli usage"() {
 
         when: "call pip"
-        Project project = ProjectBuilder.builder().build()
+        Project project = project()
         Pip pip = new Pip(project)
         pip.exec('list')
         then: 'ok'

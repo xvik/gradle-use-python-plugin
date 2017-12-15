@@ -45,7 +45,7 @@ class WorkflowKitTest extends AbstractKitTest {
 
         then: "existing env used"
         result.task(':checkPython').outcome == TaskOutcome.SUCCESS
-        result.output.contains(env.pythonPath.replace('/', '\\'))
+        result.output.contains(isWin ? env.pythonPath.replace('/', '\\') : env.pythonPath)
     }
 
     def "Check restricted user scope - existing env not used"() {
@@ -87,7 +87,7 @@ class WorkflowKitTest extends AbstractKitTest {
 
         then: "existing env used"
         result.task(':checkPython').outcome == TaskOutcome.SUCCESS
-        result.output.contains(env.pythonPath.replace('/', '\\'))
+        result.output.contains(isWin ? env.pythonPath.replace('/', '\\') : env.pythonPath)
     }
 
     def "Check prevent virtualenv installation"() {

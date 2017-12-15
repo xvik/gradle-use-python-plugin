@@ -128,7 +128,8 @@ class CheckPythonTask extends BasePipTask {
         }
 
         logger.lifecycle("Using virtualenv $env.version ($ext.envPath)")
-        env.create()
+        // symlink by default (copy if requested by user config)
+        env.create(ext.envCopy)
         return true
     }
 

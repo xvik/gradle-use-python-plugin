@@ -1,10 +1,12 @@
 package ru.vyarus.gradle.plugin.python
 
 import org.apache.tools.ant.taskdefs.condition.Os
+import org.gradle.testfixtures.ProjectBuilder
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
+import ru.vyarus.gradle.plugin.python.cmd.Virtualenv
 import spock.lang.Specification
 
 /**
@@ -44,7 +46,7 @@ abstract class AbstractKitTest extends Specification {
      * Allow debug TestKit vm execution. After vm start it will wait for debug connection and continue processing after.
      * (the same effect could be achieved with GradleRunner.withDebug(true) method)
      */
-    def debug(){
+    def debug() {
         file('gradle.properties') << "org.gradle.jvmargs=-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000"
     }
 
@@ -74,5 +76,11 @@ abstract class AbstractKitTest extends Specification {
 
     BuildResult runFailedVer(String gradleVersion, String... commands) {
         return gradle(commands).withGradleVersion(gradleVersion).buildAndFail()
+    }
+
+    // custom virtualenv to use for simulations
+    Virtualenv env(String path = '.gradle/python') {
+        new Virtualenv(ProjectBuilder.builder()
+                .withProjectDir(testProjectDir.root).build(), path)
     }
 }

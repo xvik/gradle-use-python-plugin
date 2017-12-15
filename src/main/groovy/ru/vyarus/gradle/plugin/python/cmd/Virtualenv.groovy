@@ -28,6 +28,14 @@ class Virtualenv {
         this(project, null, null, path)
     }
 
+    /**
+     * Create virtualenv utility.
+     *
+     * @param project gradle project instance
+     * @param pythonPath python path (null to use global)
+     * @param binary python binary name (null to use default python3 or python)
+     * @param path environment path relative to project
+     */
     Virtualenv(Project project, String pythonPath, String binary, String path) {
         python = new Python(project, pythonPath, binary)
                 .logLevel(LogLevel.LIFECYCLE)
@@ -56,14 +64,47 @@ class Virtualenv {
     }
 
     /**
-     * Create virtualenv. Do nothing if already exists.
+     * Create virtualenv with setuptools and pip. Do nothing if already exists.
+     * To copy environment instead of symlinking, use {@code copy ( true )} otherwise don't specify parameter.
      */
     @SuppressWarnings('BuilderMethodWithSideEffects')
-    void create() {
+    void create(boolean copy = false) {
+        create(true, true, copy)
+    }
+
+    /**
+     * Create the lightest env without setuptools and pip. Do nothing if already exists.
+     * To copy environment instead of symlinking, use {@code copy ( true )} otherwise don't specify parameter.
+     */
+    @SuppressWarnings('BuilderMethodWithSideEffects')
+    void createPythonOnly(boolean copy = false) {
+        create(false, false, copy)
+    }
+
+    /**
+     * Create virtualenv. Do nothing if already exists.
+     * To copy environment instead if symlinking, use {@code copy ( ? , ? , true )} otherwise omit last parameter.
+     *
+     * @param setuptools do not install setuptools (--no-setuptools)
+     * @param pip do not install pip and wheel (--no-pip --no-wheel)
+     * @param copy copy virtualenv instead if symlink (--always-copy)
+     */
+    @SuppressWarnings('BuilderMethodWithSideEffects')
+    void create(boolean setuptools, boolean pip, boolean copy = false) {
         if (exists()) {
             return
         }
-        python.callModule(name, path)
+        String cmd = path
+        if (copy) {
+            cmd += ' --always-copy'
+        }
+        if (!setuptools) {
+            cmd += ' --no-setuptools'
+        }
+        if (!pip) {
+            cmd += ' --no-pip --no-wheel'
+        }
+        python.callModule(name, cmd)
     }
 
     /**

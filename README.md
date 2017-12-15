@@ -7,7 +7,7 @@
 
 Plugin **does not install python and pip** itself and use globally installed python (by default). 
 It's easier to prepare python manually and python have good compatibility (from user perspective) and does not need to 
-be installed often).
+be installed often.
 
 The only plugin intention is to simplify python usage from gradle.
 
@@ -189,13 +189,20 @@ python.envPath = 'path/to/your/env'
 
 It will automatically change `pythonPath` configuration accordingly.
 
-NOTE: plugin will not create environment if you don't use any modules. If you still want to use project specific environment
-(without declared pip modules) then create it manually: `virtualenv .gradle/python` (default location). Plugin will recognize
+NOTE: plugin will *not* create environment if you don't use any modules. If you still want to use project specific environment
+(without declared pip modules) then create it manually: `python3 -m virtualenv .gradle/python` (default location). Plugin will recognize
 existing env and use it.
 
 IMPORTANT: virtualenv creates local python copy (by default in `.gradle/python`). Copy is created from global python and
-later used *instead* of global python (global python may be even removed). If you want to change used python version in the environment, 
+later used *instead* of global python. If you want to change used python version in the environment, 
 then manually remove `.gradle/python` so it could be created again (from global python).
+
+To copy environment instead of symlinking (default) set ([--always-copy](https://virtualenv.pypa.io/en/stable/reference/#cmdoption-always-copy)):
+
+```groovy
+python.envCopy = true
+```
+
 
 #### Scope
 
@@ -402,6 +409,8 @@ python {
    installVirtualenv = true
    // used virtualenv path (if virtualenv used, see 'scope')
    envPath = '.gradle/python'
+   // copy virtualenv instead of symlink (when created)
+   envCopy = false
 }
 ```
 

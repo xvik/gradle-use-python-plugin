@@ -41,12 +41,12 @@ class VirtualenvCliTest extends AbstractTest {
         Project project = project()
         Virtualenv env = new Virtualenv(project, 'env')
         assert !env.exists()
-        env.create()
+        env.createPythonOnly()
         then: "env created"
         env.exists()
 
         when: "create one more time"
-        env.create()
+        env.createPythonOnly()
         then: "nothing happen"
         env.exists()
     }

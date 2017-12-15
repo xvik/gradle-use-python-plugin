@@ -59,6 +59,7 @@ class CheckTaskKitTest extends AbstractKitTest {
 
             python {
                 minPipVersion = '10.1'
+                scope = USER
                 
                 pip 'mod:1'
             }

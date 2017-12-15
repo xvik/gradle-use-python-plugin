@@ -25,6 +25,34 @@ class PipUpdatesTaskKitTest extends AbstractKitTest {
             }
 
             python {
+                scope = USER
+                pip 'click:6.6'
+            }
+
+        """
+
+        when: "run task"
+        BuildResult result = run('pipUpdates')
+
+        then: "click install called"
+        result.task(':pipUpdates').outcome == TaskOutcome.SUCCESS
+        result.output.contains('The following modules could be updated:')
+        result.output =~ /click\s+6.6/
+    }
+
+    def "Check updates detected in environment"() {
+
+        setup:
+        // make sure old version installed
+        new Pip(ProjectBuilder.builder().build()).install('click==6.6')
+
+        build """
+            plugins {
+                id 'ru.vyarus.use-python'
+            }
+
+            python {
+                scope = VIRTUALENV
                 pip 'click:6.6'
             }
 
@@ -68,6 +96,7 @@ class PipUpdatesTaskKitTest extends AbstractKitTest {
             }
 
             python {
+                scope = USER
                 pip 'click:6.7' // version does not matter here
             }
 

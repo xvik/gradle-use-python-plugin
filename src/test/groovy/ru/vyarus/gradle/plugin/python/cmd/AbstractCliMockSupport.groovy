@@ -35,9 +35,11 @@ abstract class AbstractCliMockSupport extends Specification {
         logger = new TestLogger()
         project.getLogger()  >>  { logger }
         project.getRootDir() >> { dir.root }
+        project.file(_) >> { new File(dir.root, it[0]) }
     }
 
     void mockExec(Project project, String output, int res) {
+        // check execution with logs without actual execution
         project.exec(_) >> {Closure spec ->
             DefaultExecAction act = ConfigureUtil.configure(spec, new DefaultExecAction(Stub(PathToFileResolver)))
             OutputStream os = act.standardOutput

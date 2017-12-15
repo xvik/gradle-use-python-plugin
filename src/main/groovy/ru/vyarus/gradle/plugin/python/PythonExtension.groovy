@@ -74,6 +74,11 @@ class PythonExtension {
      * Virtualenv will be created automatically if not yet exists.
      */
     String envPath = '.gradle/python'
+    /**
+     * Copy virtual environment instead of symlink (see --always-copy virtualenv option).
+     * By default use default virtualenv behaviour: symlink environment.
+     */
+    boolean envCopy
 
     /**
      * Shortcut for {@link #pip(java.lang.Iterable)}.

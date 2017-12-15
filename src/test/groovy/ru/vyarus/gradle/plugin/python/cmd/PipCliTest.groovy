@@ -22,11 +22,22 @@ class PipCliTest extends AbstractTest {
         when: "pip install"
         pip.install('click==6.7')
         then: "ok"
-        true
+        pip.isInstalled('click')
 
         when: "pip uninstall"
         pip.uninstall('click')
         then: "ok"
-        true
+        !pip.isInstalled('click')
+    }
+
+    def "Check pip utils"() {
+
+        when: "call pip"
+        Project project = project()
+        Pip pip = new Pip(project)
+        pip.exec('list')
+        then: "ok"
+        pip.version =~ /\d+\.\d+\.\d+/
+        pip.versionLine
     }
 }

@@ -2,6 +2,7 @@ package ru.vyarus.gradle.plugin.python.cmd
 
 import groovy.transform.CompileStatic
 import groovy.transform.Memoized
+import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.logging.LogLevel
 import ru.vyarus.gradle.plugin.python.util.PythonExecutionFailed
@@ -46,7 +47,13 @@ class Pip {
      * @param module module name
      */
     void uninstall(String module) {
-        exec("uninstall $module -y -q")
+        exec("uninstall $module -y")
+        if (isInstalled(module)) {
+            // known problem
+            throw new GradleException("Failed to uninstall module $module. Try to update pip: " +
+                    '\'pip install -U pip\' or try to manually remove package ' +
+                    '(probably not enough permissions)')
+        }
     }
 
     /**

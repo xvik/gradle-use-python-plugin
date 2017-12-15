@@ -27,5 +27,11 @@ class PipExecTest extends AbstractCliMockSupport {
         pip.exec('list --format')
         then: "ok"
         logger.res =~ /\[python] python(3)? -m pip list --format --user\n\t sample output\n/
+
+        when: "call freeze"
+        logger.reset()
+        pip.exec('freeze')
+        then: "ok"
+        logger.res =~ /\[python] python(3)? -m pip freeze --user\n\t sample output\n/
     }
 }

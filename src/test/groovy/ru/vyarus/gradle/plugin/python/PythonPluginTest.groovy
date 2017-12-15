@@ -23,6 +23,7 @@ class PythonPluginTest extends AbstractTest {
         project.tasks.getByName('checkPython')
         project.tasks.getByName('pipInstall')
         project.tasks.getByName('pipUpdates')
+        project.tasks.getByName('pipList')
     }
 
     def "Check extension usage"() {
@@ -64,6 +65,13 @@ class PythonPluginTest extends AbstractTest {
         pipUpdates.pythonBinary == 'py'
         !pipUpdates.userScope
         pipUpdates.modules == ['sample:1', 'foo:2']
+
+        then: "pip list task configured"
+        def pipList = project.tasks.getByName('pipList');
+        pipList.pythonPath == 'foo/bar'
+        pipList.pythonBinary == 'py'
+        !pipList.userScope
+        pipList.modules == ['sample:1', 'foo:2']
     }
 
 

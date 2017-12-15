@@ -29,8 +29,7 @@ class PipUpdatesTask extends BasePipTask {
             logger.lifecycle('No modules declared')
         } else {
             List<String> res = []
-            List<String> updates = python
-                    .readOutput("-m pip list -o -l --format=columns $userFlag").toLowerCase().readLines()
+            List<String> updates = pip.readOutput('list -o -l --format=columns').toLowerCase().readLines()
 
             // when no updates - no output (for all or filtered)
             if (showAll || updates.empty) {

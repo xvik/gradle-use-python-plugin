@@ -61,8 +61,8 @@ class PipInstallTask extends BasePipTask {
         List<String> res = []
         if (!modulesList.isEmpty()) {
             // use list of installed modules to check if 'pip install' is required for module
-            List<String> installed = (isAlwaysInstallModules() ? '' :
-                    python.readOutput("-m pip freeze $userFlag")).toLowerCase().readLines()
+            List<String> installed = (isAlwaysInstallModules() ? '' : pip.readOutput('freeze'))
+                    .toLowerCase().readLines()
             // install modules
             modulesList.each { PipModule mod ->
                 String pipDef = mod.toPipString()

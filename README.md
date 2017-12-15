@@ -24,6 +24,7 @@ Features:
     - `checkPython` - validate python installation (and create virtualenv if required)
     - `pipInstall` - install declared pip modules
     - `pipUpdates` - show the latest available versions for the registered modules
+    - `pipList` - show all installed modules (the same as pipInstall shows after installation)
     - `type:PythonTask` - call python command/script/module
     - `type:PipInstallTask` - may be used for custom pip modules installation workflow
 
@@ -377,6 +378,8 @@ python {
     showInstalledVersions = false
 }
 ```
+
+Note: you can always see the list of installed modules with `pipList` task (exactly the same list as after pipInstall).
  
 Also, by default 'pip install' is not called for modules already installed with correct version.
 In most situations this is preferred behaviour, but if you need to be sure about dependencies 

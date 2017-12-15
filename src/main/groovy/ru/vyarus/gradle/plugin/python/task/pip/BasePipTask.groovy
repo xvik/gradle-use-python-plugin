@@ -81,14 +81,4 @@ class BasePipTask extends BasePythonTask {
     protected Pip getPip() {
         return new Pip(project, getPythonPath(), getPythonBinary(), getUserScope())
     }
-
-    /**
-     * Use in custom python commands: {@code python.callModule('pip', "list $userFlag")}.
-     * @return user flag if user scope configured or empty string
-     */
-    @Internal
-    @Memoized
-    protected String getUserFlag() {
-        return getUserScope() ? ' --user' : ''
-    }
 }

@@ -1,5 +1,6 @@
 package ru.vyarus.gradle.plugin.python.cmd
 
+import org.gradle.api.logging.LogLevel
 import ru.vyarus.gradle.plugin.python.util.PythonExecutionFailed
 
 /**
@@ -122,23 +123,23 @@ class PythonExecTest extends AbstractCliMockSupport {
         setup:
         mockExec(project, null, 0)
         project.logger.appendLevel = true
-        python = new Python(project)
+        python = new Python(project).logLevel(LogLevel.LIFECYCLE)
 
         when: "call module"
         python.exec('mmm')
         then: "ok"
-        logger.res =~ /INFO \[python] python(3)? mmm/
+        logger.res =~ /LIFECYCLE \[python] python(3)? mmm/
 
         when: "call hidden"
         python.withHiddenLog {
             python.exec('hid')
         }
         then: "changed log"
-        logger.res =~ /DEBUG \[python] python(3)? hid/
+        logger.res =~ /INFO \[python] python(3)? hid/
 
         when: "normal call after"
         python.exec('aft')
         then: "changed log"
-        logger.res =~ /INFO \[python] python(3)? aft/
+        logger.res =~ /LIFECYCLE \[python] python(3)? aft/
     }
 }

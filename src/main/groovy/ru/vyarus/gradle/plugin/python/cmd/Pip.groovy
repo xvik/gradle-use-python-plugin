@@ -61,15 +61,13 @@ class Pip {
      * @return true if module installed
      */
     boolean isInstalled(String module) {
-        python.withHiddenLog {
-            try {
-                // has no output on error, so nothing will appear in log
-                python.readOutput("-m pip show $module")
-            } catch (PythonExecutionFailed ignored) {
-                return false
-            }
-            return true
+        try {
+            // has no output on error, so nothing will appear in log
+            readOutput("show $module")
+        } catch (PythonExecutionFailed ignored) {
+            return false
         }
+        return true
     }
 
     /**
@@ -78,12 +76,20 @@ class Pip {
      * @param cmd pip command to execute
      */
     void exec(String cmd) {
-        // automatically apply user scope
-        if (!cmd.contains(USER) && userScope &&
-                USER_AWARE_COMMANDS.contains(cmd.split(' ')[0].toLowerCase())) {
-            cmd += " $USER"
+        python.callModule('pip', applyUserFlag(cmd))
+    }
+
+    /**
+     * Calls pip command and return output as string. Preferred way instead of direct python usage to correctly
+     * apply --user flag for commands.
+     *
+     * @param cmd pip command to call
+     * @return command execution output
+     */
+    String readOutput(String cmd) {
+        python.withHiddenLog {
+            python.readOutput("-m pip ${applyUserFlag(cmd)}")
         }
-        python.callModule('pip', cmd)
     }
 
     /**
@@ -110,8 +116,14 @@ class Pip {
      */
     @Memoized
     String getVersionLine() {
-        python.withHiddenLog {
-            python.readOutput('-m pip --version')
+        readOutput('--version')
+    }
+
+    private String applyUserFlag(String cmd) {
+        if (!cmd.contains(USER) && userScope
+                && USER_AWARE_COMMANDS.contains(cmd.split(' ')[0].toLowerCase())) {
+            cmd += " $USER"
         }
+        cmd
     }
 }

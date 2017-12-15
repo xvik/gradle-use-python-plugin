@@ -9,6 +9,7 @@ import ru.vyarus.gradle.plugin.python.task.CheckPythonTask
 import ru.vyarus.gradle.plugin.python.task.PythonTask
 import ru.vyarus.gradle.plugin.python.task.pip.BasePipTask
 import ru.vyarus.gradle.plugin.python.task.pip.PipInstallTask
+import ru.vyarus.gradle.plugin.python.task.pip.PipListTask
 import ru.vyarus.gradle.plugin.python.task.pip.PipUpdatesTask
 
 /**
@@ -49,6 +50,10 @@ class PythonPlugin implements Plugin<Project> {
 
         project.tasks.create('pipUpdates', PipUpdatesTask) {
             description = 'Check if new versions available for declared pip modules'
+        }
+
+        project.tasks.create('pipList', PipListTask) {
+            description = 'Show all installed modules'
         }
 
         configureDefaults(project, extension, checkTask, installTask)

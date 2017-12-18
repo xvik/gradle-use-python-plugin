@@ -15,10 +15,10 @@ class PipModule {
 
     PipModule(String name, String version) {
         if (!name) {
-            throw new IllegalArgumentException("Module name required")
+            throw new IllegalArgumentException('Module name required')
         }
         if (!version) {
-            throw new IllegalArgumentException("Module version required")
+            throw new IllegalArgumentException('Module version required')
         }
 
         this.name = name

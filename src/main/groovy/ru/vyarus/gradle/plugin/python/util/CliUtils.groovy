@@ -95,9 +95,7 @@ final class CliUtils {
                 tmp.append(it)
             }
             // last arg
-            if (tmp.length() > 0) {
-                res << tmp.toString()
-            }
+            res << tmp.toString()
             return res
         }
         return EMPTY

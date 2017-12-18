@@ -94,12 +94,13 @@ class WorkflowKitTest extends AbstractKitTest {
 
         setup: "create undetectable virtualenv and use it as pure python"
         Virtualenv env = env('env')
-        env.createPythonOnly()
+        env.create()
         build """
             plugins {
                 id 'ru.vyarus.use-python'
             }
-                        
+                   
+            python.pip 'click:6.7'     
             python.pythonPath = '$env.pythonPath'
             python.installVirtualenv = false
         """
@@ -172,7 +173,7 @@ class WorkflowKitTest extends AbstractKitTest {
         BuildResult result = runFailed('checkPython')
 
         then: "error - pip not installed"
-        result.output.contains('Pip is not installed')
+        result.output.contains('Pip is not installed on virtualenv')
     }
 
     def "Check virtualenv required"() {
@@ -198,5 +199,25 @@ class WorkflowKitTest extends AbstractKitTest {
 
         then: "virtualenv not found"
         result.output.contains('Virtualenv is not installed')
+    }
+
+    def "Check fail to detect python binary in environment"() {
+
+        setup: "detectable environment"
+        Virtualenv env = env()
+        env.createPythonOnly()
+        build """
+            plugins {
+                id 'ru.vyarus.use-python'
+            }
+                        
+            python.pythonBinary = 'py'
+        """
+
+        when: "run task"
+        BuildResult result = runFailed('checkPython')
+
+        then: "error - python not found"
+        result.output.contains('This must be a bug of virtualenv support, please report it')
     }
 }

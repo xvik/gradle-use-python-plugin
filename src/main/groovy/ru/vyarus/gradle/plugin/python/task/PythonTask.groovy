@@ -110,9 +110,9 @@ class PythonTask extends BasePythonTask {
     private void initWorkDirIfRequired() {
         String dir = getWorkDir()
         if (dir && isCreateWorkDir()) {
-            File docs = project.file(dir)
-            if (!docs.exists()) {
-                docs.mkdirs()
+            File wrkd = project.file(dir)
+            if (!wrkd.exists()) {
+                wrkd.mkdirs()
             }
         }
     }

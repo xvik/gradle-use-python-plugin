@@ -118,6 +118,20 @@ class PythonExecTest extends AbstractCliMockSupport {
         logger.res == (isWin ? "[python] cmd /c some\\path\\py.exe mmm\n\t sample output\n" : "[python] some/path/py mmm\n\t sample output\n")
     }
 
+    def "Check custom path with trailing slash"() {
+
+        setup:
+        mockExec(project, 'sample output', 0)
+        python = new Python(project, 'some/path/', 'py')
+        file('some/path').mkdirs()
+        file('some/path/py.exe').createNewFile()
+
+        when: "call module"
+        python.exec('mmm')
+        then: "ok"
+        logger.res == (isWin ? "[python] cmd /c some\\path\\py.exe mmm\n\t sample output\n" : "[python] some/path/py mmm\n\t sample output\n")
+    }
+
     def "Check hidden logs"() {
 
         setup:

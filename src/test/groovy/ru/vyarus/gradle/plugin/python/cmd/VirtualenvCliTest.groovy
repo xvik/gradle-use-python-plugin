@@ -16,6 +16,14 @@ class VirtualenvCliTest extends AbstractTest {
         }
     }
 
+    def "Check incorrect virtualenv creation"() {
+
+        when: "create virtualenv cli without path"
+        new Virtualenv(project(), null)
+        then: "error"
+        thrown(IllegalArgumentException)
+    }
+
     def "Check virtualenv detection"() {
 
         when: "call check env existence"

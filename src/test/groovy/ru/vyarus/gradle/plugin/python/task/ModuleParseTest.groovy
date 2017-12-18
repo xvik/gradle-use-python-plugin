@@ -28,4 +28,27 @@ class ModuleParseTest extends Specification {
         then: "err"
         thrown(IllegalArgumentException)
     }
+
+    def "Check module hash equals"() {
+
+        when: "two equal modules"
+        PipModule mod = new PipModule('one', '1')
+        PipModule mod2 = new PipModule('one', '1')
+        then: "equal"
+        mod.hashCode() == mod2.hashCode()
+        mod.equals(mod2)
+    }
+
+    def "Check module creation error"() {
+
+        when: "module without version"
+        new PipModule('one', null)
+        then: "err"
+        thrown(AssertionError)
+
+        when: "module without name"
+        new PipModule(null, '1')
+        then: "err"
+        thrown(AssertionError)
+    }
 }

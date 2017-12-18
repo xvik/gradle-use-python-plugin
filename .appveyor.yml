@@ -18,7 +18,7 @@ test_script:
 
 on_success:
   - ./gradlew jacocoTestReport --no-daemon
-  - codecov -f build\repots\jacoco\test\jacocoTestReport.xml
+  - python -m codecov -f build\repots\jacoco\test\jacocoTestReport.xml
 
 cache:
   - C:\Users\appveyor\.gradle\caches

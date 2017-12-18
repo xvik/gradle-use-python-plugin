@@ -11,7 +11,7 @@ script: travis_wait 20 ./gradlew check --no-daemon
 
 after_success:
   - ./gradlew jacocoTestReport --no-daemon
-  - bash <(curl -s https://codecov.io/bash)
+  - bash <(curl -s https://codecov.io/bash) -F linux
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock

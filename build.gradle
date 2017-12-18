@@ -1,5 +1,6 @@
 plugins {
     id 'groovy'
+    id 'jacoco'
     id 'java-gradle-plugin'
     id 'com.gradle.plugin-publish' version '0.9.7'
     id 'net.researchgate.release' version '2.6.0'
@@ -8,6 +9,7 @@ plugins {
     id 'ru.vyarus.java-lib' version '1.0.5'
     id 'ru.vyarus.github-info' version '1.1.0'
     id 'com.github.ben-manes.versions' version '0.15.0'
+    id "pl.droidsonroids.jacoco.testkit" version "1.0.3"
 }
 
 sourceCompatibility = 1.6
@@ -100,3 +102,19 @@ test {
 }
 
 dependencyUpdates.revision = 'release'
+
+jacoco.toolVersion '0.7.9'
+test.jacoco.destinationFile = file('build/jacoco/unit.exec')
+generateJacocoTestKitProperties.destinationFile = file('build/jacoco/test.exec').absolutePath.replace("\\", '/')
+
+task jacocoMerge(type: JacocoMerge) {
+    dependsOn test
+    executionData = fileTree('build/jacoco/').matching { exclude 'full.exec' }
+    destinationFile = file('build/jacoco/full.exec')
+}
+
+jacocoTestReport {
+    dependsOn jacocoMerge
+    executionData jacocoMerge.destinationFile
+    reports.xml.enabled = true
+}

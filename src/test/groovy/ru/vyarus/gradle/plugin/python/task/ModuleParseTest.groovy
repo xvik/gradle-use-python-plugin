@@ -37,18 +37,20 @@ class ModuleParseTest extends Specification {
         then: "equal"
         mod.hashCode() == mod2.hashCode()
         mod.equals(mod2)
+        mod.equals(mod)
+        !mod.equals(new Object())
     }
 
     def "Check module creation error"() {
 
         when: "module without version"
-        new PipModule('one', null)
+        PipModule.parse('one: ')
         then: "err"
-        thrown(AssertionError)
+        thrown(IllegalArgumentException)
 
         when: "module without name"
-        new PipModule(null, '1')
+        PipModule.parse(' :1')
         then: "err"
-        thrown(AssertionError)
+        thrown(IllegalArgumentException)
     }
 }

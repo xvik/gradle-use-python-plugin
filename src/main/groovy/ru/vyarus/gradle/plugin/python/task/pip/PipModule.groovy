@@ -14,8 +14,12 @@ class PipModule {
     String version
 
     PipModule(String name, String version) {
-        assert name != null
-        assert version != null
+        if (!name) {
+            throw new IllegalArgumentException("Module name required")
+        }
+        if (!version) {
+            throw new IllegalArgumentException("Module version required")
+        }
 
         this.name = name
         this.version = version

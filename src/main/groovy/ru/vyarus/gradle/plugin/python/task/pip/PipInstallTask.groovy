@@ -65,8 +65,7 @@ class PipInstallTask extends BasePipTask {
             // use list of installed modules to check if 'pip install' is required for module
             // have to always use global list (even if user scope used) to avoid redundant installation attempts
             List<String> installed = (isAlwaysInstallModules() ? ''
-                    : pip.inGlobalScope { pip.readOutput('-m pip freeze') } as String)
-                    .toLowerCase().readLines()
+                    : pip.inGlobalScope { pip.readOutput('freeze') } as String).toLowerCase().readLines()
             // install modules
             modulesList.each { PipModule mod ->
                 String pipDef = mod.toPipString()

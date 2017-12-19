@@ -43,9 +43,6 @@ class PipUpdatesTaskKitTest extends AbstractKitTest {
     def "Check updates detected in environment"() {
 
         setup:
-        // make sure old version installed
-        new Pip(ProjectBuilder.builder().build()).install('click==6.6')
-
         build """
             plugins {
                 id 'ru.vyarus.use-python'
@@ -58,8 +55,15 @@ class PipUpdatesTaskKitTest extends AbstractKitTest {
 
         """
 
+        when: "install old version"
+        BuildResult result = run('pipInstall')
+        then: "installed"
+        result.task(':pipInstall').outcome == TaskOutcome.SUCCESS
+        result.output.contains('pip install click')
+
+
         when: "run task"
-        BuildResult result = run('pipUpdates')
+        result = run('pipUpdates')
 
         then: "click update detected"
         result.task(':pipUpdates').outcome == TaskOutcome.SUCCESS

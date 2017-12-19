@@ -6,8 +6,8 @@
 ### About
 
 Plugin **does not install python and pip** itself and use globally installed python (by default). 
-It's easier to prepare python manually and python have good compatibility (from user perspective) and does not need to 
-be installed often.
+It's easier to prepare python manually because python have good compatibility (from user perspective) and does not need to 
+be updated often.
 
 The only plugin intention is to simplify python usage from gradle.
 

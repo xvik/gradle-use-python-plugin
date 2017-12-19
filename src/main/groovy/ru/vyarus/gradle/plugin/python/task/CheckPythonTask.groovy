@@ -14,8 +14,8 @@ import ru.vyarus.gradle.plugin.python.util.PythonExecutionFailed
 
 /**
  * Task validates python installation. Will fail if python or pip not found or minimal version doesn't match.
- * Task called before any {@link ru.vyarus.gradle.plugin.python.task.pip.PipInstallTask}
- * (by default, before pipInstall).
+ * Task called before any {@link ru.vyarus.gradle.plugin.python.task.BasePythonTask} (any python task) to
+ * set validate and set correct python (use env).
  * <p>
  * If existing virtualenv is detected then plugin immediately switches to use it (without checking global python).
  * When virtualenv not exists, then global python checked. If pip modules required, pip existence checked and

@@ -69,6 +69,10 @@ class PythonPlugin implements Plugin<Project> {
                 pythonPath = { extension.pythonPath }
                 pythonBinary = { extension.pythonBinary }
             }
+            // all python tasks must be executed after check task to use correct environment (switch to virtualenv)
+            if (task != checkTask) {
+                dependsOn checkTask
+            }
         }
 
         project.tasks.withType(PythonTask) { task ->
@@ -91,7 +95,6 @@ class PythonPlugin implements Plugin<Project> {
                 showInstalledVersions = { extension.showInstalledVersions }
                 alwaysInstallModules = { extension.alwaysInstallModules }
             }
-            dependsOn checkTask
         }
     }
 }

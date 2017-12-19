@@ -51,6 +51,8 @@ class PipInstallTask extends BasePipTask {
 
         if (isShowInstalledVersions()) {
             // show all installed modules versions (to help problems resolution)
+            // note: if some modules are already installed in global scope and user scope is used,
+            // then global modules will not be shown
             pip.exec('list --format=columns')
         }
     }
@@ -61,7 +63,9 @@ class PipInstallTask extends BasePipTask {
         List<String> res = []
         if (!modulesList.isEmpty()) {
             // use list of installed modules to check if 'pip install' is required for module
-            List<String> installed = (isAlwaysInstallModules() ? '' : pip.readOutput('freeze'))
+            // have to always use global list (even if user scope used) to avoid redundant installation attempts
+            List<String> installed = (isAlwaysInstallModules() ? ''
+                    : pip.inGlobalScope { pip.readOutput('-m pip freeze') } as String)
                     .toLowerCase().readLines()
             // install modules
             modulesList.each { PipModule mod ->

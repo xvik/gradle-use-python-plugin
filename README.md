@@ -379,9 +379,18 @@ python {
 }
 ```
 
-Note: you can always see the list of installed modules with `pipList` task (exactly the same list as after pipInstall).
+You can always see the list of installed modules with `pipList` task (exactly the same list as after pipInstall).
+
+NOTE: if global python is used with USER scope and some modules were manually installed in global scope
+then they will not be shown by pipList (and after pip install). To see all modules: 
+
+```groovy
+pipList.all = true
+```
+
+Global modules are hidden by default (for USER scope) because on linux there are a lot of system modules pre-installed.  
  
-Also, by default 'pip install' is not called for modules already installed with correct version.
+By default 'pip install' is not called for modules already installed with correct version.
 In most situations this is preferred behaviour, but if you need to be sure about dependencies 
 then force installation:
 

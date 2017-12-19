@@ -22,6 +22,8 @@ class PipListTaskKitTest extends AbstractKitTest {
             plugins {
                 id 'ru.vyarus.use-python'
             }
+            
+            python.scope = USER
         """
 
         when: "run task"
@@ -29,6 +31,32 @@ class PipListTaskKitTest extends AbstractKitTest {
 
         then: "click update detected"
         result.task(':pipList').outcome == TaskOutcome.SUCCESS
+        result.output.contains('pip list --format=columns --user')
+        result.output =~ /click\s+6.6/
+    }
+
+    def "Check list all task"() {
+
+        setup:
+        // to show at least something
+        new Pip(ProjectBuilder.builder().build()).install('click==6.6')
+
+        build """
+            plugins {
+                id 'ru.vyarus.use-python'
+            }
+            
+            python.scope = USER
+            
+            pipList.all = true
+        """
+
+        when: "run task"
+        BuildResult result = run('pipList')
+
+        then: "click update detected"
+        result.task(':pipList').outcome == TaskOutcome.SUCCESS
+        !result.output.contains('pip list --format=columns --user')
         result.output =~ /click\s+6.6/
     }
 }

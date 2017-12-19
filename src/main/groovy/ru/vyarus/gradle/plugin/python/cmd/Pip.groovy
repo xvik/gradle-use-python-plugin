@@ -20,7 +20,7 @@ class Pip {
     private static final List<String> USER_AWARE_COMMANDS = ['install', 'list', 'freeze']
 
     private final Python python
-    final boolean userScope
+    private boolean userScope
 
     Pip(Project project) {
         this(project, null, null, true)
@@ -117,6 +117,22 @@ class Pip {
     @Memoized
     String getVersionLine() {
         readOutput('--version')
+    }
+
+    /**
+     * Execute pip methods within closure in global scope (no matter if user scope configured).
+     *
+     * @param closure closure with pip actions to be executed in global scope
+     * @return closure result
+     */
+    public <T> T inGlobalScope(Closure closure) {
+        boolean isUserScope = this.userScope
+        this.userScope = false
+        try {
+            return (T) closure.call()
+        } finally {
+            this.userScope = isUserScope
+        }
     }
 
     private String applyUserFlag(String cmd) {

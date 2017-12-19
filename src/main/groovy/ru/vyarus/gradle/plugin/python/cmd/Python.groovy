@@ -198,7 +198,7 @@ class Python {
         LogLevel level = logLevel
         logLevel(LogLevel.INFO)
         try {
-            closure.call()
+            return (T) closure.call()
         } finally {
             logLevel(level)
         }

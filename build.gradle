@@ -53,7 +53,7 @@ bintray {
         repo = 'xvik'
         name = project.name
         desc = project.description
-        labels = ['gradle', 'python']
+        labels = ['gradle', 'python', 'virtualenv']
         publicDownloadNumbers = true
         version {
             gpg {
@@ -71,7 +71,7 @@ bintray {
 
 pluginBundle {
     description = 'Manage pip dependencies and use python in gradle build'
-    tags = ['python']
+    tags = ['python', 'virtualenv']
 
     plugins {
         usePythonPlugin {

@@ -1,5 +1,6 @@
 package ru.vyarus.gradle.plugin.python.util
 
+import groovy.transform.CompileStatic
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.process.internal.ExecException
 
@@ -9,11 +10,12 @@ import org.gradle.process.internal.ExecException
  * @author Vyacheslav Rusakov
  * @since 20.11.2017
  */
+@CompileStatic
 final class CliUtils {
 
     private static final String[] EMPTY = []
     private static final String SPACE = ' '
-    private static final VERSION_SPLIT = '\\.'
+    private static final String VERSION_SPLIT = '\\.'
 
     private CliUtils() {
     }
@@ -96,7 +98,7 @@ final class CliUtils {
             }
             // last arg
             res << tmp.toString()
-            return res
+            return res as String[]
         }
         return EMPTY
     }

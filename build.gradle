@@ -104,17 +104,5 @@ test {
 dependencyUpdates.revision = 'release'
 
 jacoco.toolVersion '0.7.9'
-test.jacoco.destinationFile = file('build/jacoco/unit.exec')
+jacocoTestReport.reports.xml.enabled = true
 generateJacocoTestKitProperties.destinationFile = file('build/jacoco/test.exec').absolutePath.replace("\\", '/')
-
-task jacocoMerge(type: JacocoMerge) {
-    dependsOn test
-    executionData = fileTree('build/jacoco/').matching { exclude 'full.exec' }
-    destinationFile = file('build/jacoco/full.exec')
-}
-
-jacocoTestReport {
-    dependsOn jacocoMerge
-    executionData jacocoMerge.destinationFile
-    reports.xml.enabled = true
-}

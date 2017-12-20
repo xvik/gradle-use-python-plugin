@@ -3,6 +3,7 @@
 [![Build Status](https://img.shields.io/travis/xvik/gradle-use-python-plugin.svg)](https://travis-ci.org/xvik/gradle-use-python-plugin)
 [![Appveyor build status](https://ci.appveyor.com/api/projects/status/github/xvik/gradle-use-python-plugin?svg=true)](https://ci.appveyor.com/project/xvik/gradle-use-python-plugin)
 [![codecov](https://codecov.io/gh/xvik/gradle-use-python-plugin/branch/master/graph/badge.svg)](https://codecov.io/gh/xvik/gradle-use-python-plugin)
+
 ### About
 
 Plugin **does not install python and pip** itself and use globally installed python (by default). 
@@ -12,6 +13,7 @@ be updated often.
 The only plugin intention is to simplify python usage from gradle.
 
 Features:
+
 * Install required python modules using pip (per project (virtualenv, default), os user (--user) or globally ) 
 * Provides task to call python commands, modules or scripts (`PythonTask`)
 * Could be used as basement for building plugins for specific python modules (like 
@@ -36,7 +38,7 @@ Releases are published to [bintray jcenter](https://bintray.com/vyarus/xvik/grad
 [gradle plugins portal](https://plugins.gradle.org/plugin/ru.vyarus.use-python).
 
 
-[![JCenter](https://img.shields.io/bintray/v/vyarus/xvik/gradle-use-python-plugin.svg?label=jcenter)](https://bintray.com/vyarus/xvik/gradle-use-python-plugin/_latestVersion)
+[![JCenter](https://api.bintray.com/packages/vyarus/xvik/gradle-use-python-plugin/images/download.svg)](https://bintray.com/vyarus/xvik/gradle-use-python-plugin/_latestVersion)
 [![Maven Central](https://img.shields.io/maven-central/v/ru.vyarus/gradle-use-python-plugin.svg)](https://maven-badges.herokuapp.com/maven-central/ru.vyarus/gradle-use-python-plugin)
 
 ```groovy
@@ -235,7 +237,7 @@ declared as project ext properties (`ext.USER==ru.vyarus.gradle.plugin.python.Py
 To quick check if new versions are available for the registered pip modules
 use `pipUpdates` task:
 
-```
+```text
 :pipUpdates
 The following modules could be updated:
 
@@ -406,7 +408,7 @@ All configuration options with default values:
 
 ```groovy
 python {
-   // path to python binary (global by defualt)
+   // path to python binary (global by default)
    pythonPath
    // python binary name (python or python3 by default)
    pythonBinary

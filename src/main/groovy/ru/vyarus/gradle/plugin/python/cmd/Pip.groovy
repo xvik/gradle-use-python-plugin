@@ -106,9 +106,7 @@ class Pip {
      */
     @Memoized
     String getVersion() {
-        python.withHiddenLog {
-            python.readOutput('-c "import pip; print(pip.__version__)"')
-        }
+        return resolveInfo()[0]
     }
 
     /**
@@ -116,7 +114,7 @@ class Pip {
      */
     @Memoized
     String getVersionLine() {
-        readOutput('--version')
+        return resolveInfo()[1]
     }
 
     /**
@@ -141,5 +139,23 @@ class Pip {
             cmd += " $USER"
         }
         cmd
+    }
+
+    /**
+     * Reduce the number of python executions during initialization.
+     *
+     * @return [raw pip version, pip version line]
+     */
+    @Memoized
+    private List<String> resolveInfo() {
+        String[] cmd = [
+                'import pip',
+                'print(pip.__version__)',
+                'pip.parseopts([\'--version\'])',
+        ]
+        python.withHiddenLog {
+            python.readOutput("-c \"${cmd.join(';')}\"")
+                    .readLines()
+        }
     }
 }

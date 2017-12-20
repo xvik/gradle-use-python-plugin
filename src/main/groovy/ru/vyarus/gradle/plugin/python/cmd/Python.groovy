@@ -7,6 +7,7 @@ import org.gradle.api.Project
 import org.gradle.api.logging.LogLevel
 import org.gradle.process.ExecResult
 import ru.vyarus.gradle.plugin.python.util.CliUtils
+import ru.vyarus.gradle.plugin.python.util.DurationFormatter
 import ru.vyarus.gradle.plugin.python.util.OutputLogger
 import ru.vyarus.gradle.plugin.python.util.PythonExecutionFailed
 
@@ -173,9 +174,7 @@ class Python {
      */
     @Memoized
     String getHomeDir() {
-        withHiddenLog {
-            return readOutput('-c "import sys;print(sys.prefix)"')
-        }
+        return resolveInfo()[1]
     }
 
     /**
@@ -183,10 +182,7 @@ class Python {
      */
     @Memoized
     String getVersion() {
-        withHiddenLog {
-            return readOutput('-c "import sys;ver=sys.version_info;' +
-                    'print(str(ver.major)+\'.\'+str(ver.minor)+\'.\'+str(ver.micro))"')
-        }
+        return resolveInfo()[0]
     }
 
     /**
@@ -226,6 +222,7 @@ class Python {
         String formattedCommand = commandLine.replace('\r', '').replace('\n', SPACE)
         project.logger.log(logLevel, "[python] $formattedCommand")
 
+        long start = System.currentTimeMillis()
         ExecResult res = project.exec {
             it.executable = exec
             it.args(cmd)
@@ -236,6 +233,8 @@ class Python {
                 setWorkingDir(workDir)
             }
         }
+        project.logger.info('Python execution time: {}',
+                DurationFormatter.format(System.currentTimeMillis() - start))
         if (res.exitValue != 0) {
             throw new PythonExecutionFailed("Python call failed: $formattedCommand")
         }
@@ -284,5 +283,25 @@ class Python {
             cmd = CliUtils.mergeArgs(cmd, extraArgs)
         }
         return cmd
+    }
+
+    /**
+     * Reduce the number of python executions during initialization.
+     *
+     * @return [raw python version, python home path]
+     */
+    @Memoized
+    private List<String> resolveInfo() {
+        String[] cmd = [
+                'import sys',
+                'ver=sys.version_info',
+                'print(str(ver.major)+\'.\'+str(ver.minor)+\'.\'+str(ver.micro))',
+                'print(sys.prefix)',
+        ]
+        withHiddenLog {
+            // raw version, home path
+            readOutput("-S -c \"${cmd.join(';')}\"")
+                    .readLines()
+        }
     }
 }

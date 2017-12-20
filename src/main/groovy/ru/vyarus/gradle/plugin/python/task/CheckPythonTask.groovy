@@ -63,7 +63,7 @@ class CheckPythonTask extends BasePipTask {
         // important because python could change on second execution
         Python python = new Python(project, pythonPath, pythonBinary)
         try {
-            python.exec('--version')
+            python.version
         } catch (ExecException ex) {
             throw new GradleException("Python not found: $python.usedBinary. " + (virtual ?
                     'This must be a bug of virtualenv support, please report it ' +

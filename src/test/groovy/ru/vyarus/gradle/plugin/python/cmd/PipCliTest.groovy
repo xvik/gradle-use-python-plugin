@@ -38,6 +38,6 @@ class PipCliTest extends AbstractTest {
         pip.exec('list')
         then: "ok"
         pip.version =~ /\d+\.\d+\.\d+/
-        pip.versionLine
+        pip.versionLine =~ /pip \d+\.\d+\.\d+ from/
     }
 }

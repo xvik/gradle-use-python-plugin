@@ -31,29 +31,39 @@ class DurationFormatter {
         long days = duration / MILLIS_PER_DAY
         duration %= MILLIS_PER_DAY
         if (days > 0L) {
-            result.append(days)
-            result.append('d')
+            append(result, days, 'd')
         }
 
         long hours = duration / MILLIS_PER_HOUR
         duration %= MILLIS_PER_HOUR
-        if (hours > 0L || result.length() > 0) {
-            result.append(hours)
-            result.append('h')
+        if (hours > 0L) {
+            append(result, hours, 'h')
         }
 
         long minutes = duration / MILLIS_PER_MINUTE
         duration %= MILLIS_PER_MINUTE
-        if (minutes > 0L || result.length() > 0) {
-            result.append(minutes)
-            result.append('m')
+        if (minutes > 0L) {
+            append(result, minutes, 'm')
         }
 
-        int secondsScale = result.length() > 0 ? 2 : 3
-        result.append(BigDecimal.valueOf(duration)
-                .divide(BigDecimal.valueOf(MILLIS_PER_SECOND))
-                .setScale(secondsScale, 4))
-        result.append('s')
+        // if at least one sec
+        boolean onlySecs = result.length() == 0
+        if (onlySecs || duration >= MILLIS_PER_SECOND) {
+            int secondsScale = onlySecs ? 3 : 0
+            append(result,
+                    BigDecimal.valueOf(duration)
+                            .divide(BigDecimal.valueOf(MILLIS_PER_SECOND))
+                            .setScale(secondsScale, 4),
+                    's')
+        }
         return result.toString()
+    }
+
+    private static void append(StringBuilder builder, Object num, String what) {
+        if (builder.length() > 0) {
+            builder.append(' ')
+        }
+        builder.append(num)
+        builder.append(what)
     }
 }

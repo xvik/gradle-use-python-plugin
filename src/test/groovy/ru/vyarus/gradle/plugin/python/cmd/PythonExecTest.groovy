@@ -156,4 +156,28 @@ class PythonExecTest extends AbstractCliMockSupport {
         then: "changed log"
         logger.res =~ /LIFECYCLE \[python] python(3)? aft/
     }
+
+    def "Check -c argument wrapping"() {
+
+        setup:
+        mockExec(project, null, 0)
+        python = new Python(project)
+
+        when: "call with -c"
+        python.exec('-c something')
+        then: "ok"
+        logger.res =~ /\[python] python(3)? -c ${isWin ? 'something' : 'exec(\"something\")'}/
+
+        when: "call with -c but not last"
+        logger.reset()
+        python.exec('-c something -d')
+        then: "no wrapping on linux"
+        logger.res =~ /\[python] python(3)? -c something -d/
+
+        when: "call module with -c"
+        logger.reset()
+        python.exec('-m some -c something')
+        then: "no wrapping on linux"
+        logger.res =~ /\[python] python(3)? -m some -c something/
+    }
 }

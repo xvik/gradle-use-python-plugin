@@ -272,17 +272,28 @@ class Python {
             // important to easily spot args parsing problems
             project.logger.info("Parsed arguments line '{}': {}", args, cmd)
         }
-        cmd.eachWithIndex { String arg, int i ->
-            if (arg == '-c' && i + 1 < cmd.length) {
-                // wrap command to grant cross-platform compatibility
-                // (e.g. simple -c "string" is not always executed)
-                cmd[i + 1] = CliUtils.wrapCommand(cmd[i + 1])
-            }
-        }
+        detectAndWrapCommand(cmd)
         if (this.extraArgs) {
             cmd = CliUtils.mergeArgs(cmd, extraArgs)
         }
         return cmd
+    }
+
+    /**
+     * Detect python command call (-c) and wrap command argument if required (on linux).
+     * @param cmd
+     */
+    private void detectAndWrapCommand(String[] cmd) {
+        boolean moduleCall = false
+        cmd.eachWithIndex { String arg, int i ->
+            if (arg == '-m') {
+                moduleCall = true
+            }
+            if (!moduleCall && arg == '-c' && i + 1 < cmd.length) {
+                // wrap command to grant cross-platform compatibility (simple -c "string" is not always executed)
+                cmd[i + 1] = CliUtils.wrapCommand(cmd[i + 1])
+            }
+        }
     }
 
     /**

@@ -166,7 +166,7 @@ class PythonExecTest extends AbstractCliMockSupport {
         when: "call with -c"
         python.exec('-c something')
         then: "ok"
-        logger.res =~ /\[python] python(3)? -c ${isWin ? 'something' : 'exec(\"something\")'}/
+        logger.res =~ /\[python] python(3)? -c ${isWin ? 'something' : 'exec\\(\"something\"\\)'}/
 
         when: "call with -c but not last"
         logger.reset()

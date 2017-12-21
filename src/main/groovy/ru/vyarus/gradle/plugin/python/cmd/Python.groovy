@@ -289,7 +289,7 @@ class Python {
             if (arg == '-m') {
                 moduleCall = true
             }
-            if (!moduleCall && arg == '-c' && i + 1 < cmd.length) {
+            if (!moduleCall && arg == '-c' && i + 2 == cmd.length) {
                 // wrap command to grant cross-platform compatibility (simple -c "string" is not always executed)
                 cmd[i + 1] = CliUtils.wrapCommand(cmd[i + 1])
             }

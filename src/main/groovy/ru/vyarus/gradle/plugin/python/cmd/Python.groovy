@@ -218,6 +218,9 @@ class Python {
                 CliUtils.wincmdArgs(executable, project.rootDir, prepareArgs(args), wrkDirUsed)
                 : prepareArgs(args)
 
+        // important to show arguments as array to easily spot args parsing problems
+        project.logger.info("Python arguments: {}", cmd)
+
         String commandLine = "$exec ${cmd.join(SPACE)}"
         String formattedCommand = commandLine.replace('\r', '').replace('\n', SPACE)
         project.logger.log(logLevel, "[python] $formattedCommand")
@@ -268,10 +271,6 @@ class Python {
     @SuppressWarnings('Instanceof')
     private String[] prepareArgs(Object args) {
         String[] cmd = CliUtils.parseArgs(args)
-        if (args instanceof CharSequence) {
-            // important to easily spot args parsing problems
-            project.logger.info("Parsed arguments line '{}': {}", args, cmd)
-        }
         detectAndWrapCommand(cmd)
         if (this.extraArgs) {
             cmd = CliUtils.mergeArgs(cmd, extraArgs)

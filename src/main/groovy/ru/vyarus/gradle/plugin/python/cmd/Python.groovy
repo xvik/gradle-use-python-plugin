@@ -219,7 +219,7 @@ class Python {
                 : prepareArgs(args)
 
         // important to show arguments as array to easily spot args parsing problems
-        project.logger.info("Python arguments: {}", cmd)
+        project.logger.info('Python arguments: {}', cmd)
 
         String commandLine = "$exec ${cmd.join(SPACE)}"
         String formattedCommand = commandLine.replace('\r', '').replace('\n', SPACE)

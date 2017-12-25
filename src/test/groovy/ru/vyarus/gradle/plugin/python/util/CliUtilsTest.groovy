@@ -81,9 +81,17 @@ class CliUtilsTest extends Specification {
 
     def "Check command line parsing"() {
 
+        println "one \"middle\" two"
         expect:
         CliUtils.parseCommandLine('') as List == []
         CliUtils.parseCommandLine('one two "three four" five') as List == ['one', 'two', '"three four"', 'five']
+        CliUtils.parseCommandLine('"one   two"') as List == ['"one   two"']
+        CliUtils.parseCommandLine('"one \\"middle\\" two"') as List == ['"one \\"middle\\" two"']
+        CliUtils.parseCommandLine('one two\\ three four') as List == ['one', 'two three', 'four']
+        CliUtils.parseCommandLine('two\\\\ three') as List == ['two\\ three']
+        CliUtils.parseCommandLine('t\\wo three') as List == ['t\\wo', 'three']
+        CliUtils.parseCommandLine('two\\') as List == ['two\\']
+        CliUtils.parseCommandLine('-c "\'one\', \'two\'"') as List == ['-c', '"\'one\', \'two\'"']
     }
 
     def "Check wincmd formatting"() {
@@ -93,7 +101,7 @@ class CliUtilsTest extends Specification {
 
         when: "executable not exists"
         CliUtils.wincmdArgs('not_exists', home, [] as String[], false)
-        then: "erorr"
+        then: "error"
         thrown(ExecException)
 
         when: "normal executions"

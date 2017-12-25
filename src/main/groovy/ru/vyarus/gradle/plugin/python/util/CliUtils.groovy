@@ -16,6 +16,7 @@ final class CliUtils {
     private static final String[] EMPTY = []
     private static final String SPACE = ' '
     private static final String VERSION_SPLIT = '\\.'
+    private static final String BACKSLASH = '\\'
 
     private CliUtils() {
     }
@@ -66,35 +67,61 @@ final class CliUtils {
 
     /**
      * Parse arguments from simple string. Support quotes (but not nested).
+     * Also, support escaped space ('first\ last' - > argument not split 'first last') and escaped quotes (\\").
      *
      * @param command arguments string
      * @return parsed arguments
      */
-    @SuppressWarnings('CouldBeElvis')
+    @SuppressWarnings('MethodSize')
     static String[] parseCommandLine(String command) {
         String cmd = command.trim()
         if (cmd) {
-            cmd = cmd.replaceAll('\\s{2,}', SPACE)
             List<String> res = []
-            String scope
             StringBuilder tmp = new StringBuilder()
+            // inside quotes (ignore spaces inside quotes), but not escaped quotes
+            String quoted
+            // \ appear before current char (escape character not printed yet)
+            boolean escaped = false
             cmd.each {
-                if (it == SPACE && !scope) {
-                    res << tmp.toString()
-                    tmp = new StringBuilder()
-                    return
+                // non escaped quotes char - start/stop quote scope
+                if (it in ['"', '\''] && !escaped) {
+                    quoted = quoted && it == quoted ? null : (quoted ?: it)
                 }
-                if (it in ['"', '\'']) {
-                    // only look quotes after separator/line start
-                    if (!scope) {
-                        //start quote
-                        scope = it
-                    } else if (scope == it) {
-                        // end quote
-                        scope = null
+                if (!quoted) {
+                    if (it == SPACE) {
+                        // ignore multiple split spaces (leading spaces after split)
+                        if (tmp.length() == 0) {
+                            // ignore leading escaped space
+                            escaped = false
+                            return
+                        }
+                        if (escaped) {
+                            // for escaped space - do not split, write space only (remove escape)
+                            escaped = false
+                        } else {
+                            // split
+                            res << tmp.toString()
+                            tmp = new StringBuilder()
+                            return
+                        }
                     }
                 }
-                tmp.append(it)
+
+                if (escaped) {
+                    // write preserved backslash
+                    tmp.append(BACKSLASH)
+                }
+                escaped = it == BACKSLASH
+
+                if (!escaped) {
+                    // write current char, if it's not escape (postponed until the next char)
+                    tmp.append(it)
+                }
+            }
+
+            if (escaped) {
+                // special case: backslash was the last char
+                tmp.append(BACKSLASH)
             }
             // last arg
             res << tmp.toString()

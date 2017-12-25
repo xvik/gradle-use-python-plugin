@@ -49,10 +49,11 @@ class PythonTask extends BasePythonTask {
      * <li>code execution: {@code '-c import sys;\nsys...'}
      * <li>file execution: {@code 'path/to/file.py} (relative to workDir)
      * </ul>
+     * Command could be specified as string, array or list (iterable).
      */
     @Input
     @Optional
-    String command
+    Object command
     /**
      * Python logs output level. By default it's {@link LogLevel@LIFECYCLE} (visible with '-i' gradle flag).
      */
@@ -76,7 +77,7 @@ class PythonTask extends BasePythonTask {
     @TaskAction
     void run() {
         String mod = getModule()
-        String cmd = getCommand()
+        Object cmd = getCommand()
         if (!mod && !cmd) {
             throw new GradleException('Module or command to execute must be defined')
         }

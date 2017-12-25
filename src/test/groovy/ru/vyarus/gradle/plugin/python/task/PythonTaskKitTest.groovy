@@ -52,6 +52,28 @@ class PythonTaskKitTest extends AbstractKitTest {
         result.output =~ /net\.rubygrapefruit\.platform\.NativeException: Could not start 'python(3)?'/
     }
 
+    def "Check array command"() {
+        setup:
+        build """
+            plugins {
+                id 'ru.vyarus.use-python'
+            }
+
+            task sample(type: PythonTask) {
+                module = 'pip'
+                command = ['list', '--user']
+            }
+        """
+
+        when: "run task"
+        BuildResult result = run('sample')
+
+        then: "executed"
+        result.task(':sample').outcome == TaskOutcome.SUCCESS
+        result.output =~ /\[python] python(3)? -m pip list --user/
+    }
+
+
     def "Check module command"() {
         setup:
         build """

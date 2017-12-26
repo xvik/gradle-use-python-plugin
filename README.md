@@ -320,6 +320,17 @@ task script(type: PythonTask) {
 }
 ```
 
+##### Command parsing
+
+When command passed as string it is manually parsed to arguments array (split by space):
+
+* Spaces in quotes are ignored: `"quoted space"` or `'quoted space''` 
+* Escaped sapces are ignored: `with\\ space` (argument will be used with simple space then - escape removed).
+* Escaped quotes are ignored: `"with \\"interrnal quotes\\" inside"`. But pay attention that it must be 2 symbols `\\"` and **not** `\"` because otherwise it is impossible to detect escape.  
+
+To view parsed arguments run gradle with `-i` flag (enable info logs). In case when command can't be parsed properly 
+(bug in parser or unsupported case) use array of arguments instead of string.
+
 #### Configuration
 
 ##### Python location

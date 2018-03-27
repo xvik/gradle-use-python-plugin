@@ -11,6 +11,8 @@ import ru.vyarus.gradle.plugin.python.util.ExecRes
 import ru.vyarus.gradle.plugin.python.util.TestLogger
 import spock.lang.Specification
 
+import java.util.concurrent.Executors
+
 /**
  * @author Vyacheslav Rusakov
  * @since 20.11.2017
@@ -41,7 +43,8 @@ abstract class AbstractCliMockSupport extends Specification {
     void mockExec(Project project, String output, int res) {
         // check execution with logs without actual execution
         project.exec(_) >> {Closure spec ->
-            DefaultExecAction act = ConfigureUtil.configure(spec, new DefaultExecAction(Stub(PathToFileResolver)))
+            DefaultExecAction act = ConfigureUtil.configure(spec,
+                    new DefaultExecAction(Stub(PathToFileResolver), Executors.newSingleThreadExecutor()))
             OutputStream os = act.standardOutput
             if (output) {
                 os.write(output.bytes)

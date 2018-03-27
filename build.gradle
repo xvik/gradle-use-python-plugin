@@ -2,20 +2,20 @@ plugins {
     id 'groovy'
     id 'jacoco'
     id 'java-gradle-plugin'
-    id 'com.gradle.plugin-publish' version '0.9.7'
+    id 'com.gradle.plugin-publish' version '0.9.10'
     id 'net.researchgate.release' version '2.6.0'
-    id 'ru.vyarus.quality' version '2.4.0'
-    id 'com.jfrog.bintray' version '1.7.3'
+    id 'ru.vyarus.quality' version '3.0.0'
+    id 'com.jfrog.bintray' version '1.8.0'
     id 'ru.vyarus.java-lib' version '1.0.5'
     id 'ru.vyarus.github-info' version '1.1.0'
-    id 'com.github.ben-manes.versions' version '0.15.0'
+    id 'com.github.ben-manes.versions' version '0.17.0'
     id "pl.droidsonroids.jacoco.testkit" version "1.0.3"
 }
 
-sourceCompatibility = 1.6
+sourceCompatibility = 1.7
 
 wrapper {
-    gradleVersion = '4.1'
+    gradleVersion = '4.6'
 }
 
 repositories { jcenter() }
@@ -102,7 +102,5 @@ test {
 }
 
 dependencyUpdates.revision = 'release'
-
-jacoco.toolVersion '0.7.9'
 jacocoTestReport.reports.xml.enabled = true
 generateJacocoTestKitProperties.destinationFile = file('build/jacoco/test.exec').absolutePath.replace("\\", '/')

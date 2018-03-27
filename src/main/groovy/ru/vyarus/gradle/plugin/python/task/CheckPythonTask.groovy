@@ -110,17 +110,14 @@ class CheckPythonTask extends BasePipTask {
     private boolean checkEnv(Virtualenv env, PythonExtension ext) {
         Pip pip = new Pip(project, ext.pythonPath, ext.pythonBinary, true)
         if (!pip.isInstalled(env.name)) {
-
             if (ext.installVirtualenv) {
                 // automatically install virtualenv if allowed (in --user)
                 pip.install(env.name)
-
             } else if (ext.scope == PythonExtension.Scope.VIRTUALENV) {
                 // virtualenv strictly required - fail
                 throw new GradleException('Virtualenv is not installed. Please install it ' +
                         '(https://virtualenv.pypa.io/en/stable/installation/) or change target pip ' +
                         "scope 'python.scope' from ${PythonExtension.Scope.VIRTUALENV}")
-
             } else {
                 // not found, but ok (fallback to USER scope)
                 return false

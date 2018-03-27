@@ -9,7 +9,7 @@
     "projectVersion": "0.1.0",
     "projectDesc": "Use python modules in gradle build",
     "pluginPortalDesc": "Manage pip dependencies and use python in gradle build",
-    "targetJava": "1.6",
+    "targetJava": "1.7",
     "pluginPortalTags": "python, virtualenv",
     "mirrorToJcenter": true,
     "pluginPortalUseCustomGroup": true,
@@ -18,6 +18,6 @@
     "bintrayTags": "gradle, python, virtualenv",
     "bintraySignFiles": true,
     "mavenCentralSync": true,
-    "usedGeneratorVersion": "1.5.0"
+    "usedGeneratorVersion": "1.6.0"
   }
 }

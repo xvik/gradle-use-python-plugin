@@ -2,6 +2,7 @@ package ru.vyarus.gradle.plugin.python.cmd
 
 import groovy.transform.CompileStatic
 import groovy.transform.Memoized
+import groovy.transform.TypeCheckingMode
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.Project
 import org.gradle.api.logging.LogLevel
@@ -208,6 +209,7 @@ class Python {
     }
 
     @SuppressWarnings('UnnecessarySetter')
+    @CompileStatic(TypeCheckingMode.SKIP)
     private void processExecution(Object args, OutputStream os) {
         boolean wrkDirUsed = workDir as boolean
         // on win non global python could be called only through cmd
@@ -244,6 +246,7 @@ class Python {
     }
 
     @Memoized
+    @CompileStatic(TypeCheckingMode.SKIP)
     private static String getPythonBinary(Project project, String pythonPath, String binary) {
         String res = binary ?: 'python'
         boolean isWindows = Os.isFamily(Os.FAMILY_WINDOWS)

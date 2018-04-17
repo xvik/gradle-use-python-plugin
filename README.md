@@ -499,7 +499,7 @@ In your plugin, add plugin as dependency:
 
 ```groovy
 dependencies {
-    compile 'ru.vyarus:gradle-use-python-plugin:1.0.0'
+    compile 'ru.vyarus:gradle-use-python-plugin:1.0.2'
 }
 ```
 

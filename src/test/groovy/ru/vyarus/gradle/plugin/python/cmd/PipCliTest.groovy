@@ -4,6 +4,8 @@ import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import ru.vyarus.gradle.plugin.python.AbstractTest
 
+import java.util.regex.Pattern
+
 /**
  * @author Vyacheslav Rusakov
  * @since 20.11.2017
@@ -39,5 +41,27 @@ class PipCliTest extends AbstractTest {
         then: "ok"
         pip.version =~ /\d+\.\d+\.\d+/
         pip.versionLine =~ /pip \d+\.\d+\.\d+ from/
+    }
+
+    def "Check version parse fail"() {
+
+        when: "prepare pip"
+        Project project = project()
+        Pip pip = new FooPip(project)
+        then: "ok"
+        pip.version =~ /\d+\.\d+\.\d+/
+
+    }
+
+    class FooPip extends Pip {
+
+        FooPip(Project project) {
+            super(project)
+        }
+
+        @Override
+        String getVersionLine() {
+            return 'you will not parse it'
+        }
     }
 }

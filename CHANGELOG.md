@@ -1,3 +1,5 @@
+* Fix pip 10 compatibility (#1)
+
 ### 1.0.1 (2017-12-26)
 * Fix python command recognition: avoid wrapping for -c module argument
 * Support escaped space and quote during command string parsing

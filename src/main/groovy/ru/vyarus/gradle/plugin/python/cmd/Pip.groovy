@@ -7,6 +7,9 @@ import org.gradle.api.Project
 import org.gradle.api.logging.LogLevel
 import ru.vyarus.gradle.plugin.python.util.PythonExecutionFailed
 
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+
 /**
  * Pip commands execution utility. Use {@link Python} internally.
  *
@@ -15,6 +18,8 @@ import ru.vyarus.gradle.plugin.python.util.PythonExecutionFailed
  */
 @CompileStatic
 class Pip {
+
+    private static final Pattern VERSION = Pattern.compile('pip ([\\d.]+)')
 
     public static final String USER = '--user'
     private static final List<String> USER_AWARE_COMMANDS = ['install', 'list', 'freeze']
@@ -106,7 +111,17 @@ class Pip {
      */
     @Memoized
     String getVersion() {
-        return resolveInfo()[0]
+        // first try to parse line to avoid duplicate python call
+        Matcher matcher = VERSION.matcher(versionLine)
+        if (matcher.find()) {
+            // note: this will drop beta postfix (e.g. for 10.0.0b2 version will be 10.0.0)
+            return matcher.group(1)
+        }
+        // if can't recognize version, ask directly
+        return python.withHiddenLog {
+            python.readOutput('-c \"import pip; print(pip.__version__)\"')
+                    .readLines()
+        }
     }
 
     /**
@@ -114,7 +129,9 @@ class Pip {
      */
     @Memoized
     String getVersionLine() {
-        return resolveInfo()[1]
+        return python.withHiddenLog {
+            python.readOutput('-m pip --version')
+        }
     }
 
     /**
@@ -139,23 +156,5 @@ class Pip {
             cmd += " $USER"
         }
         cmd
-    }
-
-    /**
-     * Reduce the number of python executions during initialization.
-     *
-     * @return [raw pip version, pip version line]
-     */
-    @Memoized
-    private List<String> resolveInfo() {
-        String[] cmd = [
-                'import pip',
-                'print(pip.__version__)',
-                'pip.parseopts([\'--version\'])',
-        ]
-        python.withHiddenLog {
-            python.readOutput("-c \"${cmd.join(';')}\"")
-                    .readLines()
-        }
     }
 }

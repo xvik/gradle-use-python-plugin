@@ -1,10 +1,7 @@
 package ru.vyarus.gradle.plugin.python.cmd
 
 import org.gradle.api.Project
-import org.gradle.testfixtures.ProjectBuilder
 import ru.vyarus.gradle.plugin.python.AbstractTest
-
-import java.util.regex.Pattern
 
 /**
  * @author Vyacheslav Rusakov
@@ -45,14 +42,9 @@ class PipCliTest extends AbstractTest {
 
     def "Check version parse fail"() {
 
-        when: "fallback to python call"
+        when: "prepare pip"
         Project project = project()
-        Pip pip = new FooPip(project, 'you will not parse it')
-        then: "ok"
-        pip.version =~ /\d+\.\d+\.\d+/
-
-        when: "empty version in regex fallback to python"
-        pip = new FooPip(project, 'pip form ')
+        Pip pip = new FooPip(project)
         then: "ok"
         pip.version =~ /\d+\.\d+\.\d+/
 
@@ -60,16 +52,13 @@ class PipCliTest extends AbstractTest {
 
     class FooPip extends Pip {
 
-        String line
-
-        FooPip(Project project, String line) {
+        FooPip(Project project) {
             super(project)
-            this.line = line
         }
 
         @Override
         String getVersionLine() {
-            return line
+            return 'you will not parse it'
         }
     }
 }

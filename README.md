@@ -47,7 +47,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'ru.vyarus:gradle-use-python-plugin:1.0.1'
+        classpath 'ru.vyarus:gradle-use-python-plugin:1.0.2'
     }
 }
 apply plugin: 'ru.vyarus.use-python'
@@ -57,7 +57,7 @@ OR
 
 ```groovy
 plugins {
-    id 'ru.vyarus.use-python' version '1.0.1'
+    id 'ru.vyarus.use-python' version '1.0.2'
 }
 ```
 

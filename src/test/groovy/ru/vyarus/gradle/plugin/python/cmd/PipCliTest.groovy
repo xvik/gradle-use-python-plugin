@@ -45,9 +45,14 @@ class PipCliTest extends AbstractTest {
 
     def "Check version parse fail"() {
 
-        when: "prepare pip"
+        when: "fallback to python call"
         Project project = project()
-        Pip pip = new FooPip(project)
+        Pip pip = new FooPip(project, 'you will not parse it')
+        then: "ok"
+        pip.version =~ /\d+\.\d+\.\d+/
+
+        when: "empty version in regex fallback to python"
+        pip = new FooPip(project, 'pip form ')
         then: "ok"
         pip.version =~ /\d+\.\d+\.\d+/
 
@@ -55,13 +60,16 @@ class PipCliTest extends AbstractTest {
 
     class FooPip extends Pip {
 
-        FooPip(Project project) {
+        String line
+
+        FooPip(Project project, String line) {
             super(project)
+            this.line = line
         }
 
         @Override
         String getVersionLine() {
-            return 'you will not parse it'
+            return line
         }
     }
 }

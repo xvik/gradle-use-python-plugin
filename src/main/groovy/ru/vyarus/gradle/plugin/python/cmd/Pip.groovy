@@ -115,10 +115,7 @@ class Pip {
         Matcher matcher = VERSION.matcher(versionLine)
         if (matcher.find()) {
             // note: this will drop beta postfix (e.g. for 10.0.0b2 version will be 10.0.0)
-            String ver = matcher.group(1)
-            if (ver) {
-                return ver
-            }
+            return matcher.group(1)
         }
         // if can't recognize version, ask directly
         return python.withHiddenLog {

@@ -1,0 +1,44 @@
+package ru.vyarus.gradle.plugin.python.task
+
+import org.gradle.testkit.runner.BuildResult
+import org.gradle.testkit.runner.TaskOutcome
+import ru.vyarus.gradle.plugin.python.AbstractKitTest
+
+/**
+ * @author Vyacheslav Rusakov
+ * @since 19.05.2018
+ */
+class PipVcsModulesInstallTest extends AbstractKitTest {
+
+    def "Check vcs install"() {
+
+        setup:
+        build """
+            plugins {
+                id 'ru.vyarus.use-python'
+            }
+
+            python {
+                pip 'git+https://github.com/ictxiangxin/boson/@b52727f7170acbedc5a1b4e1df03972bd9bb85e3#egg=boson-0.9'
+            }
+
+        """
+
+        when: "run task"
+        BuildResult result = run('pipInstall')
+
+        then: "package install called"
+        result.task(':checkPython').outcome == TaskOutcome.SUCCESS
+        result.task(':pipInstall').outcome == TaskOutcome.SUCCESS
+        result.output.contains('Successfully built boson')
+        result.output.contains('boson-0.9')
+
+        when: "second install"
+        result = run('pipInstall')
+        then: "package not installed"
+        result.task(':checkPython').outcome == TaskOutcome.SUCCESS
+        result.task(':pipInstall').outcome == TaskOutcome.UP_TO_DATE
+        !result.output.contains('Successfully built boson')
+        !result.output.contains('boson-0.9')
+    }
+}

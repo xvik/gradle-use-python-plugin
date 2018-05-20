@@ -1,6 +1,7 @@
 package ru.vyarus.gradle.plugin.python.task.pip
 
 import groovy.transform.CompileStatic
+import ru.vyarus.gradle.plugin.python.task.pip.module.ModuleFactory
 
 /**
  * Pip module declaration pojo. Support parsing 'name:version' format (used for configuration).
@@ -34,6 +35,8 @@ class PipModule {
     }
 
     /**
+     * Must be used for module up to date detection.
+     *
      * @return module declaration in pip format
      */
     String toPipString() {
@@ -42,11 +45,20 @@ class PipModule {
         return "$name==$version"
     }
 
+    /**
+     * Must be used for installation.
+     *
+     * @return module installation declaration
+     */
+    String toPipInstallString() {
+        return toPipString()
+    }
+
     boolean equals(Object o) {
         if (this.is(o)) {
             return true
         }
-        if (getClass() != o.class) {
+        if (!getClass().isAssignableFrom(o.class)) {
             return false
         }
 
@@ -62,18 +74,15 @@ class PipModule {
     }
 
     /**
-     * Parse module declaration in format 'module:version'.
+     * Parse module declaration in format 'module:version' or 'vcs+protocol://repo_url/@vcsVersion#egg=pkg-pkgVersion'
+     * (for vcs module).
      *
      * @param declaration module declaration to parse
      * @return parsed module pojo
      * @throws IllegalArgumentException if module format does not match
+     * @see ModuleFactory#create(java.lang.String)
      */
     static PipModule parse(String declaration) {
-        String[] parts = declaration.split(':')
-        if (parts.length != 2) {
-            throw new IllegalArgumentException(
-                    "Incorrect pip module declaration (must be 'module:version'): $declaration")
-        }
-        return new PipModule(parts[0].trim() ?: null, parts[1].trim() ?: null)
+        return ModuleFactory.create(declaration)
     }
 }

@@ -68,10 +68,9 @@ class PipInstallTask extends BasePipTask {
                     : pip.inGlobalScope { pip.readOutput('freeze') } as String).toLowerCase().readLines()
             // install modules
             modulesList.each { PipModule mod ->
-                String pipDef = mod.toPipString()
                 // don't install if already installed (assume dependencies are also installed)
-                if (!installed.contains(pipDef.toLowerCase())) {
-                    res.add(pipDef)
+                if (!installed.contains(mod.toPipString().toLowerCase())) {
+                    res.add(mod.toPipInstallString())
                 }
             }
         }

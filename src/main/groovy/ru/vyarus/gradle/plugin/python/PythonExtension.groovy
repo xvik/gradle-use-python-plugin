@@ -1,6 +1,7 @@
 package ru.vyarus.gradle.plugin.python
 
 import groovy.transform.CompileStatic
+import ru.vyarus.gradle.plugin.python.task.pip.module.ModuleFactory
 
 /**
  * Use-python plugin extension. Used to declare python location (use global if not declared) and specify
@@ -31,7 +32,7 @@ class PythonExtension {
      */
     String minPythonVersion
     /**
-     * Minimal required pip version. Format is teh same as python version: "major.minor.micro". Any precision could
+     * Minimal required pip version. Format is the same as python version: "major.minor.micro". Any precision could
      * be used (9, 8.2, etc). By default pip 9 is required.
      */
     String minPipVersion = '9'
@@ -94,6 +95,12 @@ class PythonExtension {
      * matching is supported (pip support ranges, but this is intentionally not supported in order to avoid
      * side effects).
      * <p>
+     * VCS module declaration is also supported in format: "vcs+protocol://repo_url/@vcsVersion#egg=pkg-pkgVersion".
+     * Note that it requires both vcs version (e.g. commit hash) and package version in order to be able to perform
+     * up-to-date check. You can specify branch name or tag (for example, for git) instead of direct hash, but
+     * prefer using exact version (hash or tags, not branches) in order to get reproducible builds.
+     * See <a href="https://pip.pypa.io/en/stable/reference/pip_install/#vcs-support">pip vcs docs</p>.
+     * <p>
      * Duplicate declarations are allowed: in this case the latest declaration will be used.
      * <p>
      * Note: if newer package version is already installed, pip will remove it and install correct version.
@@ -123,23 +130,19 @@ class PythonExtension {
         /**
          * Use virtualenv. Fail if virtualenv module not installed.
          * If virtualenv is not created, then it would be created automatically.
-         * Path of environment location is configurable (by difault cached in .gradle dir).
+         * Path of environment location is configurable (by default cached in .gradle dir).
          */
         VIRTUALENV
     }
 
     /**
-     * Checks if module is already declared. Could be used by other plugins to test if required module
-     * is manually declared or not (in order to apply defaults).
+     * Checks if module is already declared (as usual or vcs module). Could be used by other plugins to test
+     * if required module is manually declared or not (in order to apply defaults).
      *
      * @param name module name to check
      * @return true of module already declared, false otherwise
      */
     boolean isModuleDeclared(String name) {
-        String nm = name.toLowerCase() + ':'
-        String res = modules.find {
-            it.toLowerCase().startsWith(nm)
-        }
-        return res != null
+        return ModuleFactory.findModuleDeclaration(name, modules) != null
     }
 }

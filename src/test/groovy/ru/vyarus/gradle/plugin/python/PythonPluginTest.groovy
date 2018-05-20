@@ -2,7 +2,7 @@ package ru.vyarus.gradle.plugin.python
 
 import org.gradle.api.GradleException
 import org.gradle.api.Project
-import org.gradle.testfixtures.ProjectBuilder
+import ru.vyarus.gradle.plugin.python.task.pip.module.VcsPipModule
 
 /**
  * @author Vyacheslav Rusakov
@@ -104,5 +104,37 @@ class PythonPluginTest extends AbstractTest {
         ext.isModuleDeclared('sample')
         ext.isModuleDeclared('foo')
         !ext.isModuleDeclared('sampleee')
+    }
+
+    def "Check modules override"() {
+
+        when: "vcs declaration override normal"
+        Project project = project {
+            apply plugin: "ru.vyarus.use-python"
+
+            python.pip 'foo:1',
+                        'git+https://git.example.com/foo@v2.0#egg=foo-2'
+        }
+        def res = project.tasks.getByName('pipInstall').getModulesList()
+
+        then: "one module"
+        res.size() == 1
+        res[0] instanceof VcsPipModule
+        res[0].toPipString() == "foo==2"
+
+
+        when: "opposite override"
+        project = super.project {
+            apply plugin: "ru.vyarus.use-python"
+
+            python.pip  'git+https://git.example.com/foo@v2.0#egg=foo-2',
+                    'foo:1'
+        }
+        res = project.tasks.getByName('pipInstall').getModulesList()
+
+        then: "one module"
+        res.size() == 1
+        !(res[0] instanceof VcsPipModule)
+        res[0].toPipString() == "foo==1"
     }
 }

@@ -1,3 +1,7 @@
+* Add vcs modules support in format: "vcs+protocol://repo_url/@vcsVersion#egg=pkg-pkgVersion" (#2)
+* PipModule api changes:
+    - Added toPipInstallString(): must be used for installation command instead of toPipString()  
+
 ### 1.0.2 (2018-04-18)
 * Fix pip 10 compatibility (#1)
 

@@ -7,17 +7,24 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 /**
- * Module descriptor parser. Supports versioned vcs modules and special exact syntax (name:version).
+ * Module descriptor parser. Supports versioned vcs modules, special exact syntax (name:version) and
+ * feature-enabled exact syntax (name[feature1,feature2]:version).
  *
  * @author Vyacheslav Rusakov
  * @since 18.05.2018
  */
 @CompileStatic
+@SuppressWarnings('DuplicateNumberLiteral')
 class ModuleFactory {
 
     private static final Pattern VCS_FORMAT = Pattern.compile('@[^#]+#egg=([^&]+)')
     private static final String VERSION_SEPARATOR = ':'
     private static final String VCS_VERSION_SEPARATOR = '-'
+
+    private static final Pattern FEATURE_FORMAT = Pattern.compile('(.+)\\[(.+)]:(.+)')
+    private static final String QUALIFIER_START = '['
+    private static final String QUALIFIER_END = ']'
+
     private static final int DECL_PARTS = 2
 
     /**
@@ -25,9 +32,15 @@ class ModuleFactory {
      * @return parsed module instance (normal or vcs)
      */
     static PipModule create(String descriptor) {
-        return descriptor.contains('#egg=') || descriptor.contains('/') ?
-                parseVcsModule(descriptor) :
-                parseModule(descriptor)
+        PipModule res
+        if (descriptor.contains('#egg=') || descriptor.contains('/')) {
+            res = parseVcsModule(descriptor)
+        } else if (descriptor.contains(QUALIFIER_START) && descriptor.contains(QUALIFIER_END)) {
+            res = parseFeatureModule(descriptor)
+        } else {
+            res = parseModule(descriptor)
+        }
+        return res
     }
 
     /**
@@ -39,10 +52,16 @@ class ModuleFactory {
      */
     static String findModuleDeclaration(String name, List<String> modules) {
         String nm = name.toLowerCase() + VERSION_SEPARATOR
+        String qualifNm = name.toLowerCase() + QUALIFIER_START
         String vcsNm = "#egg=${name.toLowerCase()}-"
         return modules.find {
             String mod = it.toLowerCase()
-            mod.startsWith(nm) || mod.contains(vcsNm)
+            if (mod.contains(QUALIFIER_START)) {
+                // qualified definition
+                return mod.startsWith(qualifNm)
+            }
+            // vcs and simple definitions
+            return mod.startsWith(nm) || mod.contains(vcsNm)
         }
     }
 
@@ -61,7 +80,7 @@ class ModuleFactory {
         if (!matcher.find()) {
             throw new IllegalArgumentException("${wrongVcs(desc)} Module name not found")
         }
-        String name = matcher.group(1)
+        String name = matcher.group(1).trim()
         // '-' could not appear in module name
         if (!name.contains(VCS_VERSION_SEPARATOR)) {
             throw new IllegalArgumentException(
@@ -73,11 +92,32 @@ class ModuleFactory {
             throw new IllegalArgumentException(
                     "${wrongVcs(desc)} module name (#egg= part) contains multiple '-' symbols: '$name'")
         }
-        String version = split[1]
+        String version = split[1].trim()
         // remove version part because pip fails to install with it
         String shortDesc = desc.replace(name, split[0])
-        name = split[0]
+        name = split[0].trim()
         return new VcsPipModule(shortDesc, name, version)
+    }
+
+    /**
+     * Feature enabled module declaration: name[qualifier]:version.
+     *
+     * @param desc module descriptor
+     * @return simple module if qualifier is empty or feature module
+     */
+    private static PipModule parseFeatureModule(String desc) {
+        Matcher matcher = FEATURE_FORMAT.matcher(desc)
+        if (!matcher.matches()) {
+            throw new IllegalArgumentException('Incorrect pip module declaration (expected ' +
+                    "'module[qualifier,qualifier2]:version'): '$desc'")
+        }
+        String name = matcher.group(1).trim()
+        String qualifier = matcher.group(2).trim()
+        String version = matcher.group(3).trim()
+        return qualifier ?
+                new FeaturePipModule(name, qualifier, version)
+                // no qualifier ([]) - silently create simple module
+                : new PipModule(name, version)
     }
 
     /**

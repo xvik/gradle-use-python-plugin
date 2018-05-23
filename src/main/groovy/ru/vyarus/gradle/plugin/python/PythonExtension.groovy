@@ -95,6 +95,10 @@ class PythonExtension {
      * matching is supported (pip support ranges, but this is intentionally not supported in order to avoid
      * side effects).
      * <p>
+     * Feature syntax is also allowed: "moduleName[qualifier]:version". As it is impossible to detect enabled features
+     * of installed modules then qualified module will not be installed if module with the same name and
+     * version is already installed (moduleName:version).
+     * <p>
      * VCS module declaration is also supported in format: "vcs+protocol://repo_url/@vcsVersion#egg=pkg-pkgVersion".
      * Note that it requires both vcs version (e.g. commit hash) and package version in order to be able to perform
      * up-to-date check. You can specify branch name or tag (for example, for git) instead of direct hash, but

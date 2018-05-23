@@ -1,4 +1,5 @@
 * Add vcs modules support in format: "vcs+protocol://repo_url/@vcsVersion#egg=pkg-pkgVersion" (#2)
+* Support module features syntax: module\[feature]:version (#3)
 * PipModule api changes:
     - Added toPipInstallString(): must be used for installation command instead of toPipString()  
 

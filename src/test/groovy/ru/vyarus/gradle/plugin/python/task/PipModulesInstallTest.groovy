@@ -8,7 +8,7 @@ import ru.vyarus.gradle.plugin.python.AbstractKitTest
  * @author Vyacheslav Rusakov
  * @since 19.05.2018
  */
-class PipVcsModulesInstallTest extends AbstractKitTest {
+class PipModulesInstallTest extends AbstractKitTest {
 
     def "Check vcs install"() {
 
@@ -40,5 +40,34 @@ class PipVcsModulesInstallTest extends AbstractKitTest {
         result.task(':pipInstall').outcome == TaskOutcome.UP_TO_DATE
         !result.output.contains('Successfully built boson')
         !result.output.contains('boson-0.9')
+    }
+
+    def "Check square syntax"() {
+
+        setup:
+        build """
+            plugins {
+                id 'ru.vyarus.use-python'
+            }
+
+            python {
+                pip 'requests[socks,security]:2.18.4'
+            }
+
+        """
+
+        when: "run task"
+        BuildResult result = run('pipInstall')
+
+        then: "package install called"
+        result.task(':checkPython').outcome == TaskOutcome.SUCCESS
+        result.task(':pipInstall').outcome == TaskOutcome.SUCCESS
+        result.output.contains('requests-2.18.4')
+
+        when: "second install"
+        result = run('pipInstall')
+        then: "package not installed"
+        result.task(':checkPython').outcome == TaskOutcome.SUCCESS
+        result.task(':pipInstall').outcome == TaskOutcome.UP_TO_DATE
     }
 }

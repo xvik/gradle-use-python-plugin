@@ -1,5 +1,6 @@
 package ru.vyarus.gradle.plugin.python.task
 
+import ru.vyarus.gradle.plugin.python.task.pip.module.FeaturePipModule
 import ru.vyarus.gradle.plugin.python.task.pip.module.ModuleFactory
 import ru.vyarus.gradle.plugin.python.task.pip.PipModule
 import ru.vyarus.gradle.plugin.python.task.pip.module.VcsPipModule
@@ -144,11 +145,54 @@ class ModuleParseTest extends Specification {
                 'git+https://git.example.com/something@v1.0#egg=something-6.6',
                 'some:1.2',
                 'git+https://git.example.com/MyProject@v1.0#egg=MyProject-6.6',
+                'someth[qualif]:1.1'
         ]
 
         expect:
         ModuleFactory.findModuleDeclaration('sOme', mods) == 'some:1.2'
         ModuleFactory.findModuleDeclaration('myproject', mods) == 'git+https://git.example.com/MyProject@v1.0#egg=MyProject-6.6'
         ModuleFactory.findModuleDeclaration('something', mods) == 'git+https://git.example.com/something@v1.0#egg=something-6.6'
+        ModuleFactory.findModuleDeclaration('someth', mods) == 'someth[qualif]:1.1'
+    }
+
+    def "Check feature mods"() {
+
+        when:
+        PipModule mod = ModuleFactory.create('requests[socks,security]:2.18.4')
+        then:
+        mod instanceof FeaturePipModule
+        mod.version == '2.18.4'
+        mod.name == 'requests'
+        mod.toString() == 'requests[socks,security] 2.18.4'
+        mod.toPipString() == 'requests==2.18.4'
+        mod.toPipInstallString() == 'requests[socks,security]==2.18.4'
+    }
+
+    def "Check feature mods errors"() {
+
+        when: "bad name format"
+        ModuleFactory.create('mod[]:1.2')
+        then: "err"
+        def ex = thrown(IllegalArgumentException)
+        ex.message == 'Incorrect pip module declaration (expected \'module[qualifier,qualifier2]:version\'): \'mod[]:1.2\''
+
+        when: "empty qualifier"
+        PipModule mod = ModuleFactory.create('mod[ ]:1.2')
+        then: "usual module"
+        mod.name == 'mod'
+        mod.version == '1.2'
+        mod.toPipInstallString() == 'mod==1.2'
+    }
+
+    def "Check feature module equals"() {
+
+            when: "two equal modules"
+            PipModule mod = new PipModule('one', '1')
+            PipModule mod2 = new FeaturePipModule('one', 'qualif', '1')
+            then: "equal"
+            mod.hashCode() == mod2.hashCode()
+            mod.equals(mod2)
+            mod.equals(mod)
+            !mod.equals(new Object())
     }
 }

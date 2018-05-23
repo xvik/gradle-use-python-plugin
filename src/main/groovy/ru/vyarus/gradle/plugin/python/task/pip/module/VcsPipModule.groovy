@@ -23,7 +23,7 @@ import ru.vyarus.gradle.plugin.python.task.pip.PipModule
 @CompileStatic
 class VcsPipModule extends PipModule {
 
-    String declaration
+    private final String declaration
 
     VcsPipModule(String declaration, String name, String version) {
         super(name, version)

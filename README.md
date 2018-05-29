@@ -47,7 +47,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'ru.vyarus:gradle-use-python-plugin:1.0.2'
+        classpath 'ru.vyarus:gradle-use-python-plugin:1.1.0'
     }
 }
 apply plugin: 'ru.vyarus.use-python'
@@ -57,7 +57,7 @@ OR
 
 ```groovy
 plugins {
-    id 'ru.vyarus.use-python' version '1.0.2'
+    id 'ru.vyarus.use-python' version '1.1.0'
 }
 ```
 
@@ -105,6 +105,31 @@ pip3 install -U pip
 Note that on ubuntu pip installed with `python3-pip` package is 9.0.1, but it did not(!) downgrade
 module versions (e.g. `pip install click 6.6` when click 6.7 is installed will do nothing). 
 Maybe there are other differences, so it's highly recommended to upgrade pip with `pip3 install -U pip`.
+
+#### Automatic pip upgrade
+
+As described above, there are different ways of pip installation in linux and, more important,
+admin permissions are required to upgrade global pip. So it is impossible to upgrade pip from plugin (in all cases).
+
+But, it is possible inside virtualenv or user (--user) scope. Note that plugin creates virtualenv by default (per project independent python environment).
+
+So, in order to use newer pip simply put it as first dependency:
+
+```
+python {
+    pip 'pip:10.0.1'
+    pip 'some_module:1.0'
+}
+```
+
+Here project virtualenv will be created with global pip and newer pip version installed inside environment. 
+Packages installation is sequential, so all other packages will be installed with newer pip (each installation is independent pip command).
+
+The same will work for user scope: `python.scope = USER`
+
+When applying this trick, consider minimal pip version declared in configuration
+(`python.minPipVersion='9'` by default) as minimal pip version required for *project setup* 
+(instead of minimal version required *for work*).
 
 #### Automatic python install
 
@@ -159,9 +184,65 @@ will be used:
 python.pip 'module1:2.0', 'module2:1.0', 'module1:1.0' 
 ```
 
-Will install version 1.0 of module1 because it was the latest declaration.
+Will install version 1.0 of module1 because it was the latest declaration. Module overrides
+work for all declaration types (see below): the last declared module is used.
 
 Dependencies are installed with `pipInstall` task which is called before any declared `PythonTask`.
+
+Note that by default dependencies are installed inside project specific virtualenv (project specific copy of python environment).
+
+#### Pip module extra features
+
+You can declare modules with [extra features](https://setuptools.readthedocs.io/en/latest/setuptools.html#declaring-extras-optional-features-with-their-own-dependencies) 
+in module name to install special version of module (with enabled features):
+
+```groovy
+python.pip 'requests[socks,security]:2.18.4'
+```
+
+IMPORTANT: it is impossible to track if this "variation" of module is installed, so
+plugin performs up-to-date check for such modules by name only (for example, 
+if 'requests==2.18.4' is already installed). For most cases, this is suitable behaviour because, by default, 
+modules are installed in virtualenv and so you will always have correct module installed.
+For other cases, you can disable up-to-date checks (delegate all dependencies logic to pip): `python.alwaysInstallModules = true` 
+
+#### VCS pip modules
+
+You can declare [vcs modules](https://pip.pypa.io/en/stable/reference/pip_install/#vcs-support): modules installed directly from 
+version control (e.g. git, svn). Format: 
+
+```
+vcs+protocol://repo_url/@vcsVersion#egg=pkg-pkgVersion
+```
+
+* `@vcsVersion` part is required: prefer using commit version or tag for reproducible builds
+* `-pkgVersion` is installed module version. Required to be able to compare declared plugin with installed version.
+
+For example:
+
+```groovy
+python.pip 'git+https://github.com/ictxiangxin/boson/@b52727f7170acbedc5a1b4e1df03972bd9bb85e3#egg=boson-0.9'
+```
+
+Declares module `boson` version `0.9`, installed from git commit `b52727f7170acbedc5a1b4e1df03972bd9bb85e3` (it may be tag name or branch, but prefer not using branch names).
+
+`pipInstall` will be considered up-to-date if `boson==0.9` is already installed. Note that declared module version
+is completely free: you can set any version (0.10, 1.2, etc.), it is not checked and used only for up-to-date validation. 
+
+Vcs module installation is: source checkout and module build (using setup.py). You may need to specify subdirectory
+as `&subdirectory=pkg_dir` ([see docs](https://pip.pypa.io/en/stable/reference/pip_install/#vcs-support))
+
+To avoid installation problems, package version is not used for actual installation (in spite of the fact that its official 
+convention, it doesnt work in some cases). For example, module above will be installed as (no  `-0.9`):
+
+```bash
+pip install git+https://github.com/ictxiangxin/boson/@b52727f7170acbedc5a1b4e1df03972bd9bb85e3#egg=boson
+```
+
+All pip supported vcs could be used: git, svn, hg, bzr 
+
+If up-to-date logic, implemented by `pipInstall` task, does not suit your needs, you can always
+disable it with `python.alwaysInstallModules = true` (pip always called). But this will be slower.
 
 #### Virtualenv
 
@@ -499,7 +580,7 @@ In your plugin, add plugin as dependency:
 
 ```groovy
 dependencies {
-    compile 'ru.vyarus:gradle-use-python-plugin:1.0.2'
+    compile 'ru.vyarus:gradle-use-python-plugin:1.1.0'
 }
 ```
 
@@ -629,6 +710,9 @@ User will be able to override default versions by direct module declaration (eve
 ```groovy
 python.pip 'sommodule:0.9'
 ``` 
+
+NOTE: all pip declarations are supported so direct module version could be overridden with VCS declaration
+and vice-versa (only the declaration order is important).
 
 ### Might also like
 

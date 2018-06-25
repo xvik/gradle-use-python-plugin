@@ -217,7 +217,7 @@ class Python {
                 // use absolute python path if work dir set (relative will simply not work)
                 : (wrkDirUsed && customBinaryPath ? project.file(executable).canonicalPath : executable)
         String[] cmd = withCmd ?
-                CliUtils.wincmdArgs(executable, project.rootDir, prepareArgs(args), wrkDirUsed)
+                CliUtils.wincmdArgs(executable, project.projectDir, prepareArgs(args), wrkDirUsed)
                 : prepareArgs(args)
 
         // important to show arguments as array to easily spot args parsing problems

@@ -14,6 +14,19 @@ class PipModule {
     String name
     String version
 
+    /**
+     * Parse module declaration in format 'module:version' or 'vcs+protocol://repo_url/@vcsVersion#egg=pkg-pkgVersion'
+     * (for vcs module).
+     *
+     * @param declaration module declaration to parse
+     * @return parsed module pojo
+     * @throws IllegalArgumentException if module format does not match
+     * @see ModuleFactory#create(java.lang.String)
+     */
+    static PipModule parse(String declaration) {
+        return ModuleFactory.create(declaration)
+    }
+
     PipModule(String name, String version) {
         if (!name) {
             throw new IllegalArgumentException('Module name required')
@@ -71,18 +84,5 @@ class PipModule {
         result = name.hashCode()
         result = 31 * result + version.hashCode()
         return result
-    }
-
-    /**
-     * Parse module declaration in format 'module:version' or 'vcs+protocol://repo_url/@vcsVersion#egg=pkg-pkgVersion'
-     * (for vcs module).
-     *
-     * @param declaration module declaration to parse
-     * @return parsed module pojo
-     * @throws IllegalArgumentException if module format does not match
-     * @see ModuleFactory#create(java.lang.String)
-     */
-    static PipModule parse(String declaration) {
-        return ModuleFactory.create(declaration)
     }
 }

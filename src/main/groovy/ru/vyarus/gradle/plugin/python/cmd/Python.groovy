@@ -31,7 +31,7 @@ import ru.vyarus.gradle.plugin.python.util.PythonExecutionFailed
  * @since 15.11.2017
  */
 @CompileStatic
-@SuppressWarnings('ConfusingMethodName')
+@SuppressWarnings(['ConfusingMethodName', 'StaticMethodsBeforeInstanceMethods'])
 class Python {
 
     private static final String PYTHON3 = 'python3'

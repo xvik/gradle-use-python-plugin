@@ -2,6 +2,7 @@ package ru.vyarus.gradle.plugin.python.cmd
 
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.Project
+import org.gradle.initialization.DefaultBuildCancellationToken
 import org.gradle.internal.file.PathToFileResolver
 import org.gradle.process.internal.DefaultExecAction
 import org.gradle.util.ConfigureUtil
@@ -44,7 +45,9 @@ abstract class AbstractCliMockSupport extends Specification {
         // check execution with logs without actual execution
         project.exec(_) >> {Closure spec ->
             DefaultExecAction act = ConfigureUtil.configure(spec,
-                    new DefaultExecAction(Stub(PathToFileResolver), Executors.newSingleThreadExecutor()))
+                    new DefaultExecAction(Stub(PathToFileResolver),
+                            Executors.newSingleThreadExecutor(),
+                            new DefaultBuildCancellationToken()))
             OutputStream os = act.standardOutput
             if (output) {
                 os.write(output.bytes)

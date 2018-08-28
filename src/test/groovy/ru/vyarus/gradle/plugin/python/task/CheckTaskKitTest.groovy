@@ -58,7 +58,7 @@ class CheckTaskKitTest extends AbstractKitTest {
             }
 
             python {
-                minPipVersion = '10.1'
+                minPipVersion = '200.1'
                 scope = USER
                 
                 pip 'mod:1'
@@ -70,6 +70,6 @@ class CheckTaskKitTest extends AbstractKitTest {
         BuildResult result = runFailed('checkPython')
 
         then: "task successful"
-        result.output.contains('does not match minimal required version: 10.1')
+        result.output.contains('does not match minimal required version: 200.1')
     }
 }

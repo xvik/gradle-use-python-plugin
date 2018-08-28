@@ -44,7 +44,7 @@ class MultiplePythonInstallationsKitTest extends AbstractKitTest {
         result.task(':sub1:sample').outcome == TaskOutcome.SUCCESS
         result.output =~ /click\s+6.7/
         result.output.contains('samplee')
-        result.output.contains("${projectName()}/sub1/python")
+        result.output.contains("${projectName()}${File.separator}sub1${File.separator}python")
 
 
         when: "run module 2 task"
@@ -54,6 +54,6 @@ class MultiplePythonInstallationsKitTest extends AbstractKitTest {
         result.task(':sub2:sample').outcome == TaskOutcome.SUCCESS
         result.output =~ /click\s+6.7/
         result.output.contains('samplee')
-        result.output.contains("${projectName()}/sub2/python")
+        result.output.contains("${projectName()}${File.separator}sub2${File.separator}python")
     }
 }

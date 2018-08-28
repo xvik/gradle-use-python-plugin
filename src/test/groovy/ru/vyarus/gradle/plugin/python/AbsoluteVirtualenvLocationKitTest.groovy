@@ -43,6 +43,6 @@ class AbsoluteVirtualenvLocationKitTest extends AbstractKitTest {
         result.output.contains('samplee')
 
         then: "virtualenv created at correct path"
-        result.output.contains("${envDir.root.canonicalPath}/")
+        result.output.contains("${envDir.root.canonicalPath}${File.separator}")
     }
 }

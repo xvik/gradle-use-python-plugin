@@ -43,7 +43,7 @@ class PythonUsedInSubmoduleKitTest extends AbstractKitTest {
         result.output.contains('samplee')
 
         then: "virtualenv created at the root level"
-        result.output.contains("${projectName()}/.gradle/python")
+        result.output.contains("${projectName()}${File.separator}.gradle${File.separator}python")
     }
 
     def "Check all modules applies plugin but used only in sub"() {
@@ -83,7 +83,7 @@ class PythonUsedInSubmoduleKitTest extends AbstractKitTest {
         result.output.contains('samplee')
 
         then: "virtualenv created at the root level"
-        result.output.contains("${projectName()}/.gradle/python")
+        result.output.contains("${projectName()}${File.separator}.gradle${File.separator}python")
     }
 
 
@@ -135,7 +135,7 @@ class PythonUsedInSubmoduleKitTest extends AbstractKitTest {
         result.output.contains('samplee')
 
         then: "virtualenv created at the root level"
-        result.output.contains("${projectName()}/.gradle/python")
+        result.output.contains("${projectName()}${File.separator}.gradle${File.separator}python")
     }
 
 
@@ -173,7 +173,7 @@ class PythonUsedInSubmoduleKitTest extends AbstractKitTest {
         result.output.contains('samplee')
 
         then: "virtualenv created at module level"
-        !result.output.contains("${projectName()}/.gradle/python")
-        result.output.contains("${projectName()}/sub/python/")
+        !result.output.contains("${projectName()}${File.separator}.gradle${File.separator}python")
+        result.output.contains("${projectName()}${File.separator}sub${File.separator}python")
     }
 }

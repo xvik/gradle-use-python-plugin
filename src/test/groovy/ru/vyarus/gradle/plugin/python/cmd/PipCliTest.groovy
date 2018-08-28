@@ -36,8 +36,8 @@ class PipCliTest extends AbstractTest {
         Pip pip = new Pip(project)
         pip.exec('list')
         then: "ok"
-        pip.version =~ /\d+\.\d+\.\d+/
-        pip.versionLine =~ /pip \d+\.\d+\.\d+ from/
+        pip.version =~ /\d+\.\d+(\.\d+)?/
+        pip.versionLine =~ /pip \d+\.\d+(\.\d+)? from/
     }
 
     def "Check version parse fail"() {
@@ -46,7 +46,7 @@ class PipCliTest extends AbstractTest {
         Project project = project()
         Pip pip = new FooPip(project)
         then: "ok"
-        pip.version =~ /\d+\.\d+\.\d+/
+        pip.version =~ /\d+\.\d+(\.\d+)?/
 
     }
 

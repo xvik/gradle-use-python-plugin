@@ -37,7 +37,7 @@ abstract class AbstractCliMockSupport extends Specification {
         project = Stub(Project)
         logger = new TestLogger()
         project.getLogger()  >>  { logger }
-        project.getRootDir() >> { dir.root }
+        project.getProjectDir() >> { dir.root }
         project.file(_) >> { new File(dir.root, it[0]) }
     }
 

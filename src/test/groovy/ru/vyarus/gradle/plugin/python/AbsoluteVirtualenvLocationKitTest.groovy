@@ -23,7 +23,7 @@ class AbsoluteVirtualenvLocationKitTest extends AbstractKitTest {
             }
                         
             python {
-                envPath = "${envDir.root}" 
+                envPath = "${envDir.root.canonicalPath.replace('\\', '\\\\')}" 
 
                 pip 'click:6.7'
             }

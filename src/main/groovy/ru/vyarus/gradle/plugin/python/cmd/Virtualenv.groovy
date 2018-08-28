@@ -34,7 +34,7 @@ class Virtualenv {
      * @param project gradle project instance
      * @param pythonPath python path (null to use global)
      * @param binary python binary name (null to use default python3 or python)
-     * @param path environment path relative to project
+     * @param path environment path (relative to project or absolute)
      */
     Virtualenv(Project project, String pythonPath, String binary, String path) {
         python = new Python(project, pythonPath, binary)

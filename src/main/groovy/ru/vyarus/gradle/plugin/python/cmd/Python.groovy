@@ -313,8 +313,11 @@ class Python {
         ]
         withHiddenLog {
             // raw version, home path
-            readOutput("-S -c \"${cmd.join(';')}\"")
+            List<String> res = readOutput("-S -c \"${cmd.join(';')}\"")
                     .readLines()
+            // remove possible relative section from path (/dd/dd/../tt -> /dd/tt)
+            res.set(1, new File(res.get(1)).canonicalPath)
+            return res
         }
     }
 }

@@ -174,7 +174,9 @@ final class CliUtils {
      * @return arguments for cmd
      */
     static String[] wincmdArgs(String executable, File projectHome, String[] args, boolean workDirUsed) {
-        File file = new File(projectHome, executable)
+        // it could be absolute or relative path
+        File file = executable.contains(':/') || executable.contains(':\\') ?
+                new File(executable) : new File(projectHome, executable)
         // manual check to unify win/linux behaviour
         if (!file.exists()) {
             throw new ExecException("Cannot run program \"$executable\": error=2, No such file or directory")

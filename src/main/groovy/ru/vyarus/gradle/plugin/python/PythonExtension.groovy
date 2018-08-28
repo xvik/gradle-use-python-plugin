@@ -1,6 +1,7 @@
 package ru.vyarus.gradle.plugin.python
 
 import groovy.transform.CompileStatic
+import org.gradle.api.Project
 import ru.vyarus.gradle.plugin.python.task.pip.module.ModuleFactory
 
 /**
@@ -73,13 +74,24 @@ class PythonExtension {
     /**
      * Virtual environment path to use. Used only when {@link #scope} is configured to use virtualenv.
      * Virtualenv will be created automatically if not yet exists.
+     * <p>
+     * By default env path is set to '.gradle/python' inside the root project (!). This avoids virtualenv duplication
+     * in the multi-module setup (all modules will use the same env and so pip modules may be installed only once).
+     * <p>
+     * If multiple env required (e.g. to use different python versions or to separate pip initialization (e.g.
+     * for incompatible modules)) declare env path manually in each module.
      */
-    String envPath = '.gradle/python'
+    String envPath
     /**
      * Copy virtual environment instead of symlink (see --always-copy virtualenv option).
      * By default use default virtualenv behaviour: symlink environment.
      */
     boolean envCopy
+
+    PythonExtension(Project project) {
+        // by default storing environment inside the root project and use relative path (for simpler logs)
+        envPath = project.relativePath(project.rootProject.file('.gradle/python'))
+    }
 
     /**
      * Shortcut for {@link #pip(java.lang.Iterable)}.

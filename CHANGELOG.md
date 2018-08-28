@@ -1,3 +1,8 @@
+* Improve virtualenv usage in multi-module project (#5):
+    - Fix virtualenv access from module on windows
+    - By default virtualenv is created in the root project and used for all modules
+    - Per module python setup is also possible by overriding envPath
+
 ### 1.1.0 (2018-05-29)
 * Add vcs modules support in format: "vcs+protocol://repo_url/@vcsVersion#egg=pkg-pkgVersion" (#2)
 * Support module features syntax: module\[feature]:version (#3)

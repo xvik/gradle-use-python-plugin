@@ -30,7 +30,7 @@ class PythonPlugin implements Plugin<Project> {
     @Override
     @CompileStatic(TypeCheckingMode.SKIP)
     void apply(Project project) {
-        PythonExtension extension = project.extensions.create('python', PythonExtension)
+        PythonExtension extension = project.extensions.create('python', PythonExtension, project)
 
         // simplify direct tasks usage
         project.extensions.extraProperties.set(PipInstallTask.simpleName, PipInstallTask)

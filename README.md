@@ -47,7 +47,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'ru.vyarus:gradle-use-python-plugin:1.1.0'
+        classpath 'ru.vyarus:gradle-use-python-plugin:1.2.0'
     }
 }
 apply plugin: 'ru.vyarus.use-python'
@@ -57,7 +57,7 @@ OR
 
 ```groovy
 plugins {
-    id 'ru.vyarus.use-python' version '1.1.0'
+    id 'ru.vyarus.use-python' version '1.2.0'
 }
 ```
 
@@ -143,6 +143,13 @@ If you want automatic python installation, try looking on JetBrain's
 it has some caveats (for example, on windows python could be installed automatically just once 
 and requires manual un-installation). 
 
+#### Multi-module projects
+
+When used in multi-module project, plugin will create virtualenv inside the root project directory
+in order to share the same environment for all modules.
+
+See [multi-module setup cases](https://github.com/xvik/gradle-use-python-plugin/wiki/Multi-module-projects) 
+
 #### Travis configuration
 
 To make plugin work on [travis](https://travis-ci.org/) you'll need `sudo` and install pip [manually](.travis.yml):
@@ -152,8 +159,12 @@ language: java
 jdk: oraclejdk8
 
 sudo: required
+addons:
+  apt:
+    packages:
+    - "python3"
+    - "python3-pip"
 before_install:
-  - sudo apt-get -y install python3-pip
   - sudo pip3 install -U pip
 ``` 
 
@@ -526,6 +537,9 @@ python {
 }
 ```
 
+Note that in case of multi-module project envPath is set to '.gradle/python' inside the root project,
+even if plugin is activated inside module (see [multi-module setup](https://github.com/xvik/gradle-use-python-plugin/wiki/Multi-module-projects)). 
+
 #### PythonTask
 
 PythonTask configuration:
@@ -580,7 +594,7 @@ In your plugin, add plugin as dependency:
 
 ```groovy
 dependencies {
-    compile 'ru.vyarus:gradle-use-python-plugin:1.1.0'
+    compile 'ru.vyarus:gradle-use-python-plugin:1.2.0'
 }
 ```
 

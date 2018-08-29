@@ -1,6 +1,8 @@
+### 1.2.0 (2018-08-30)
 * Improve virtualenv usage in multi-module project (#5):
     - Fix virtualenv access from module on windows
     - By default virtualenv is created in the root project and used for all modules
+        (breaking) note that before virtualenv was created inside module (on linux)
     - Per module python setup is also possible by overriding envPath
 
 ### 1.1.0 (2018-05-29)

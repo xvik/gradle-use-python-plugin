@@ -88,6 +88,18 @@ class PythonExtension {
      */
     boolean envCopy
 
+    /**
+     * By default, pip cache all installed packages. Sometimes this may lead to incorrect dependency version
+     * resolution (when newer version from cache installed instead of specified). Since pip 20 vcs dependencies
+     * (module build from vcs revision) are also cached, so if you need to force rebuild each time you will
+     * need to disable cache (may be useful for testing).
+     * <p>
+     * Essentially, disabling this option adds {@code --no-cache-dir} for all pip calls.
+     *
+     * @see <a href="https://pip.pypa.io/en/stable/reference/pip_install/#caching">--no-cache-dir</a>
+     */
+    boolean usePipCache = true
+
     PythonExtension(Project project) {
         // by default storing environment inside the root project and use relative path (for simpler logs)
         envPath = project.relativePath(project.rootProject.file('.gradle/python'))

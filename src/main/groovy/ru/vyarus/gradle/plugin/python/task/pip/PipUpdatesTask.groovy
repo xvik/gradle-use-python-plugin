@@ -25,7 +25,7 @@ class PipUpdatesTask extends BasePipTask {
     @SuppressWarnings('DuplicateNumberLiteral')
     void run() {
         boolean showAll = getAll()
-        if (!showAll && modulesList.isEmpty()) {
+        if (!showAll && modulesList.empty) {
             logger.lifecycle('No modules declared')
         } else {
             List<String> res = []

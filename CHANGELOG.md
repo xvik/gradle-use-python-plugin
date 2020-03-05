@@ -1,3 +1,7 @@
+* Add `python.usePipCache` option to be able to disable cache for dependencies installation 
+    ([--no-cache-dir](ttps://pip.pypa.io/en/stable/reference/pip_install/#caching))
+  Also, option added to Pip object constructor and BasePipTask (with default from extension)
+
 ### 1.2.0 (2018-08-30)
 * Improve virtualenv usage in multi-module project (#5):
     - Fix virtualenv access from module on windows

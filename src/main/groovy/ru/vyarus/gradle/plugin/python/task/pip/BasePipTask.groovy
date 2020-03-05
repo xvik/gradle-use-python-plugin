@@ -29,11 +29,23 @@ class BasePipTask extends BasePythonTask {
     /**
      * Work with packages in user scope (--user pip option). When false - work with global scope.
      * Note that on linux it is better to work with user scope to overcome permission problems.
+     * <p>
      * Enabled by default (see {@link ru.vyarus.gradle.plugin.python.PythonExtension#scope})
      */
     @Input
     @Optional
     boolean userScope
+
+    /**
+     * Affects only {@link pip install} by applying {@code --no-cache-dir}. Disables cache during package resolution.
+     * May be useful in problematic cases (when cache leads to incorrect version installation or to force vcs
+     * modules re-building each time (pip 20 cache vcs resolved modules by default)).
+     * <p>
+     * Enabled by default (see {@link ru.vyarus.gradle.plugin.python.PythonExtension#usePipCache)
+     */
+    @Input
+    @Optional
+    boolean useCache = true
 
     /**
      * Shortcut for {@link #pip(java.lang.Iterable)}.
@@ -79,6 +91,6 @@ class BasePipTask extends BasePythonTask {
     @Memoized
     @SuppressWarnings('UnnecessaryGetter')
     protected Pip getPip() {
-        return new Pip(project, getPythonPath(), getPythonBinary(), getUserScope())
+        return new Pip(project, getPythonPath(), getPythonBinary(), getUserScope(), getUseCache())
     }
 }

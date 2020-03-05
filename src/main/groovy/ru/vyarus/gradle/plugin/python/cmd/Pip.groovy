@@ -22,19 +22,31 @@ class Pip {
     private static final Pattern VERSION = Pattern.compile('pip ([\\d.]+)')
 
     public static final String USER = '--user'
-    private static final List<String> USER_AWARE_COMMANDS = ['install', 'list', 'freeze']
+    public static final String NO_CACHE = '--no-cache-dir'
+    private static final String INSTALL_TASK = 'install'
+    private static final List<String> USER_AWARE_COMMANDS = [INSTALL_TASK, 'list', 'freeze']
 
     private final Python python
+    // --user for install, list and freeze tasks
     private boolean userScope
+    // --no-cache-dir for install task
+    // may be changed externally
+    boolean useCache
 
     Pip(Project project) {
         this(project, null, null, true)
     }
 
+    // reamains for compatibility with older releases
     Pip(Project project, String pythonPath, String binary, boolean userScope) {
+        this(project, pythonPath, binary, userScope, true)
+    }
+
+    Pip(Project project, String pythonPath, String binary, boolean userScope, boolean useCache) {
         python = new Python(project, pythonPath, binary)
                 .logLevel(LogLevel.LIFECYCLE)
         this.userScope = userScope
+        this.useCache = useCache
     }
 
     /**
@@ -81,7 +93,7 @@ class Pip {
      * @param cmd pip command to execute
      */
     void exec(String cmd) {
-        python.callModule('pip', applyUserFlag(cmd))
+        python.callModule('pip', applyFlags(cmd))
     }
 
     /**
@@ -93,7 +105,7 @@ class Pip {
      */
     String readOutput(String cmd) {
         python.withHiddenLog {
-            python.readOutput("-m pip ${applyUserFlag(cmd)}")
+            python.readOutput("-m pip ${applyFlags(cmd)}")
         }
     }
 
@@ -149,10 +161,15 @@ class Pip {
         }
     }
 
-    private String applyUserFlag(String cmd) {
+    private String applyFlags(String cmd) {
+        // -- user
         if (!cmd.contains(USER) && userScope
                 && USER_AWARE_COMMANDS.contains(cmd.split(' ')[0].toLowerCase())) {
             cmd += " $USER"
+        }
+        // --no-cache-dir (only for install command)
+        if (!useCache && !cmd.contains(NO_CACHE) && cmd.startsWith(INSTALL_TASK)) {
+            cmd += " $NO_CACHE"
         }
         cmd
     }

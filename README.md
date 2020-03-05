@@ -10,11 +10,13 @@ Plugin **does not install python and pip** itself and use globally installed pyt
 It's easier to prepare python manually because python have good compatibility (from user perspective) and does not need to 
 be updated often.
 
-The only plugin intention is to simplify python usage from gradle.
+The only plugin intention is to simplify python usage from gradle. By default, plugin creates python virtualenv
+inside the project and installs all modules there so each project has its own python (copy) and couls not be 
+affected by other projects or system changes.
 
 Features:
 
-* Install required python modules using pip (per project (virtualenv, default), os user (--user) or globally ) 
+* Install required python modules using pip (per project (virtualenv), os user (--user) or globally) 
 * Provides task to call python commands, modules or scripts (`PythonTask`)
 * Could be used as basement for building plugins for specific python modules (like 
 [mkdocs plugin](https://github.com/xvik/gradle-mkdocs-plugin))
@@ -30,6 +32,13 @@ Features:
     - `type:PythonTask` - call python command/script/module
     - `type:PipInstallTask` - may be used for custom pip modules installation workflow
 
+##### Possible pip issue warning (linux/macos)
+
+If `pip3 list -o` fails with: `TypeError: '>' not supported between instances of 'Version' and 'Version'`
+Then simply update installed pip version: `python3 -m pip install --upgrade pip`
+
+This is a [known issue](https://github.com/pypa/pip/issues/3057) related to incorrectly 
+patched pip packages in some distributions.  
 
 ### Setup
 

@@ -283,7 +283,7 @@ class Python {
 
     /**
      * Detect python command call (-c) and wrap command argument if required (on linux).
-     * @param cmd
+     * @param cmd command to execute
      */
     private void detectAndWrapCommand(String[] cmd) {
         boolean moduleCall = false

@@ -56,4 +56,23 @@ class PipExecTest extends AbstractCliMockSupport {
         then: "scope is correct"
         logger.res =~ /\[python] python(3)? -m pip install mod --user/
     }
+
+    def "Check pip cache disable for installation"() {
+        setup:
+        mockExec(project, null, 0)
+        pip.useCache = false
+
+        when: "call install without cache"
+        pip.install('mod')
+        then: "flag applied"
+        logger.res =~ /\[python] python(3)? -m pip install mod --user --no-cache-dir/
+
+        when: "call different command"
+        pip.exec('list')
+        then: "no flag applied"
+        logger.res =~ /\[python] python(3)? -m pip list --user/
+
+        cleanup:
+        pip.useCache = true
+    }
 }

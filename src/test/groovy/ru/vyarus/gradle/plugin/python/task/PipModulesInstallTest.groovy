@@ -20,6 +20,7 @@ class PipModulesInstallTest extends AbstractKitTest {
 
             python {
                 pip 'git+https://github.com/ictxiangxin/boson/@b52727f7170acbedc5a1b4e1df03972bd9bb85e3#egg=boson-0.9'
+                usePipCache = false
             }
 
         """

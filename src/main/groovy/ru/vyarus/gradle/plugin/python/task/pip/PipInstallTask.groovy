@@ -61,7 +61,7 @@ class PipInstallTask extends BasePipTask {
     @Internal
     protected List<String> getModulesToInstall() {
         List<String> res = []
-        if (!modulesList.isEmpty()) {
+        if (!modulesList.empty) {
             // use list of installed modules to check if 'pip install' is required for module
             // have to always use global list (even if user scope used) to avoid redundant installation attempts
             List<String> installed = (isAlwaysInstallModules() ? ''

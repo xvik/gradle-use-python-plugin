@@ -84,8 +84,9 @@ class PythonPlugin implements Plugin<Project> {
         project.tasks.withType(BasePipTask) { task ->
             task.conventionMapping.with {
                 modules = { extension.modules }
-                // in case of virtualenv checkPython will manually disable
+                // in case of virtualenv checkPython will manually disable it
                 userScope = { extension.scope != PythonExtension.Scope.GLOBAL }
+                useCache = { extension.usePipCache }
             }
         }
 

@@ -32,7 +32,6 @@ class PythonTask extends BasePythonTask {
      * Create work directory if it doesn't exist. Enabled by default.
      */
     @Input
-    @Optional
     boolean createWorkDir = true
     /**
      * Module name. If specified, "-m module " will be prepended to specified command (if command not specified then

@@ -31,7 +31,6 @@ class PipInstallTask extends BasePipTask {
      * By default use {@link ru.vyarus.gradle.plugin.python.PythonExtension#showInstalledVersions} value.
      */
     @Input
-    @Optional
     boolean alwaysInstallModules
 
     PipInstallTask() {

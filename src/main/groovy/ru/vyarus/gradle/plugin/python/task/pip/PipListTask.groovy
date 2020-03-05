@@ -2,7 +2,6 @@ package ru.vyarus.gradle.plugin.python.task.pip
 
 import groovy.transform.CompileStatic
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 
 /**
@@ -22,7 +21,6 @@ class PipListTask extends BasePipTask {
      * Note that option will not take effect if global scope is configured or virtualenv is used.
      */
     @Input
-    @Optional
     boolean all
 
     @TaskAction

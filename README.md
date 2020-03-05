@@ -11,7 +11,7 @@ It's easier to prepare python manually because python have good compatibility (f
 be updated often.
 
 The only plugin intention is to simplify python usage from gradle. By default, plugin creates python virtualenv
-inside the project and installs all modules there so each project has its own python (copy) and couls not be 
+inside the project and installs all modules there so each project has its own python (copy) and could not be 
 affected by other projects or system changes.
 
 Features:
@@ -42,13 +42,9 @@ patched pip packages in some distributions.
 
 ### Setup
 
-Releases are published to [bintray jcenter](https://bintray.com/vyarus/xvik/gradle-use-python-plugin/), 
-[maven central](https://maven-badges.herokuapp.com/maven-central/ru.vyarus/gradle-use-python-plugin) and 
-[gradle plugins portal](https://plugins.gradle.org/plugin/ru.vyarus.use-python).
-
-
-[![JCenter](https://api.bintray.com/packages/vyarus/xvik/gradle-use-python-plugin/images/download.svg)](https://bintray.com/vyarus/xvik/gradle-use-python-plugin/_latestVersion)
+[![JCenter](https://img.shields.io/bintray/v/vyarus/xvik/gradle-use-python-plugin.svg?label=jcenter)](https://bintray.com/vyarus/xvik/gradle-use-python-plugin/_latestVersion)
 [![Maven Central](https://img.shields.io/maven-central/v/ru.vyarus/gradle-use-python-plugin.svg)](https://maven-badges.herokuapp.com/maven-central/ru.vyarus/gradle-use-python-plugin)
+[![Gradle Plugin Portal](https://img.shields.io/maven-metadata/v/https/plugins.gradle.org/m2/ru/vyarus/use-python/ru.vyarus.use-python.gradle.plugin/maven-metadata.xml.svg?colorB=007ec6&label=plugins%20portal)](https://plugins.gradle.org/plugin/ru.vyarus.use-python)
 
 ```groovy
 buildscript {
@@ -68,7 +64,12 @@ OR
 plugins {
     id 'ru.vyarus.use-python' version '1.2.0'
 }
-```
+```  
+
+#### Compatibility
+
+Plugin compiled for java 7.
+Compatible with gradle 4 and above.
 
 #### Python & Pip
 
@@ -143,7 +144,7 @@ When applying this trick, consider minimal pip version declared in configuration
 #### Automatic python install
 
 Python is assumed to be used as java: install and forget. It perfectly fits user
-use case: install python once and plugin will replace all manual work. 
+use case: install python once and plugin will replace all manual work on project environment setup. 
 
 It is also easy to configure python on CI (like travis).    
 
@@ -159,13 +160,14 @@ in order to share the same environment for all modules.
 
 See [multi-module setup cases](https://github.com/xvik/gradle-use-python-plugin/wiki/Multi-module-projects) 
 
-#### Travis configuration
+#### Travis CI configuration
 
-To make plugin work on [travis](https://travis-ci.org/) you'll need `sudo` and install pip [manually](.travis.yml):
+To make plugin work on [travis](https://travis-ci.org/) you'll need to install python3 packages:
 
 ```yaml
-language: java
-jdk: oraclejdk8
+language: java  
+dist: xenial
+jdk: openjdk8
 
 sudo: required
 addons:
@@ -173,11 +175,31 @@ addons:
     packages:
     - "python3"
     - "python3-pip"
+    - "python3-setuptools" 
+
 before_install:
   - sudo pip3 install -U pip
 ``` 
 
-It will be python 3.4 by default.
+It will be python 3.5 by default.
+
+NOTE: travis does not require manual `sudo` support enable anymore (enabled by default) 
+
+#### Appveyour CI configuration
+
+To make plugin work on [appveyour](https://www.appveyor.com/) you'll need to add python to path:
+
+```yaml
+environment:
+    matrix:
+        - JAVA_HOME: C:\Program Files\Java\jdk1.8.0
+          PYTHON: "C:\\Python35-x64"
+
+install:
+  - set PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%
+```         
+
+Now plugin would be able to find python binary.   
 
 ### Usage
 
@@ -263,6 +285,8 @@ All pip supported vcs could be used: git, svn, hg, bzr
 
 If up-to-date logic, implemented by `pipInstall` task, does not suit your needs, you can always
 disable it with `python.alwaysInstallModules = true` (pip always called). But this will be slower.
+
+NOTE: since pip 20, compiled vcs module is cached (before it was build on each execution)
 
 #### Virtualenv
 

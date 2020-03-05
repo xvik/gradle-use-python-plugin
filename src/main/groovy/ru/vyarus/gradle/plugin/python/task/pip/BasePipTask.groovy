@@ -33,7 +33,6 @@ class BasePipTask extends BasePythonTask {
      * Enabled by default (see {@link ru.vyarus.gradle.plugin.python.PythonExtension#scope})
      */
     @Input
-    @Optional
     boolean userScope
 
     /**
@@ -44,7 +43,6 @@ class BasePipTask extends BasePythonTask {
      * Enabled by default (see {@link ru.vyarus.gradle.plugin.python.PythonExtension#usePipCache)
      */
     @Input
-    @Optional
     boolean useCache = true
 
     /**

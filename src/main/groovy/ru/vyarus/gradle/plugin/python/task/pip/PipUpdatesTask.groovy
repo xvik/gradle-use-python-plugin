@@ -2,7 +2,6 @@ package ru.vyarus.gradle.plugin.python.task.pip
 
 import groovy.transform.CompileStatic
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 
 /**
@@ -18,7 +17,6 @@ class PipUpdatesTask extends BasePipTask {
      * True to show all available updates. By default (false): show only updates for configured modules.
      */
     @Input
-    @Optional
     boolean all
 
     @TaskAction

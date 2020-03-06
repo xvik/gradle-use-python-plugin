@@ -233,6 +233,23 @@ Dependencies are installed with `pipInstall` task which is called before any dec
 
 Note that by default dependencies are installed inside project specific virtualenv (project specific copy of python environment).
 
+Behaviour matrix for possible `scope` and `installVirtualenv` configurations:
+
+scope | installVirtualenv | Behaviour | default
+------|-----|------ |-----
+GLOBAL | ignored | packages installed in global scope (`pip install name`)|
+USER | ignored | packages installed in user scope (`pip install name --user`)|
+VIRTUALENV_OR_USER | true | if virtualenv not installed, install it in user scope; create project specific virtualenv and use it | default
+VIRTUALENV_OR_USER | false | when virtualenv is not installed install packages in user scope (same as USER); when virtualenv installed create project specific virtualenv and use it |
+VIRTUALENV | true | if virtualenv not installed, install it in user scope; create project specific virtualenv and use it |
+VIRTUALENV | false | throw error when virtualenv not installed 
+ 
+Note that `VIRTUALENV + true` and `VIRTUALENV_OR_USER + true` behaviours are the same. Different scope
+name here describes behavior for unexpected `installVirtualenv=false` change (to fail or fallback to user scope).   
+
+`USER` and `GLOBAL` scopes will ignore local (virtual)environment, even if project-specific environment was created before,
+with these options global python will be used instead.  
+
 #### Pip module extra features
 
 You can declare modules with [extra features](https://setuptools.readthedocs.io/en/latest/setuptools.html#declaring-extras-optional-features-with-their-own-dependencies) 

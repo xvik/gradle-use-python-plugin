@@ -62,7 +62,7 @@ class PythonExtension {
     boolean alwaysInstallModules
 
     /**
-     * Installed pip packages scope.
+     * Target scope for pip packages installation.
      */
     Scope scope = Scope.VIRTUALENV_OR_USER
     /**
@@ -140,7 +140,7 @@ class PythonExtension {
     }
 
     /**
-     * Pip dependencies scope.
+     * Pip dependencies installation scope.
      */
     static enum Scope {
         /**
@@ -152,11 +152,13 @@ class PythonExtension {
          */
         USER,
         /**
-         * Use virtualenv if installed or fall back to user scope.
+         * Same behaviour as {@link #VIRTUALENV} when virtualenv module installed (possibly automatically), but if
+         * module not found, falls back to user scope (same as {@link #USER}, instead of creating local environment).
          */
         VIRTUALENV_OR_USER,
         /**
-         * Use virtualenv. Fail if virtualenv module not installed.
+         * Use virtualenv. virtualenv must be either installed manually or requested for automatic installation
+         * {@link PythonExtension#installVirtualenv}). Will fail if mode not installed (either way).
          * If virtualenv is not created, then it would be created automatically.
          * Path of environment location is configurable (by default cached in .gradle dir).
          */

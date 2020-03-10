@@ -38,7 +38,7 @@ class CliUtilsTest extends Specification {
     def "Check output prefixing"() {
 
         expect: 'output prefixed'
-        CliUtils.prefixOutput('sample\noutput', '  ') == '   sample\n   output'
+        CliUtils.prefixOutput('sample\noutput', '  ') == "   sample${System.lineSeparator()}   output"
         CliUtils.prefixOutput('sample\noutput', null) == 'sample\noutput'
     }
 

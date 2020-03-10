@@ -4,6 +4,7 @@ import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
+import ru.vyarus.gradle.plugin.python.util.CliUtils
 
 /**
  * @author Vyacheslav Rusakov
@@ -23,7 +24,7 @@ class AbsoluteVirtualenvLocationKitTest extends AbstractKitTest {
             }
                         
             python {
-                envPath = "${envDir.root.canonicalPath.replace('\\', '\\\\')}" 
+                envPath = "${CliUtils.canonicalPath(envDir.root).replace('\\', '\\\\')}"
 
                 pip 'click:6.7'
             }
@@ -43,6 +44,6 @@ class AbsoluteVirtualenvLocationKitTest extends AbstractKitTest {
         result.output.contains('samplee')
 
         then: "virtualenv created at correct path"
-        result.output.contains("${envDir.root.canonicalPath}${File.separator}")
+        result.output.contains("${CliUtils.canonicalPath(envDir.root)}${File.separator}")
     }
 }

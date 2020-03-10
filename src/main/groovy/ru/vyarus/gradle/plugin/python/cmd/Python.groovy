@@ -206,7 +206,7 @@ class Python {
         }
 
         // cut off binary
-        return path[0..idx]
+        return path[0..idx - 1]
     }
 
     /**
@@ -230,7 +230,8 @@ class Python {
      */
     @Memoized
     boolean isVirtualenv() {
-        return new File(binaryDir + '/activate').exists()
+        String activationScript = binaryDir + '/activate'
+        return new File(activationScript).exists()
     }
 
     /**
@@ -266,7 +267,7 @@ class Python {
         // on win non global python could be called only through cmd
         String exec = withCmd ? 'cmd'
                 // use absolute python path if work dir set (relative will simply not work)
-                : (wrkDirUsed && customBinaryPath ? project.file(executable).canonicalPath : executable)
+                : (wrkDirUsed && customBinaryPath ? CliUtils.canonicalPath(executable) : executable)
         String[] cmd = withCmd ?
                 CliUtils.wincmdArgs(executable, project.projectDir, prepareArgs(args), wrkDirUsed)
                 : prepareArgs(args)
@@ -363,10 +364,13 @@ class Python {
                 'print(sys.executable)',
         ]
         withHiddenLog {
-            // raw version, home path
+            // raw version, home path, executable
             List<String> res = readScriptOutput(cmd)
             // remove possible relative section from path (/dd/dd/../tt -> /dd/tt)
-            res.set(1, new File(res.get(1)).canonicalPath)
+            // without following symlinks (very important!)
+            res.set(1, CliUtils.canonicalPath(res.get(1)))
+            res.set(2, CliUtils.canonicalPath(res.get(2)))
+
             return res
         }
     }

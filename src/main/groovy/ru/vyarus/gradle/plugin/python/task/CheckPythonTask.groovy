@@ -60,7 +60,7 @@ class CheckPythonTask extends BasePipTask {
 
         if (!python.binaryDir.startsWith(python.homeDir)) {
             logger.error("WARNING: Python binary path '{}' does not match home path reported by python (sys.prefix): " +
-                    "'{}'. Still, everything could work as expected if executed code doesn't rely on python location.",
+                    "'{}'. Everything could still work as expected if code doesn't rely on python location.",
                     python.binaryDir, python.homeDir
             )
         }
@@ -133,7 +133,7 @@ class CheckPythonTask extends BasePipTask {
 
         if (pip.python.virtualenv) {
             logger.error('WARNING: Global environment is already a virtualenv: {}. New environment would be ' +
-                    'created based on it: {}. Still, in most cases, everything would work as expected.',
+                    'created based on it: {}. In most cases, everything would work as expected.',
                     pip.python.homeDir, ext.envPath)
         }
 
@@ -156,7 +156,7 @@ class CheckPythonTask extends BasePipTask {
         }
 
         if (!python.isVirtualenv()) {
-            throw new GradleException("Convfigued environment is not a virtualenv: ${env.location.absolutePath}. " +
+            throw new GradleException("Convfigured environment is not a virtualenv: ${env.location.absolutePath}. " +
                     'Most likely, issue appear due to incorrect `python.envPath` configuration.')
         }
     }

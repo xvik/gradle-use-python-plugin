@@ -4,6 +4,11 @@ import groovy.transform.CompileStatic
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.process.internal.ExecException
 
+import java.nio.file.Files
+import java.nio.file.LinkOption
+import java.nio.file.Path
+import java.nio.file.Paths
+
 /**
  * Cli helper utilities.
  *
@@ -182,8 +187,38 @@ final class CliUtils {
             throw new ExecException("Cannot run program \"$executable\": error=2, No such file or directory")
         }
         // when work dir not used we can use relative path, but with work dir only absolute path
-        String exec = workDirUsed ? file.canonicalPath : executable
+        String exec = workDirUsed ? canonicalPath(file) : executable
         return mergeArgs(['/c', exec.contains(SPACE) ? "\"\"$exec\"\"" : exec], args)
+    }
+
+    /**
+     * Shortcut for {@link #canonicalPath(java.io.File)}.
+     *
+     * @param file file to get canonical path for
+     * @return canonical path for file without following symlinks
+     */
+    static String canonicalPath(File file) {
+        canonicalPath(file.absolutePath)
+    }
+
+    /**
+     * Format canonical path WITHOUT following symlinks (which {@link File#getCanonicalPath()} do). Used to
+     * remove redundant ".." parts in path.
+     *
+     * @param file file or directory path
+     * @return canonical path
+     */
+    static String canonicalPath(String file) {
+        String path = file?.trim()
+        if (!path) {
+            return path
+        }
+        Path target = Paths.get(path)
+        if (Files.exists(target)) {
+            return target.toRealPath(LinkOption.NOFOLLOW_LINKS).normalize().toString()
+        }
+        // return not existing path as is
+        return path
     }
 
     private static boolean isPositionMatch(String[] ver, String[] req, int pos) {

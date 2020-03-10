@@ -31,6 +31,9 @@ class PythonCliTest extends AbstractTest {
         then: "ok"
         res ==~ /\d+\.\d+\.\d+/
 
+        and: 'check virtualenv detection'
+        !python.virtualenv
+
         when: 'check simple exec'
         python.exec('-c "print(\'hello\')"')
         then: "ok"

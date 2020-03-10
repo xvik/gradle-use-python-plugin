@@ -18,6 +18,7 @@ import spock.lang.Specification
  */
 abstract class AbstractKitTest extends Specification {
 
+    boolean debug
     boolean isWin = Os.isFamily(Os.FAMILY_WINDOWS)
 
     @Rule
@@ -27,7 +28,7 @@ abstract class AbstractKitTest extends Specification {
     def setup() {
         buildFile = testProjectDir.newFile('build.gradle')
         // jacoco coverage support
-        fileFromClasspath('gradle.properties','testkit-gradle.properties')
+        fileFromClasspath('gradle.properties', 'testkit-gradle.properties')
     }
 
     def build(String file) {
@@ -41,27 +42,32 @@ abstract class AbstractKitTest extends Specification {
     File fileFromClasspath(String toFile, String source) {
         File target = file(toFile)
         target.parentFile.mkdirs()
-        target << getClass().classLoader.getResourceAsStream(source).text
+        target << (getClass().getResourceAsStream(source) ?: getClass().classLoader.getResourceAsStream(source)).text
     }
 
     /**
-     * Allow debug TestKit vm execution. After vm start it will wait for debug connection and continue processing after.
-     * (the same effect could be achieved with GradleRunner.withDebug(true) method)
+     * Enable it and run test with debugger (no manual attach required). Not always enabled to speed up tests during
+     * normal execution.
      */
     def debug() {
-        file('gradle.properties') << "\norg.gradle.jvmargs=-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000"
+        debug = true
     }
 
     String projectName() {
         return testProjectDir.root.getName()
     }
 
-    GradleRunner gradle(String... commands) {
+    GradleRunner gradle(File root, String... commands) {
         GradleRunner.create()
-                .withProjectDir(testProjectDir.root)
+                .withProjectDir(root)
                 .withArguments((commands + ['--stacktrace']) as String[])
                 .withPluginClasspath()
+                .withDebug(debug)
                 .forwardOutput()
+    }
+
+    GradleRunner gradle(String... commands) {
+        gradle(testProjectDir.root, commands)
     }
 
     BuildResult run(String... commands) {

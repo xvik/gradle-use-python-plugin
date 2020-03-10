@@ -57,6 +57,13 @@ class CheckPythonTask extends BasePipTask {
         if (virtual) {
             switchEnvironment(env, ext)
         }
+
+        if (!python.binaryDir.startsWith(python.homeDir)) {
+            logger.error("WARNING: Python binary path '{}' does not match home path reported by python (sys.prefix): " +
+                    "'{}'. Still, everything could work as expected if executed code doesn't rely on python location.",
+                    python.binaryDir, python.homeDir
+            )
+        }
     }
 
     private void checkPython(PythonExtension ext) {
@@ -124,6 +131,12 @@ class CheckPythonTask extends BasePipTask {
             }
         }
 
+        if (pip.python.virtualenv) {
+            logger.error('WARNING: Global environment is already a virtualenv: {}. New environment would be ' +
+                    'created based on it: {}. Still, in most cases, everything would work as expected.',
+                    pip.python.homeDir, ext.envPath)
+        }
+
         logger.lifecycle("Using virtualenv $env.version ($ext.envPath)")
         // symlink by default (copy if requested by user config)
         env.create(ext.envCopy)
@@ -134,15 +147,17 @@ class CheckPythonTask extends BasePipTask {
     private void switchEnvironment(Virtualenv env, PythonExtension ext) {
         // switch environment and check again
         ext.pythonPath = env.pythonPath
+        this.pythonPath = ext.pythonPath
+
         checkPython(ext)
         // only if pip required
         if (!getModules().empty) {
             checkPip(ext)
         }
 
-        // disable user scope (not allowed in virtualenv)
-        project.tasks.withType(BasePipTask) { BasePipTask task ->
-            task.userScope = false
+        if (!python.isVirtualenv()) {
+            throw new GradleException("Convfigued environment is not a virtualenv: ${env.location.absolutePath}. " +
+                    'Most likely, issue appear due to incorrect `python.envPath` configuration.')
         }
     }
 }

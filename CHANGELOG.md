@@ -1,7 +1,16 @@
 * (breaking) Drop java 7 support
 * Add `python.usePipCache` option to be able to disable cache for dependencies installation 
     ([--no-cache-dir](ttps://pip.pypa.io/en/stable/reference/pip_install/#caching))
-  Also, option added to Pip object constructor and BasePipTask (with default from extension)     
+  Also, option added to Pip object constructor and BasePipTask (with default from extension)
+* Add `Python.getBinaryDir()` returning (in most cases) executed python binary folder
+    (based on `sys.executable` with fallback to `sys.prefix/bin`)
+* Fix virtualenv installation fail when "global" python is already virtualenv due to --user flag usage 
+  (like on travis now)
+    - Add `Python.isVirtualenv()` method. Virtualenv is detected by `activate` script in python binary 
+      (which may not be always accurate, but should work in the majority of cases)
+    - `Pip` internally use `Python.isVirtualenv()` to prevent applying --user flag 
+    - Configured (`envPath`) or created virtualenv is validated (shows error on incorrect configuration)
+    - Show warnings for cases when virtualenv is created from another virtualenv (because it may have side effects)       
 
 ### 1.2.0 (2018-08-30)
 * Improve virtualenv usage in multi-module project (#5):

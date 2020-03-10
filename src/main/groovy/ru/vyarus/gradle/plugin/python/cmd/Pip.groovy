@@ -163,8 +163,9 @@ class Pip {
 
     private String applyFlags(String cmd) {
         // -- user
-        if (!cmd.contains(USER) && userScope
-                && USER_AWARE_COMMANDS.contains(cmd.split(' ')[0].toLowerCase())) {
+        // explicit virtualenv check is required because flag will fail under virtualenv
+        if (!cmd.contains(USER) && userScope && USER_AWARE_COMMANDS.contains(cmd.split(' ')[0].toLowerCase())
+                && !python.virtualenv) {
             cmd += " $USER"
         }
         // --no-cache-dir (only for install command)

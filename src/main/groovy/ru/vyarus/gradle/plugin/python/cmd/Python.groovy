@@ -31,7 +31,7 @@ import ru.vyarus.gradle.plugin.python.util.PythonExecutionFailed
  * @since 15.11.2017
  */
 @CompileStatic
-@SuppressWarnings(['ConfusingMethodName', 'StaticMethodsBeforeInstanceMethods'])
+@SuppressWarnings(['ConfusingMethodName', 'StaticMethodsBeforeInstanceMethods', 'DuplicateNumberLiteral'])
 class Python {
 
     private static final String PYTHON3 = 'python3'
@@ -137,7 +137,9 @@ class Python {
         return new ByteArrayOutputStream().withStream { os ->
             try {
                 processExecution(args, os)
-                return os.toString().trim()
+                String output = os.toString().trim()
+                project.logger.info(CliUtils.prefixOutput(output, outputPrefix))
+                return output
             } catch (Throwable th) {
                 // print process output, because it might contain important error details
                 String output = os.toString().trim()
@@ -171,6 +173,9 @@ class Python {
     }
 
     /**
+     * Warning: it will return {@code sys.prefix} path, which may not point to actual python installation!
+     * For example, on linux this may return "/usr". For virtualenv this will point to environment.
+     *
      * @return python home directory (works for global python too)
      */
     @Memoized
@@ -179,11 +184,53 @@ class Python {
     }
 
     /**
+     * Warning: it is NOT based on {@link #getHomeDir()} which may return not actual python installation dir.
+     * Binary dir extracted from actual python execution ({@code sys.executable}). Note that {@code sys.executable}
+     * MAY return empty string instead and in this case binary path would be guessed from {@link #getHomeDir()}.
+     * <p>
+     * In case when virtualenv created from another virtualenv, binary dir will return correct path, but
+     * {@link #getHomeDir()} most likely will point to global python.
+     *
+     * @return directory under python home containing python binary
+     */
+    @Memoized
+    String getBinaryDir() {
+        String path = resolveInfo()[2]?.trim() // executable
+        int idx = path.lastIndexOf(SLASH)
+
+        if (path.empty || idx <= 0) {
+            // just guess by home dir (yes, I know, this MIGHT be incorrect in some cases, but should be ok
+            // for virtualenvs used in majority of cases)
+            path = homeDir
+            return Os.isFamily(Os.FAMILY_WINDOWS) ? "$path/Scripts" : "$path/bin"
+        }
+
+        // cut off binary
+        return path[0..idx]
+    }
+
+    /**
      * @return python version in format major.minor.micro
      */
     @Memoized
     String getVersion() {
         return resolveInfo()[0]
+    }
+
+    /**
+     * Checks if current environment is a virtualenv. It is impossible to use {@code sys.base_path},
+     * {@code sys.real_path} or even {@code os.getenv( 'VIRTUAL_ENV' )} for detection because they might be not set
+     * even under execution within virtual environment. Instead, checked presence of "activation" script inside
+     * python installation binary path: for virtual environment such script would be present.
+     * <p>
+     * This should be able to detect not only virtualenv environment but also venv (and maybe other also using
+     * activation file).
+     *
+     * @return true if used python is a virtualenv, false for normal python installation
+     */
+    @Memoized
+    boolean isVirtualenv() {
+        return new File(binaryDir + '/activate').exists()
     }
 
     /**
@@ -202,6 +249,10 @@ class Python {
     }
 
     /**
+     * Note: in most cases it would be just "python" (or "python.exe"), assuming resolution through global PATH.
+     * If python path was manually configured then complete path would be returned. For virtualenv, path
+     * to virtual environment would be returned.
+     *
      * @return python binary used
      */
     String getUsedBinary() {
@@ -301,23 +352,29 @@ class Python {
     /**
      * Reduce the number of python executions during initialization.
      *
-     * @return [raw python version, python home path]
+     * @return [raw python version, python home path, python executable]
      */
     @Memoized
     private List<String> resolveInfo() {
         String[] cmd = [
-                'import sys',
                 'ver=sys.version_info',
                 'print(str(ver.major)+\'.\'+str(ver.minor)+\'.\'+str(ver.micro))',
                 'print(sys.prefix)',
+                'print(sys.executable)',
         ]
         withHiddenLog {
             // raw version, home path
-            List<String> res = readOutput("-S -c \"${cmd.join(';')}\"")
-                    .readLines()
+            List<String> res = readScriptOutput(cmd)
             // remove possible relative section from path (/dd/dd/../tt -> /dd/tt)
             res.set(1, new File(res.get(1)).canonicalPath)
             return res
         }
+    }
+
+    private List<String> readScriptOutput(String... lines) {
+        List<String> cmd = []
+        cmd.add('import sys')
+        cmd.addAll(lines)
+        return readOutput("-S -c \"${cmd.join(';')}\"").readLines()
     }
 }

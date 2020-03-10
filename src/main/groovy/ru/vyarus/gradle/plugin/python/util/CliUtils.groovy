@@ -29,7 +29,7 @@ final class CliUtils {
      * @return string with applied prefixes
      */
     static String prefixOutput(String output, String prefix) {
-        prefix ? output.readLines().collect { "$prefix $it" }.join('\n') : output
+        prefix ? output.readLines().collect { "$prefix $it" }.join(System.lineSeparator()) : output
     }
 
     /**

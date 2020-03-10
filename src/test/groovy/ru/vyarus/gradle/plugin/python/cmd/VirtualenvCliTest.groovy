@@ -2,6 +2,7 @@ package ru.vyarus.gradle.plugin.python.cmd
 
 import org.gradle.api.Project
 import ru.vyarus.gradle.plugin.python.AbstractTest
+import ru.vyarus.gradle.plugin.python.util.CliUtils
 
 /**
  * @author Vyacheslav Rusakov
@@ -66,7 +67,7 @@ class VirtualenvCliTest extends AbstractTest {
         Virtualenv env = new Virtualenv(project, 'env')
         then: "path correct"
         env.path == 'env'
-        env.pythonPath == (isWin ? 'env/Scripts' : 'env/bin')
+        env.pythonPath == CliUtils.canonicalPath(isWin ? 'env/Scripts' : 'env/bin')
 
         then: "version correct"
         env.version =~ /\d+\.\d+\.\d+/

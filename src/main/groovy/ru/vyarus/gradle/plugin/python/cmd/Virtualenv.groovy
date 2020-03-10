@@ -2,9 +2,9 @@ package ru.vyarus.gradle.plugin.python.cmd
 
 import groovy.transform.CompileStatic
 import groovy.transform.Memoized
-import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.Project
 import org.gradle.api.logging.LogLevel
+import ru.vyarus.gradle.plugin.python.util.CliUtils
 
 /**
  * Pip commands execution utility. Use {@link Python} internally.
@@ -112,6 +112,6 @@ class Virtualenv {
      */
     @Memoized
     String getPythonPath() {
-        return Os.isFamily(Os.FAMILY_WINDOWS) ? "$path/Scripts" : "$path/bin"
+        return CliUtils.pythonBinPath(path)
     }
 }

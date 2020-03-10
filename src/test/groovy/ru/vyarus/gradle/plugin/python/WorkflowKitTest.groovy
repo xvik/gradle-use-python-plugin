@@ -101,7 +101,7 @@ class WorkflowKitTest extends AbstractKitTest {
             }
                    
             python.pip 'click:6.7'     
-            python.pythonPath = '$env.pythonPath'
+            python.pythonPath = '${env.pythonPath.replace("\\", "\\\\")}'
             python.installVirtualenv = false
         """
 
@@ -145,7 +145,7 @@ class WorkflowKitTest extends AbstractKitTest {
                 id 'ru.vyarus.use-python'
             }
                         
-            python.pythonPath = '$env.pythonPath'            
+            python.pythonPath = '${env.pythonPath.replace("\\", "\\\\")}'            
             python.pip 'click:6.7'
         """
 
@@ -187,7 +187,7 @@ class WorkflowKitTest extends AbstractKitTest {
             }
                         
             python {
-                pythonPath = '$env.pythonPath'
+                pythonPath = '${env.pythonPath.replace("\\", "\\\\")}'
                 installVirtualenv = false
                 scope = VIRTUALENV             
                 pip 'click:6.7'

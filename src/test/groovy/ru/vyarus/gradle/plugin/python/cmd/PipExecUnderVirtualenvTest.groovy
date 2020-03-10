@@ -1,5 +1,7 @@
 package ru.vyarus.gradle.plugin.python.cmd
 
+import ru.vyarus.gradle.plugin.python.util.CliUtils
+
 /**
  * @author Vyacheslav Rusakov
  * @since 10.03.2020
@@ -10,9 +12,13 @@ class PipExecUnderVirtualenvTest extends AbstractCliMockSupport {
 
     @Override
     void setup() {
-        // force virtualenv detection
-        file("activate").createNewFile()
-        execCase({ it.contains('sys.prefix') }, "3.5\n${dir.root.absolutePath}\n${dir.root.absolutePath}/python3")
+        String root = dir.root.absolutePath
+        String binPath = CliUtils.pythonBinPath(root)
+        File bin = new File(binPath, 'activate')
+        bin.mkdirs()
+        bin.createNewFile() // force virtualenv detection
+        assert bin.exists()
+        execCase({ it.contains('sys.prefix') }, "3.5\n${root}\n${binPath + '/python3'}")
         pip = new Pip(project)
     }
 

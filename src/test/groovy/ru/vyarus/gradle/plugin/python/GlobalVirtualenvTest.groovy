@@ -23,7 +23,7 @@ class GlobalVirtualenvTest extends AbstractKitTest {
             }
 
             python {
-                pythonPath = 'env/bin'
+                pythonPath = '${env.pythonPath.replace('\\', '\\\\')}'
                 scope = VIRTUALENV
                 pip 'click:6.7'
             }

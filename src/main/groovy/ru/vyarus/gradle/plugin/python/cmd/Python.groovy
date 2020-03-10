@@ -36,7 +36,6 @@ class Python {
 
     private static final String PYTHON3 = 'python3'
     private static final String SPACE = ' '
-    private static final String SLASH = '/'
 
     private final Project project
     private final String executable
@@ -56,7 +55,7 @@ class Python {
 
     Python(Project project, String pythonPath, String binary) {
         this.project = project
-        this.executable = getPythonBinary(project, pythonPath, binary)
+        this.executable = getPythonBinary(project, CliUtils.canonicalPath(pythonPath), binary)
         // direct executable must be called with cmd (https://docs.gradle.org/4.1/dsl/org.gradle.api.tasks.Exec.html)
         this.withCmd = pythonPath && Os.isFamily(Os.FAMILY_WINDOWS)
         // custom python path used (which may be relative and conflict with workDir)
@@ -191,18 +190,19 @@ class Python {
      * In case when virtualenv created from another virtualenv, binary dir will return correct path, but
      * {@link #getHomeDir()} most likely will point to global python.
      *
-     * @return directory under python home containing python binary
+     * @return directory under python home containing python binary (always absolute path)
      */
     @Memoized
     String getBinaryDir() {
-        String path = resolveInfo()[2]?.trim() // executable
-        int idx = path.lastIndexOf(SLASH)
+        // use resolved executable to avoid incorrect resolution in case of venv inside venv
+        String path = customBinaryPath ? project.file(executable).absolutePath : resolveInfo()[2]?.trim()
+        int idx = path.lastIndexOf(File.separator)
 
         if (path.empty || idx <= 0) {
             // just guess by home dir (yes, I know, this MIGHT be incorrect in some cases, but should be ok
             // for virtualenvs used in majority of cases)
             path = homeDir
-            return Os.isFamily(Os.FAMILY_WINDOWS) ? "$path/Scripts" : "$path/bin"
+            return CliUtils.pythonBinPath(path)
         }
 
         // cut off binary
@@ -230,7 +230,8 @@ class Python {
      */
     @Memoized
     boolean isVirtualenv() {
-        String activationScript = binaryDir + '/activate'
+        // always absolute path
+        String activationScript = binaryDir + File.separator + 'activate'
         return new File(activationScript).exists()
     }
 
@@ -303,9 +304,9 @@ class Python {
         String res = binary ?: 'python'
         boolean isWindows = Os.isFamily(Os.FAMILY_WINDOWS)
         if (pythonPath) {
-            String path = pythonPath + (pythonPath.endsWith(SLASH) ? '' : SLASH)
+            String path = pythonPath + (pythonPath.endsWith(File.separator) ? '' : File.separator)
             // $pythonPath/$binaryName(.exe)
-            res = isWindows ? "${path.replace(SLASH, '\\')}${res}.exe" : "$path$res"
+            res = isWindows ? "${path}${res}.exe" : "$path$res"
         } else if (!binary && !isWindows) {
             // check if python3 available
             new ByteArrayOutputStream().withStream { os ->

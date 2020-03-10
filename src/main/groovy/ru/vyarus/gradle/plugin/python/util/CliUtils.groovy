@@ -218,7 +218,15 @@ final class CliUtils {
             return target.toRealPath(LinkOption.NOFOLLOW_LINKS).normalize().toString()
         }
         // return not existing path as is
-        return path
+        return target.normalize().toString()
+    }
+
+    /**
+     * @param pythonHome python home path
+     * @return python binaries path relative to provided python home
+     */
+    static String pythonBinPath(String pythonHome) {
+        canonicalPath(Os.isFamily(Os.FAMILY_WINDOWS) ? "$pythonHome/Scripts" : "$pythonHome/bin")
     }
 
     private static boolean isPositionMatch(String[] ver, String[] req, int pos) {

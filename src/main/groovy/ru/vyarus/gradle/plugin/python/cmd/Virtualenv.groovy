@@ -114,4 +114,14 @@ class Virtualenv {
     String getPythonPath() {
         return CliUtils.pythonBinPath(path)
     }
+
+    /**
+     * May be used to apply additional virtualenv ({@link Python#extraArgs(java.lang.Object)}) or python
+     * ({@link Python#pythonArgs(java.lang.Object)}) arguments.
+     *
+     * @return python cli instance used to execute commands
+     */
+    Python getPython() {
+        return python
+    }
 }

@@ -13,7 +13,8 @@
     - Show warnings for cases when virtualenv is created from another virtualenv (because it may have side effects)
 * Add python extra args support (in contrast to extra agrs, applied after command, python args applied before):
     - Add `Python.pythonArgs` -  args applied just after python executable
-    - Add `PythonTask.pythonArgs`           
+    - Add `PythonTask.pythonArgs`   
+* Add `Virtualenv.python` accessor to be able to configure additional arguments            
 
 ### 1.2.0 (2018-08-30)
 * Improve virtualenv usage in multi-module project (#5):

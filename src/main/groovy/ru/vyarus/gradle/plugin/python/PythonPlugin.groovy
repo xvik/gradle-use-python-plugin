@@ -4,6 +4,7 @@ import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.tasks.TaskProvider
 import ru.vyarus.gradle.plugin.python.task.BasePythonTask
 import ru.vyarus.gradle.plugin.python.task.CheckPythonTask
 import ru.vyarus.gradle.plugin.python.task.PythonTask
@@ -39,49 +40,61 @@ class PythonPlugin implements Plugin<Project> {
         PythonExtension.Scope.values().each { project.extensions.extraProperties.set(it.name(), it) }
 
         // validate installed python
-        CheckPythonTask checkTask = project.tasks.create('checkPython', CheckPythonTask) {
-            description = 'Validate python environment'
+        TaskProvider<CheckPythonTask> checkTask = project.tasks.register('checkPython', CheckPythonTask) {
+            it.with {
+                description = 'Validate python environment'
+            }
         }
 
         // default pip install task
-        PipInstallTask installTask = project.tasks.create('pipInstall', PipInstallTask) {
-            description = 'Install pip modules'
+        TaskProvider<PipInstallTask> installTask = project.tasks.register('pipInstall', PipInstallTask) {
+            it.with {
+                description = 'Install pip modules'
+            }
         }
 
-        project.tasks.create('pipUpdates', PipUpdatesTask) {
-            description = 'Check if new versions available for declared pip modules'
+        project.tasks.register('pipUpdates', PipUpdatesTask) {
+            it.with {
+                description = 'Check if new versions available for declared pip modules'
+            }
         }
 
-        project.tasks.create('pipList', PipListTask) {
-            description = 'Show all installed modules'
+        project.tasks.register('pipList', PipListTask) {
+            it.with {
+                description = 'Show all installed modules'
+            }
         }
 
         configureDefaults(project, extension, checkTask, installTask)
     }
 
     @CompileStatic(TypeCheckingMode.SKIP)
-    private void configureDefaults(Project project, PythonExtension extension,
-                                   CheckPythonTask checkTask, PipInstallTask installTask) {
+    private void configureDefaults(Project project,
+                                   PythonExtension extension,
+                                   TaskProvider<CheckPythonTask> checkTask,
+                                   TaskProvider<PipInstallTask> installTask) {
 
-        project.tasks.withType(BasePythonTask) { task ->
-            // apply default path for all python tasks
-            task.conventionMapping.with {
-                pythonPath = { extension.pythonPath }
-                pythonBinary = { extension.pythonBinary }
-            }
-            // all python tasks must be executed after check task to use correct environment (switch to virtualenv)
-            if (task != checkTask) {
-                dependsOn checkTask
+        project.tasks.withType(BasePythonTask).configureEach { task ->
+            task.with {
+                // apply default path for all python tasks
+                task.conventionMapping.with {
+                    pythonPath = { extension.pythonPath }
+                    pythonBinary = { extension.pythonBinary }
+                }
+                // all python tasks must be executed after check task to use correct environment (switch to virtualenv)
+                if (task.taskIdentity.type != CheckPythonTask) {
+                    dependsOn checkTask
+                }
             }
         }
 
-        project.tasks.withType(PythonTask) { task ->
+        project.tasks.withType(PythonTask).configureEach { task ->
             // by default all python tasks must be executed after dependencies init
             task.dependsOn installTask
         }
 
         // apply defaults for pip tasks
-        project.tasks.withType(BasePipTask) { task ->
+        project.tasks.withType(BasePipTask).configureEach { task ->
             task.conventionMapping.with {
                 modules = { extension.modules }
                 // in case of virtualenv checkPython will manually disable it
@@ -91,7 +104,7 @@ class PythonPlugin implements Plugin<Project> {
         }
 
         // apply defaults for all pip install tasks (custom pip installs may be used)
-        project.tasks.withType(PipInstallTask) { task ->
+        project.tasks.withType(PipInstallTask).configureEach { task ->
             task.conventionMapping.with {
                 showInstalledVersions = { extension.showInstalledVersions }
                 alwaysInstallModules = { extension.alwaysInstallModules }

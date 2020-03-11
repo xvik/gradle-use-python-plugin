@@ -57,7 +57,7 @@ class PythonPluginTest extends AbstractTest {
         def pyTask = project.tasks.getByName('pyt');
         pyTask.pythonPath == 'foo/bar'
         pyTask.pythonBinary == 'py'
-        pyTask.dependsOn.contains(project.tasks.getByName('pipInstall'))
+        pyTask.dependsOn.collect {it.name}.contains('pipInstall')
 
         then: "pip updates task configured"
         def pipUpdates = project.tasks.getByName('pipUpdates');

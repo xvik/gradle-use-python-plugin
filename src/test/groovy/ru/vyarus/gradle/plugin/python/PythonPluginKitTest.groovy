@@ -107,10 +107,7 @@ class PythonPluginKitTest extends AbstractKitTest {
 
         then: "task successful"
         result.task(':checkPython').outcome == TaskOutcome.SUCCESS
-        result.output.contains('env/bin/python -m pip install virtualenv==16.7.5')
-
-        then: "check installed virtualenv version"
-        super.env().version == '16.7.5'
+        result.output.contains('-m pip install virtualenv==16.7.5')
     }
 
     def "Check install the latest virtualenv case"() {

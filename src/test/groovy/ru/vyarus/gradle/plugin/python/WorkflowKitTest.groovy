@@ -3,7 +3,6 @@ package ru.vyarus.gradle.plugin.python
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.TaskOutcome
 import ru.vyarus.gradle.plugin.python.cmd.Virtualenv
-import spock.lang.IgnoreIf
 
 /**
  * @author Vyacheslav Rusakov
@@ -136,9 +135,6 @@ class WorkflowKitTest extends AbstractKitTest {
         env.exists()
     }
 
-    // these tests does not work on travis because there is no global python, but venv by default,
-    // which can't create new environment without pip and so test situation is impossible to reproduce
-    @IgnoreIf({ System.getenv('TRAVIS') })
     def "Check pip not installed"() {
 
         setup: "use custom env without pip as pure python"
@@ -160,7 +156,6 @@ class WorkflowKitTest extends AbstractKitTest {
         result.output.contains('Pip is not installed')
     }
 
-    @IgnoreIf({ System.getenv('TRAVIS') })
     def "Check environment without pip"() {
 
         setup: "detectable environment did not contain pip"

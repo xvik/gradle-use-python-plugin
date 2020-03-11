@@ -72,6 +72,18 @@ class PythonExtension {
      */
     boolean installVirtualenv = true
     /**
+     * Used only when virtualenv is installed automatically ({@link #installVirtualenv). It's better to install
+     * exact version, known to work well to avoid side effects. For example, virtualenv 20.0.x is a major rewrite and
+     * it contains some minor regressions in behaviour (which would be fixed eventually, ofc).
+     * <p>
+     * You can set null or empty value to install the latest version.
+     * <p>
+     * Property not used at all if virtualenv is already installed (no warning on version mismatch): if you installed
+     * it manually then you know what you are doing, otherwise "known to be working" version should be installed to
+     * avoid problems.
+     */
+    String virtualenvVersion = '16.7.9'
+    /**
      * Virtual environment path to use. Used only when {@link #scope} is configured to use virtualenv.
      * Virtualenv will be created automatically if not yet exists.
      * <p>

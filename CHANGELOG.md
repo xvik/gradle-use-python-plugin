@@ -14,7 +14,10 @@
 * Add python extra args support (in contrast to extra agrs, applied after command, python args applied before):
     - Add `Python.pythonArgs` -  args applied just after python executable
     - Add `PythonTask.pythonArgs`   
-* Add `Virtualenv.python` accessor to be able to configure additional arguments            
+* Add `Virtualenv.python` accessor to be able to configure additional arguments
+* Add installed virtualenv version configuration: `python.virtualenv`. This way, plugin will 
+    always install only known to be working version and avoid side effects of "just released" 
+    versions. By default, 16.7.9 would be installed because 20.0.x has some not fixed regressions                
 
 ### 1.2.0 (2018-08-30)
 * Improve virtualenv usage in multi-module project (#5):

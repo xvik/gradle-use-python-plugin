@@ -119,7 +119,8 @@ class CheckPythonTask extends BasePipTask {
         if (!pip.isInstalled(env.name)) {
             if (ext.installVirtualenv) {
                 // automatically install virtualenv if allowed (in --user)
-                pip.install(env.name)
+                // by default, exact (configured) version used to avoid side effects!)
+                pip.install(env.name + (ext.virtualenvVersion ? "==$ext.virtualenvVersion" : ''))
             } else if (ext.scope == PythonExtension.Scope.VIRTUALENV) {
                 // virtualenv strictly required - fail
                 throw new GradleException('Virtualenv is not installed. Please install it ' +

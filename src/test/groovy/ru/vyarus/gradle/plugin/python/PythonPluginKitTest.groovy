@@ -132,7 +132,7 @@ class PythonPluginKitTest extends AbstractKitTest {
 
         then: "task successful"
         result.task(':checkPython').outcome == TaskOutcome.SUCCESS
-        result.output.contains('env/bin/python -m pip install virtualenv')
-        !result.output.contains('pip install virtualenv=')
+        result.output.contains('-m pip install virtualenv')
+        !result.output.contains('-m pip install virtualenv=')
     }
 }

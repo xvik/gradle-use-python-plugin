@@ -149,6 +149,7 @@ class PythonTaskKitTest extends AbstractKitTest {
             task sample(type: PythonTask) {
                 module = 'pip'
                 command = 'list'
+                pythonArgs '-I'
                 extraArgs '--format=columns', '--user'
             }
         """
@@ -158,7 +159,7 @@ class PythonTaskKitTest extends AbstractKitTest {
 
         then: "executed"
         result.task(':sample').outcome == TaskOutcome.SUCCESS
-        result.output =~ /\[python] python(3)? -m pip list --format=columns --user/
+        result.output =~ /\[python] python(3)? -I -m pip list --format=columns --user/
     }
 
     def "Check script file call"() {

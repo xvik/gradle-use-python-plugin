@@ -91,6 +91,16 @@ class PythonCliTest extends AbstractTest {
         then: 'ignored'
         python.workDir == 'some/dir'
 
+        when: "set python args"
+        python.pythonArgs('--arg')
+        then: 'set'
+        python.pythonArgs == ['--arg']
+
+        when: "append python args"
+        python.pythonArgs(['--arg2', '--arg3'])
+        then: 'set'
+        python.pythonArgs == ['--arg', '--arg2', '--arg3']
+
         when: "set args"
         python.extraArgs('--arg')
         then: 'set'
@@ -105,6 +115,11 @@ class PythonCliTest extends AbstractTest {
         python.extraArgs(null)
         then: 'ignored'
         python.extraArgs == ['--arg', '--arg2', '--arg3']
+
+        when: "clear python args"
+        python.clearPythonArgs()
+        then: 'set'
+        python.pythonArgs.empty
 
         when: "clear args"
         python.clearExtraArgs()

@@ -42,6 +42,7 @@ class Python {
     private String workDir
     private String outputPrefix = '\t'
     private LogLevel logLevel = LogLevel.INFO
+    private final List<String> pythonArgs = []
     private final List<String> extraArgs = []
 
     // run through cmd on win (when direct executable called)
@@ -99,17 +100,50 @@ class Python {
     }
 
     /**
+     * Python's own args. May be used to apply some python keys to all called commands (like -S or -I).
+     * Arguments applied before called command. To clean existing arguments see {@link #clearPythonArgs()}.
+     * <p>
+     * For example, if we set extra arg '-I' then command call `-m mod something` will become '-I -m mod something'.
+     *
+     * @param args python arguments (array, collection or simple string) to apply to all processed commands
+     * @return cli instance for chained calls
+     * @see #extraArgs for applying module-specific args (at the end)
+     */
+    Python pythonArgs(Object args) {
+        if (args) {
+            this.pythonArgs.addAll(Arrays.asList(CliUtils.parseArgs(args)))
+        }
+        return this
+    }
+
+    /**
      * Useful if all called commands support common keys (usually this mean one module usage).
-     * Arguments are appended. To cleat existing arguments see {@link #clearExtraArgs()}.
+     * Arguments are appended. To clean existing arguments see {@link #clearExtraArgs()}.
+     * <p>
+     * Args applied after command (at the end). Don't use it for python's own args because in many cases they will
+     * not work at the end (as would assumed to belonging to called module)!
+     * <p>
+     * For example, if we set extra arg '-a' then command call `-m mod something` will become '-m mod something -p'.
      *
      * @param args extra arguments (array, collection or simple string) to apply to all processed commands
      * (null value ignored for simplified usage)
      * @return cli instance for chained calls
+     * @see #pythonArgs for applying python options
      */
     Python extraArgs(Object args) {
         if (args) {
             this.extraArgs.addAll(Arrays.asList(CliUtils.parseArgs(args)))
         }
+        return this
+    }
+
+    /**
+     * Removes all registered python arguments.
+     *
+     * @return cli instance for chained calls
+     */
+    Python clearPythonArgs() {
+        this.pythonArgs.clear()
         return this
     }
 
@@ -331,6 +365,9 @@ class Python {
     private String[] prepareArgs(Object args) {
         String[] cmd = CliUtils.parseArgs(args)
         detectAndWrapCommand(cmd)
+        if (this.pythonArgs) {
+            cmd = CliUtils.mergeArgs(pythonArgs, cmd)
+        }
         if (this.extraArgs) {
             cmd = CliUtils.mergeArgs(cmd, extraArgs)
         }

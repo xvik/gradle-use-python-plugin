@@ -10,7 +10,10 @@
       (which may not be always accurate, but should work in the majority of cases)
     - `Pip` internally use `Python.isVirtualenv()` to prevent applying --user flag 
     - Configured (`envPath`) or created virtualenv is validated (shows error on incorrect configuration)
-    - Show warnings for cases when virtualenv is created from another virtualenv (because it may have side effects)       
+    - Show warnings for cases when virtualenv is created from another virtualenv (because it may have side effects)
+* Add python extra args support (in contrast to extra agrs, applied after command, python args applied before):
+    - Add `Python.pythonArgs` -  args applied just after python executable
+    - Add `PythonTask.pythonArgs`           
 
 ### 1.2.0 (2018-08-30)
 * Improve virtualenv usage in multi-module project (#5):

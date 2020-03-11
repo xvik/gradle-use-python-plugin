@@ -52,6 +52,21 @@ class PythonExecTest extends AbstractCliMockSupport {
         logger.res =~ /(?m)\[python] python(3)? no matter\n\t sample output\n/
     }
 
+    def "Check python args"() {
+        setup:
+        python.pythonArgs('-I -S')
+        mockExec(project, 'sample output', 0)
+
+        when: "check exec"
+        logger.reset()
+        python.exec('no matter')
+        then: "ok"
+        logger.res =~ /(?m)\[python] python(3)? -I -S no matter\n\t sample output\n/
+
+        cleanup:
+        python.clearPythonArgs()
+    }
+
     def "Check extra args"() {
         setup:
         python.extraArgs('--one --two')

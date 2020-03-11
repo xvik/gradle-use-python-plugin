@@ -60,6 +60,15 @@ class PythonTask extends BasePythonTask {
     @Optional
     LogLevel logLevel = LogLevel.LIFECYCLE
     /**
+     * Python arguments applied to all executed commands. Arguments applied before called command
+     * (and so option may be useful for cases impossible with {@link #extraArgs}, applied after command).
+     * For example, it could be used for -I or -S flags (be aware that -S can cause side effects, especially
+     * inside virtual environments).
+     */
+    @Input
+    @Optional
+    List<String> pythonArgs = []
+    /**
      * Extra arguments to append to every called command.
      * Useful for pre-configured options, applied to all executed commands
      */
@@ -86,12 +95,25 @@ class PythonTask extends BasePythonTask {
                 .logLevel(getLogLevel())
                 .outputPrefix(getOutputPrefix())
                 .workDir(getWorkDir())
+                .pythonArgs(getPythonArgs())
                 .extraArgs(getExtraArgs())
 
         if (mod) {
             python.callModule(mod, cmd)
         } else {
             python.exec(cmd)
+        }
+    }
+
+    /**
+     * Add python arguments, applied before command.
+     *
+     * @param args arguments
+     */
+    @SuppressWarnings('ConfusingMethodName')
+    void pythonArgs(String... args) {
+        if (args) {
+            getPythonArgs().addAll(args)
         }
     }
 

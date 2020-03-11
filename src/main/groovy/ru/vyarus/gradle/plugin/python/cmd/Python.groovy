@@ -187,6 +187,9 @@ class Python {
      * Binary dir extracted from actual python execution ({@code sys.executable}). Note that {@code sys.executable}
      * MAY return empty string instead and in this case binary path would be guessed from {@link #getHomeDir()}.
      * <p>
+     * {@code sysconfig.get_config_var( 'BINDIR' )} also may not be used as virtualenv may be created without
+     * setuptools.
+     * <p>
      * In case when virtualenv created from another virtualenv, binary dir will return correct path, but
      * {@link #getHomeDir()} most likely will point to global python.
      *
@@ -380,6 +383,8 @@ class Python {
         List<String> cmd = []
         cmd.add('import sys')
         cmd.addAll(lines)
-        return readOutput("-S -c \"${cmd.join(';')}\"").readLines()
+
+        // IMPORTANT -S should not be used here as it affects behaviour a lot (even sys.prefix may be different)
+        return readOutput("-c \"${cmd.join(';')}\"").readLines()
     }
 }

@@ -132,9 +132,9 @@ class CheckPythonTask extends BasePipTask {
         }
 
         if (pip.python.virtualenv) {
-            logger.error('WARNING: Global environment is already a virtualenv: {}. New environment would be ' +
-                    'created based on it: {}. In most cases, everything would work as expected.',
-                    pip.python.homeDir, ext.envPath)
+            logger.error('WARNING: Global python is already a virtualenv: \'{}\'. New environment would be ' +
+                    'created based on it: \'{}\'. In most cases, everything would work as expected.',
+                    pip.python.binaryDir, ext.envPath)
         }
 
         logger.lifecycle("Using virtualenv $env.version ($ext.envPath)")

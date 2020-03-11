@@ -137,7 +137,7 @@ class WorkflowKitTest extends AbstractKitTest {
 
     def "Check pip not installed"() {
 
-        setup: "use custom env without python as pure python"
+        setup: "use custom env without pip as pure python"
         Virtualenv env = env('env')
         env.createPythonOnly()
         build """

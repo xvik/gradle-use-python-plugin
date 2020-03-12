@@ -204,7 +204,6 @@ class PythonUsedInSubmoduleKitTest extends AbstractKitTest {
         """
 
         when: "run sub task"
-        debug()
         BuildResult result = run(':sub:sample')
 
         then: "task successful"

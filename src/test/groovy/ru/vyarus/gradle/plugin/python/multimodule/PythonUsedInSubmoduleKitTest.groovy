@@ -176,4 +176,39 @@ class PythonUsedInSubmoduleKitTest extends AbstractKitTest {
         !result.output.contains("${projectName()}${File.separator}.gradle${File.separator}python")
         result.output.contains("${projectName()}${File.separator}sub${File.separator}python")
     }
+
+    def "Check submodule python call with custom work dir"() {
+
+        setup:
+        file('settings.gradle') << ' include "sub"'
+        file('sub').mkdir()
+        build """                        
+            plugins {
+                id 'ru.vyarus.use-python' apply false
+            }
+            
+            allprojects {
+               apply plugin: 'ru.vyarus.use-python' 
+            }                        
+            
+            subprojects {  
+                python {
+                    pip 'click:6.7'
+                }
+                                                                                     
+                task sample(type: PythonTask) {
+                    command = '-c print(\\'samplee\\')'
+                    workDir = 'src'
+                }
+            }
+        """
+
+        when: "run sub task"
+        debug()
+        BuildResult result = run(':sub:sample')
+
+        then: "task successful"
+        result.task(':sub:sample').outcome == TaskOutcome.SUCCESS
+        result.output.contains('samplee')
+    }
 }

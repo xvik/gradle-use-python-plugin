@@ -305,7 +305,7 @@ class Python {
         // on win non global python could be called only through cmd
         String exec = withCmd ? 'cmd'
                 // use absolute python path if work dir set (relative will simply not work)
-                : (wrkDirUsed && customBinaryPath ? CliUtils.canonicalPath(executable) : executable)
+                : (wrkDirUsed && customBinaryPath ? project.file(executable).canonicalPath : executable)
         String[] cmd = withCmd ?
                 CliUtils.wincmdArgs(executable, project.projectDir, prepareArgs(args), wrkDirUsed)
                 : prepareArgs(args)

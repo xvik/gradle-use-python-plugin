@@ -204,6 +204,8 @@ final class CliUtils {
     /**
      * Format canonical path WITHOUT following symlinks (which {@link File#getCanonicalPath()} do). Used to
      * remove redundant ".." parts in path.
+     * <p>
+     * Relative path will remain relative!
      *
      * @param file file or directory path
      * @return canonical path

@@ -79,10 +79,12 @@ abstract class AbstractKitTest extends Specification {
     }
 
     BuildResult runVer(String gradleVersion, String... commands) {
+        println 'Running with GRADLE ' + gradleVersion
         return gradle(commands).withGradleVersion(gradleVersion).build()
     }
 
     BuildResult runFailedVer(String gradleVersion, String... commands) {
+        println 'Running with GRADLE ' + gradleVersion
         return gradle(commands).withGradleVersion(gradleVersion).buildAndFail()
     }
 

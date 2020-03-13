@@ -73,7 +73,7 @@ Plugin compiled for java 8, compatible with java 11
 Gradle | Version
 --------|-------
 5-6     | 2.0.0
-4.x     | [1.1.0](https://github.com/xvik/gradle-mkdocs-plugin/tree/1.1.0)
+4.x     | [1.2.0](https://github.com/xvik/gradle-use-python-plugin/tree/1.2.0)
 
 #### Snapshots
 

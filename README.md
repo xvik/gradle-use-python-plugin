@@ -52,7 +52,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'ru.vyarus:gradle-use-python-plugin:1.2.0'
+        classpath 'ru.vyarus:gradle-use-python-plugin:2.0.0'
     }
 }
 apply plugin: 'ru.vyarus.use-python'
@@ -62,14 +62,18 @@ OR
 
 ```groovy
 plugins {
-    id 'ru.vyarus.use-python' version '1.2.0'
+    id 'ru.vyarus.use-python' version '2.0.0'
 }
 ```  
 
 #### Compatibility
 
-Plugin compiled for java 7.
-Compatible with gradle 4 and above.
+Plugin compiled for java 8, compatible with java 11
+
+Gradle | Version
+--------|-------
+5-6     | 2.0.0
+4.x     | [1.1.0](https://github.com/xvik/gradle-mkdocs-plugin/tree/1.1.0)
 
 #### Snapshots
 
@@ -165,6 +169,12 @@ Make sure the latest pip installed (required to overcome some older pip problems
 pip3 install -U pip
 ```
 
+To install exact pip version:
+
+```bash
+pip3 install -U pip==10.0.0
+```
+
 Note that on ubuntu pip installed with `python3-pip` package is 9.0.1, but it did not(!) downgrade
 module versions (e.g. `pip install click 6.6` when click 6.7 is installed will do nothing). 
 Maybe there are other differences, so it's highly recommended to upgrade pip with `pip3 install -U pip`.
@@ -172,7 +182,7 @@ Maybe there are other differences, so it's highly recommended to upgrade pip wit
 #### Automatic pip upgrade
 
 As described above, there are different ways of pip installation in linux and, more important,
-admin permissions are required to upgrade global pip. So it is impossible to upgrade pip from plugin (in all cases).
+admin permissions are required to upgrade global pip. So it is impossible to upgrade pip from the plugin (in all cases).
 
 But, it is possible inside virtualenv or user (--user) scope. Note that plugin creates virtualenv by default (per project independent python environment).
 
@@ -279,8 +289,8 @@ will be used:
 python.pip 'module1:2.0', 'module2:1.0', 'module1:1.0' 
 ```
 
-Will install version 1.0 of module1 because it was the latest declaration. Module overrides
-work for all declaration types (see below): the last declared module is used.
+Will install version 1.0 of module1 because it was the latest declaration. "Module overrides"
+works for all declaration types (see below): the latest declared module version always wins.
 
 Dependencies are installed with `pipInstall` task which is called before any declared `PythonTask`.
 
@@ -356,7 +366,9 @@ All pip supported vcs could be used: git, svn, hg, bzr
 If up-to-date logic, implemented by `pipInstall` task, does not suit your needs, you can always
 disable it with `python.alwaysInstallModules = true` (pip always called). But this will be slower.
 
-NOTE: since pip 20, compiled vcs module is cached (before it was build on each execution)
+NOTE: since pip 20, compiled vcs module is cached (before it was build on each execution), but
+it is possible to disable cache (for all modules) with `python.usePipCache=false` configuration
+(applies [--no-cache-dir](https://pip.pypa.io/en/stable/reference/pip_install/#caching) pip flag)
 
 #### Virtualenv
 
@@ -370,6 +382,10 @@ installation then disable it:
 python.installVirtualenv = false
 ```
 
+Plugin installs exact pip version declared in `python.virtualenvVersion` (by default, 16.7.9).
+This way, plugin will always install only known to be working version and avoid side effects of "just released" 
+versions (note that pip 20 is a major rewrite and may still contain side effects).
+
 In any case, plugin checks if virtualenv is already installed and use it to create local environment 
 (if not, then fall back to  `--user` scope by default). Virtualenv usage is driven by declared scope, so if you don't want to use it set:
 
@@ -379,7 +395,7 @@ python.scope = USER // or GLOBAL
 
 With USER (or GLOBAL) scope, virtualenv will not be used, even if it's already created in project (plugin will ignore it and use global python).
 
-If you already use virtualenv in your project (have created environment), then simply point plugin to use it:
+If you already use virtualenv in your project (have created manually environment), then simply point plugin to use it:
 
 ```groovy
 python.envPath = 'path/to/your/env'
@@ -427,6 +443,8 @@ python.scope = VIRTUALENV
 Note that values may be declared without quotes because it's an enum which values are 
 declared as project ext properties (`ext.USER==ru.vyarus.gradle.plugin.python.PythonExtension.Scope.USER`).
 
+Complete behaviour matrix [see above](#usage)
+
 #### Check modules updates
 
 To quick check if new versions are available for the registered pip modules
@@ -444,7 +462,7 @@ The following modules could be updated:
 Note that it will not show versions for transitive modules, only
 for modules specified directly in `python.pip`.
 
-To see all available updates (wihout filtering):
+To see all available updates (without filtering):
 
 ```groovy
 pipUpdates.all = true
@@ -550,7 +568,7 @@ python {
 
 `pythonPath` must be set to directory containing python binary (e.g. 'path/to/python/binray/python.exe')
 
-NOTE: `pythonPath` is ignored when virtualenv used.
+NOTE: `pythonPath` is ignored when virtualenv used (virtualenv located at `python.envPath` already exists).
 
 ##### Minimal python and pip versions
 
@@ -598,7 +616,7 @@ pipList.all = true
 
 Global modules are hidden by default (for USER scope) because on linux there are a lot of system modules pre-installed.  
  
-By default 'pip install' is not called for modules already installed with correct version.
+By default, 'pip install' is not called for modules already installed with correct version.
 In most situations this is preferred behaviour, but if you need to be sure about dependencies 
 then force installation:
 
@@ -633,10 +651,15 @@ python {
    scope = VIRTUALENV_OR_USER
    // automatically install virtualenv module (if pip modules declared and scope allows)   
    installVirtualenv = true
+   // if virtualenv not installed (in --user scope), plugin will install exactly this version
+   // (known to be working version) to avoid side effects
+   virtualenvVersion = '16.7.9'
    // used virtualenv path (if virtualenv used, see 'scope')
    envPath = '.gradle/python'
    // copy virtualenv instead of symlink (when created)
    envCopy = false
+   // may be used to disable pip cache (--no-cache-dir option)
+   usePipCache = true 
 }
 ```
 
@@ -656,11 +679,14 @@ PythonTask configuration:
 | module | Module name to call command on (if command not set module called directly). Useful for derived tasks. |
 | command | Python command to execute (string, array, iterable) |
 | logLevel | Logging level for python output. By default is `LIFECYCLE` (visible in console). To hide output use `LogLevel.INFO` |
-| extraArgs | Extra arguments applied at the end of declared command. Useful for derived tasks to declare default options |
+| pythonArgs | Extra python arguments applied just after python binary. Useful for declaring common python options (-I, -S, etc.) |
+| extraArgs | Extra arguments applied at the end of declared command (usually module arguments). Useful for derived tasks to declare default options |
 | outputPrefix | Prefix, applied for each line of python output. By default is '\t' to identify output for called gradle command |
 
-Also, task provide extra method `extraArgs(String... args)` to declare extra arguments (shortcut to append values to 
-extraArgs property).
+Also, task provide extra methods:
+
+* `pythonArgs(String... args)` to declare extra python arguments (shortcut to append values to pythonArgs property).
+* `extraArgs(String... args)` to declare extra arguments (shortcut to append values to extraArgs property).
 
 #### PipInstallTask
 
@@ -683,6 +709,7 @@ Configuration:
 | userScope | Use current user scope (`--user` flag). Enabled by default to avoid permission problems on *nix (global configuration). |
 | showInstalledVersions | Perform `pip list` after installation. By default use global configuration value |
 | alwaysInstallModules | Call `pip install module` for all declared modules, even if it is already installed with correct version. By default use global configuration value |
+| useCache | Can be used to disable pip cache (--no-cache-dir) |
 
 And, as shown above, custom methods: `pip(String... modules)` and `pip(Iterable<String> modules)`
 
@@ -697,7 +724,7 @@ In your plugin, add plugin as dependency:
 
 ```groovy
 dependencies {
-    compile 'ru.vyarus:gradle-use-python-plugin:1.2.0'
+    implementation 'ru.vyarus:gradle-use-python-plugin:2.0.0'
 }
 ```
 

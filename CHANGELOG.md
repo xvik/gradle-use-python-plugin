@@ -1,7 +1,8 @@
+### 2.0.0 (2020-03-13)
 * (breaking) Drop java 7 support
 * (breaking) Drop gradle 4 support
 * Add `python.usePipCache` option to be able to disable cache for dependencies installation 
-    ([--no-cache-dir](ttps://pip.pypa.io/en/stable/reference/pip_install/#caching))
+    ([--no-cache-dir](https://pip.pypa.io/en/stable/reference/pip_install/#caching))
   Also, option added to Pip object constructor and BasePipTask (with default from extension)
 * Add `Python.getBinaryDir()` returning (in most cases) executed python binary folder
     (based on `sys.executable` with fallback to `sys.prefix/bin`)
@@ -16,7 +17,7 @@
     - Add `Python.pythonArgs` -  args applied just after python executable
     - Add `PythonTask.pythonArgs`   
 * Add `Virtualenv.python` accessor to be able to configure additional arguments
-* Add installed virtualenv version configuration: `python.virtualenv`. This way, plugin will 
+* Add installed virtualenv version configuration: `python.virtualenvVersion`. This way, plugin will 
     always install only known to be working version and avoid side effects of "just released" 
     versions. By default, 16.7.9 would be installed because 20.0.x has some not fixed regressions
 * Use gradle tasks configuration avoidance for lazy tasks initialization (no init when tasks not needed)                    

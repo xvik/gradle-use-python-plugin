@@ -52,7 +52,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'ru.vyarus:gradle-use-python-plugin:2.0.0'
+        classpath 'ru.vyarus:gradle-use-python-plugin:2.1.0'
     }
 }
 apply plugin: 'ru.vyarus.use-python'
@@ -62,7 +62,7 @@ OR
 
 ```groovy
 plugins {
-    id 'ru.vyarus.use-python' version '2.0.0'
+    id 'ru.vyarus.use-python' version '2.1.0'
 }
 ```  
 
@@ -72,7 +72,7 @@ Plugin compiled for java 8, compatible with java 11
 
 Gradle | Version
 --------|-------
-5-6     | 2.0.0
+5-6     | 2.1.0
 4.x     | [1.2.0](https://github.com/xvik/gradle-use-python-plugin/tree/1.2.0)
 
 #### Snapshots
@@ -544,6 +544,26 @@ When command passed as string it is manually parsed to arguments array (split by
 To view parsed arguments run gradle with `-i` flag (enable info logs). In case when command can't be parsed properly 
 (bug in parser or unsupported case) use array of arguments instead of string.
 
+##### Environment variables
+
+By default, executed python can access system environment variables (same as `System.getenv()`).
+
+To declare custom (process specific) variables:
+
+```groovy
+task sample(type: PythonTask) {
+       command = "-c \"import os;print('variables: '+os.getenv('some', 'null')+' '+os.getenv('foo', 'null'))\""
+       environment 'some', 1
+       environment 'other', 2
+       environment(['foo': 'bar', 'baz': 'bag'])
+}
+```
+
+Map based declaration (`environment(['foo': 'bar', 'baz': 'bag'])`) does not remove previously declared variables 
+(just add all vars from map), but direct assignment `environment = ['foo': 'bar', 'baz': 'bag']` will reset variables.
+
+System variables will be available even after declaring custom variables (of course, custom variables could override global value).
+
 #### Configuration
 
 ##### Python location
@@ -682,11 +702,15 @@ PythonTask configuration:
 | pythonArgs | Extra python arguments applied just after python binary. Useful for declaring common python options (-I, -S, etc.) |
 | extraArgs | Extra arguments applied at the end of declared command (usually module arguments). Useful for derived tasks to declare default options |
 | outputPrefix | Prefix, applied for each line of python output. By default is '\t' to identify output for called gradle command |
+| environment | Process specific environment variables |
+
 
 Also, task provide extra methods:
 
 * `pythonArgs(String... args)` to declare extra python arguments (shortcut to append values to pythonArgs property).
 * `extraArgs(String... args)` to declare extra arguments (shortcut to append values to extraArgs property).
+* `environment(String var, Object value)` to set custom environment variable (shortcut to append values to environment property)
+* `environment(Map<String, Object> vars)` to set multiple custom environment variables at once (shortcut to append values to environment property)
 
 #### PipInstallTask
 

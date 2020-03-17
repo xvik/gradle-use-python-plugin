@@ -1,3 +1,4 @@
+### 2.1.0 (2020-03-17)
 * Add environment variables support (#8):
     - Python object: `Python.environment` (single and map)
     - Python task: `PythonTask.environment` (single and map)

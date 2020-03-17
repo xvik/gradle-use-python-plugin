@@ -1,3 +1,7 @@
+* Add environment variables support (#8):
+    - Python object: `Python.environment` (single and map)
+    - Python task: `PythonTask.environment` (single and map)
+
 ### 2.0.0 (2020-03-13)
 * (breaking) Drop java 7 support
 * (breaking) Drop gradle 4 support

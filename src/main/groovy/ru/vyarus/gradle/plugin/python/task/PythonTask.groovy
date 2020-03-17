@@ -76,6 +76,13 @@ class PythonTask extends BasePythonTask {
     @Optional
     List<String> extraArgs = []
     /**
+     * Environment variables for executed python process (variables specified in gradle's
+     * {@link org.gradle.process.ExecSpec#environment(java.util.Map)} during python process execution).
+     */
+    @Input
+    @Optional
+    Map<String, Object> environment = [:]
+    /**
      * Prefix each line of python output. By default it's '\t' to indicate command output.
      */
     @Input
@@ -97,6 +104,7 @@ class PythonTask extends BasePythonTask {
                 .workDir(getWorkDir())
                 .pythonArgs(getPythonArgs())
                 .extraArgs(getExtraArgs())
+                .environment(environment)
 
         if (mod) {
             python.callModule(mod, cmd)
@@ -126,6 +134,30 @@ class PythonTask extends BasePythonTask {
     void extraArgs(String... args) {
         if (args) {
             getExtraArgs().addAll(args)
+        }
+    }
+
+    /**
+     * Add environment variable for python process (will override previously set value).
+     *
+     * @param var variable name
+     * @param value variable value
+     */
+    @SuppressWarnings('ConfusingMethodName')
+    void environment(String var, Object value) {
+        getEnvironment().put(var, value)
+    }
+
+    /**
+     * Add environment variables for python process (will override already set values, but not replace context
+     * map completely). May be called multiple times: all variables would be aggregated.
+     *
+     * @param vars (may be null)
+     */
+    @SuppressWarnings('ConfusingMethodName')
+    void environment(Map<String, Object> vars) {
+        if (vars) {
+            getEnvironment().putAll(vars)
         }
     }
 

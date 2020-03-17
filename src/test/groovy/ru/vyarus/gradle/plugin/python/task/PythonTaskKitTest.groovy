@@ -184,4 +184,52 @@ class PythonTaskKitTest extends AbstractKitTest {
         result.output.contains('\t sample')
     }
 
+
+    def "Check env vars"() {
+        setup:
+        build """
+            plugins {
+                id 'ru.vyarus.use-python'
+            }
+
+            task sample(type: PythonTask) {
+                command = "-c \\"import os;print('variables: '+os.getenv('some', 'null')+' '+os.getenv('foo', 'null'))\\""
+                environment 'some', 1
+                environment(['foo': 'bar'])
+            }
+        """
+
+        when: "run task"
+        debug()
+        BuildResult result = run('sample')
+
+        then: "executed"
+        result.task(':sample').outcome == TaskOutcome.SUCCESS
+        result.output.contains('variables: 1 bar')
+    }
+
+
+    def "Check python see system variables"() {
+        setup:
+        build """
+            plugins {
+                id 'ru.vyarus.use-python'
+            }
+            
+            assert System.getenv('some') == 'foo'
+            
+            task sample(type: PythonTask) {
+                command = "-c \\"import os;print('variables: '+os.getenv('some', 'null'))\\""
+            }
+        """
+
+        when: "run task"
+        BuildResult result = gradle('sample')
+                .withEnvironment(['some': 'foo', 'PATH': System.getenv('PATH')])
+                .build()
+
+        then: "executed"
+        result.task(':sample').outcome == TaskOutcome.SUCCESS
+        result.output.contains('variables: foo')
+    }
 }

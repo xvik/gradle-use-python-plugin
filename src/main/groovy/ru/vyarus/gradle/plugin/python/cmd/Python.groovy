@@ -44,6 +44,7 @@ class Python {
     private LogLevel logLevel = LogLevel.INFO
     private final List<String> pythonArgs = []
     private final List<String> extraArgs = []
+    private final Map<String, Object> envVars = [:]
 
     // run through cmd on win (when direct executable called)
     private final boolean withCmd
@@ -138,6 +139,37 @@ class Python {
     }
 
     /**
+     * Set environment variable for executed python process.
+     * <p>
+     * Specified variables could be cleared with {@link #clearEnvironment()}.
+     *
+     * @param var environment variable
+     * @param value variable value
+     * @return cli instance for chained calls
+     */
+    Python environment(String var, Object value) {
+        envVars.put(var, value)
+        return this
+    }
+
+    /**
+     * Set environment variables for executed python process. This call does not replace previous variables map,
+     * it only adds all specified values into existing map (with possible overriding of some variable values).
+     * So if called multiple times, all specified maps would be aggregated.
+     * <p>
+     * Specified variables could be cleared with {@link #clearEnvironment()}.
+     *
+     * @param vars environment variables (may be null)
+     * @return cli instance for chained calls
+     */
+    Python environment(Map<String, Object> vars) {
+        if (vars) {
+            envVars.putAll(vars)
+        }
+        return this
+    }
+
+    /**
      * Removes all registered python arguments.
      *
      * @return cli instance for chained calls
@@ -154,6 +186,11 @@ class Python {
      */
     Python clearExtraArgs() {
         this.extraArgs.clear()
+        return this
+    }
+
+    Python clearEnvironment() {
+        this.envVars.clear()
         return this
     }
 
@@ -326,6 +363,9 @@ class Python {
             ignoreExitValue = true
             if (workDir) {
                 setWorkingDir(workDir)
+            }
+            if (envVars) {
+                it.environment(envVars)
             }
         }
         project.logger.info('Python execution time: {}',

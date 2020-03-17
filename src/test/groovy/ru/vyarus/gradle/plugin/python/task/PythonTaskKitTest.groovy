@@ -224,8 +224,10 @@ class PythonTaskKitTest extends AbstractKitTest {
         """
 
         when: "run task"
+        def env = new HashMap(System.getenv())
+        env.put('some', 'foo')
         BuildResult result = gradle('sample')
-                .withEnvironment(['some': 'foo', 'PATH': System.getenv('PATH')])
+                .withEnvironment(env)
                 .build()
 
         then: "executed"

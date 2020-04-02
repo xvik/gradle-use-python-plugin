@@ -78,4 +78,43 @@ class PipExecTest extends AbstractCliMockSupport {
         cleanup:
         pip.useCache = true
     }
+
+    def "Check pip extraIndexUrls for installation"() {
+        setup:
+        mockExec(project, null, 0)
+        pip.extraIndexUrls = ["http://extra-url.com", "http://another-url.com"]
+
+        when: "call install with extra index urls"
+        pip.install('mod')
+        then: "flag applied"
+        logger.res =~ /\[python] python(3)? -m pip install mod --user --extra-index-url http:\/\/extra-url\.com --extra-index-url http:\/\/another-url\.com/
+
+        when: "call different command"
+        pip.exec('list')
+        then: "no flag applied"
+        logger.res =~ /\[python] python(3)? -m pip list --user/
+
+        cleanup:
+        pip.extraIndexUrls = []
+    }
+
+    def "Check pip trustedHosts for installation"() {
+        setup:
+        mockExec(project, null, 0)
+        pip.trustedHosts = ["http://extra-url.com", "http://another-url.com"]
+
+        when: "call install with extra index urls"
+        pip.install('mod')
+        then: "flag applied"
+        logger.res =~ /\[python] python(3)? -m pip install mod --user --trusted-host http:\/\/extra-url\.com --trusted-host http:\/\/another-url\.com/
+
+        when: "call different command"
+        pip.exec('list')
+        then: "no flag applied"
+        logger.res =~ /\[python] python(3)? -m pip list --user/
+
+        cleanup:
+        pip.trustedHosts = []
+    }
+
 }

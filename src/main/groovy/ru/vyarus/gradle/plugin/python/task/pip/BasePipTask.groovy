@@ -46,6 +46,22 @@ class BasePipTask extends BasePythonTask {
     boolean useCache = true
 
     /**
+     * Affects only {@link pip install} by applying {@code --trusted-host}.
+     * <p>
+     * No extra indec urls are given by default (see {@link ru.vyarus.gradle.plugin.python.PythonExtension#trustedHosts)
+     */
+    @Input
+    List<String> trustedHosts = []
+
+    /**
+     * Affects only {@link pip install} by applying {@code --extra-index-url}.
+     * <p>
+     * No extra indec urls are given by default (see {@link ru.vyarus.gradle.plugin.python.PythonExtension#extraIndexUrls)
+     */
+    @Input
+    List<String> extraIndexUrls = []
+
+    /**
      * Shortcut for {@link #pip(java.lang.Iterable)}.
      *
      * @param modules modules to install
@@ -89,6 +105,6 @@ class BasePipTask extends BasePythonTask {
     @Memoized
     @SuppressWarnings('UnnecessaryGetter')
     protected Pip getPip() {
-        return new Pip(project, getPythonPath(), getPythonBinary(), getUserScope(), getUseCache())
+        return new Pip(project, getPythonPath(), getPythonBinary(), getUserScope(), getUseCache(), getExtraIndexUrls(), getTrustedHosts())
     }
 }

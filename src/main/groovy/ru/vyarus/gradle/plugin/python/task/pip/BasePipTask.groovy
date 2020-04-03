@@ -111,9 +111,8 @@ class BasePipTask extends BasePythonTask {
     @Memoized
     @SuppressWarnings('UnnecessaryGetter')
     protected Pip getPip() {
-        Pip pip = new Pip(python, getUserScope(), getUseCache())
-        pip.trustedHosts = getTrustedHosts()
-        pip.extraIndexUrls = getExtraIndexUrls()
-        pip
+        return new Pip(python, getUserScope(), getUseCache())
+                .trustedHosts(getTrustedHosts())
+                .extraIndexUrls(getExtraIndexUrls())
     }
 }

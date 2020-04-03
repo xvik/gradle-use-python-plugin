@@ -17,6 +17,7 @@ import java.util.regex.Pattern
  * @since 15.11.2017
  */
 @CompileStatic
+@SuppressWarnings('ConfusingMethodName')
 class Pip {
 
     private static final Pattern VERSION = Pattern.compile('pip ([\\d.]+)')
@@ -35,9 +36,9 @@ class Pip {
     // may be changed externally
     boolean useCache
     // --extra-index-url
-    List<String> extraIndexUrls
+    List<String> extraIndexUrls = []
     // --trusted-host
-    List<String> trustedHosts
+    List<String> trustedHosts = []
 
     Pip(Project project) {
         this(project, null, null, true)
@@ -57,6 +58,34 @@ class Pip {
         this.python = python
         this.userScope = userScope
         this.useCache = useCache
+    }
+
+    /**
+     * Apply extra pip repositories (--extra-index-url). Applies only for commands supporting it.
+     *
+     * @param urls urls to pip repositories.
+     * @return pip instance for chained calls
+     * @see ru.vyarus.gradle.plugin.python.PythonExtension#extraIndexUrls
+     */
+    Pip extraIndexUrls(List<String> urls) {
+        if (urls) {
+            this.extraIndexUrls.addAll(urls)
+        }
+        return this
+    }
+
+    /**
+     * Apply trusted hosts (--trusted-host). Applied only for {@code pip install}.
+     *
+     * @param hosts trusted hosts
+     * @return pip instance for chained calls
+     * @see ru.vyarus.gradle.plugin.python.PythonExtension#trustedHosts
+     */
+    Pip trustedHosts(List<String> hosts) {
+        if (hosts) {
+            this.trustedHosts.addAll(hosts)
+        }
+        return this
     }
 
     /**

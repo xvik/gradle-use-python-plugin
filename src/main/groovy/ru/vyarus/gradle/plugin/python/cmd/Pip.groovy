@@ -32,6 +32,8 @@ class Pip {
     // --no-cache-dir for install task
     // may be changed externally
     boolean useCache
+    List<String> extraIndexUrls
+    List<String> trustedHosts
 
     Pip(Project project) {
         this(project, null, null, true)
@@ -43,10 +45,16 @@ class Pip {
     }
 
     Pip(Project project, String pythonPath, String binary, boolean userScope, boolean useCache) {
+        this(project, pythonPath, binary, userScope, useCache, [], [])
+    }
+
+    Pip(Project project, String pythonPath, String binary, boolean userScope, boolean useCache, List<String> extraIndexUrls, List<String> trustedHosts) {
         python = new Python(project, pythonPath, binary)
                 .logLevel(LogLevel.LIFECYCLE)
         this.userScope = userScope
         this.useCache = useCache
+        this.extraIndexUrls = extraIndexUrls
+        this.trustedHosts = trustedHosts
     }
 
     /**
@@ -171,6 +179,17 @@ class Pip {
         // --no-cache-dir (only for install command)
         if (!useCache && !cmd.contains(NO_CACHE) && cmd.startsWith(INSTALL_TASK)) {
             cmd += " $NO_CACHE"
+        }
+
+        if (!extraIndexUrls.empty && cmd.startsWith(INSTALL_TASK)) {
+            extraIndexUrls.each {extraIndexUrl ->
+                cmd += " --extra-index-url $extraIndexUrl"
+            }
+        }
+        if (!trustedHosts.empty && cmd.startsWith(INSTALL_TASK)) {
+            trustedHosts.each{trustedHost ->
+                cmd += " --trusted-host $trustedHost"
+            }
         }
         cmd
     }

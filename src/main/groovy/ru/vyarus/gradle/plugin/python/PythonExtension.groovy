@@ -101,6 +101,21 @@ class PythonExtension {
     boolean envCopy
 
     /**
+     * This can be used to if you host your own pypi besides the default global one.
+     *
+     * https://pip.pypa.io/en/stable/reference/pip_install/#install-extra-index-url
+     */
+    List<String> extraIndexUrls
+
+    /**
+     * Mark a host as trusted for pip even when it has no tls, or the certificate is invalid.
+     * Can be used in combination with extraIndexUrl to use your own pypi server.
+     *
+     * https://pip.pypa.io/en/stable/reference/pip/#trusted-host
+     */
+    List<String> trustedHosts
+
+    /**
      * By default, pip cache all installed packages. Sometimes this may lead to incorrect dependency version
      * resolution (when newer version from cache installed instead of specified). Since pip 20 vcs dependencies
      * (module build from vcs revision) are also cached, so if you need to force rebuild each time you will

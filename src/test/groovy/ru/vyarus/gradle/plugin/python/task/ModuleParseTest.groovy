@@ -94,6 +94,19 @@ class ModuleParseTest extends Specification {
         res.toPipInstallString() == res.declaration
     }
 
+    def "Check module name contains dashes"() {
+
+        when:
+        VcsPipModule res = PipModule.parse("git+https://git.example.com/my-project@v1.0#egg=my-project-6.6")
+        then:
+        res.declaration == "git+https://git.example.com/my-project@v1.0#egg=my-project"
+        res.name == 'my-project'
+        res.version == '6.6'
+        res.toString() == "my-project 6.6 (git+https://git.example.com/my-project@v1.0#egg=my-project)"
+        res.toPipString() == 'my-project==6.6'
+        res.toPipInstallString() == res.declaration
+    }
+
     def "Check vcs module errors"() {
 
         when: "no @version part"
@@ -117,14 +130,6 @@ class ModuleParseTest extends Specification {
         ex.message == "Incorrect pip vsc module declaration: 'git+https://git.example.com/MyProject@4f32s432ff4233#egg=MyProject' " +
                 "(required format is 'vcs+protocol://repo_url/@vcsVersion#egg=name-pkgVersion'). Module version is required in module " +
                 "(#egg=name-version): 'MyProject'. This is important to be able to check up-to-date state without python run"
-
-        when: "bad module name"
-        PipModule.parse("git+https://git.example.com/MyProject@4f32s432ff4233#egg=My-Project-6.6")
-        then: "err"
-        ex = thrown(IllegalArgumentException)
-        ex.message == "Incorrect pip vsc module declaration: 'git+https://git.example.com/MyProject@4f32s432ff4233#egg=My-Project-6.6' " +
-                "(required format is 'vcs+protocol://repo_url/@vcsVersion#egg=name-pkgVersion'). module name (#egg= part) contains " +
-                "multiple '-' symbols: 'My-Project-6.6'"
     }
 
     def "Check vsc module equals"() {

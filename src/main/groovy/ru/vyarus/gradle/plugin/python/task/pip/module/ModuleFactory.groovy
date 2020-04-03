@@ -70,7 +70,7 @@ class ModuleFactory {
      *
      * @param desc descriptor
      * @return parsed module instance
-     * @see <a href="https://pip.pypa.io/en/stable/reference/pip_install/#vcs-support">pip vsc support</a>
+     * @see <ahref="https://pip.pypa.io/en/stable/reference/pip_install/#vcs-support"  >  pip vsc support</a>
      */
     private static PipModule parseVcsModule(String desc) {
         if (!desc.contains('@')) {
@@ -88,15 +88,11 @@ class ModuleFactory {
                             'This is important to be able to check up-to-date state without python run')
         }
         String[] split = name.split(VCS_VERSION_SEPARATOR)
-        if (split.length != DECL_PARTS) {
-            throw new IllegalArgumentException(
-                    "${wrongVcs(desc)} module name (#egg= part) contains multiple '-' symbols: '$name'")
-        }
-        String version = split[1].trim()
+        String version = split.last().trim()
         // remove version part because pip fails to install with it
-        String shortDesc = desc.replace(name, split[0])
-        name = split[0].trim()
-        return new VcsPipModule(shortDesc, name, version)
+        String pkgName = name[0..name.lastIndexOf(VCS_VERSION_SEPARATOR) - 1].trim()
+        String shortDesc = desc.replace(name, pkgName)
+        return new VcsPipModule(shortDesc, pkgName, version)
     }
 
     /**

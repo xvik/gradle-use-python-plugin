@@ -2,6 +2,9 @@
   and [--extra-index-url](https://pip.pypa.io/en/stable/reference/pip_install/#install-extra-index-url) (#10)
   May be set in `python` extension or directly for `pip` tasks. Flags applied only 
   to compatible pip commands.
+* Allow dashes in vcs module name (for example, now it is possible to specify `#egg=my-module-11.2`).
+  NOTE: This may lead to problems with versions also containing dashes (1.1-alpha.1), but
+  it may be easily changed manually (to version without dashes: 1.1.alpha.1)  
 
 ### 2.1.0 (2020-03-17)
 * Add environment variables support (#8):

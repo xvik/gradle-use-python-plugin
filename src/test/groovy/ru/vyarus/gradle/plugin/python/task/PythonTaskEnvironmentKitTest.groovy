@@ -86,4 +86,28 @@ class PythonTaskEnvironmentKitTest extends AbstractKitTest {
         result.task(':sample').outcome == TaskOutcome.SUCCESS
         result.output.contains('variables: foo')
     }
+
+    def "Check composition with blobal vars"() {
+        setup:
+        build """
+            plugins {
+                id 'ru.vyarus.use-python'
+            }
+            
+            python.envVar 'some', 1
+
+            task sample(type: PythonTask) {
+                command = "-c \\"import os;print('variables: '+os.getenv('some', 'null')+' '+os.getenv('foo', 'null'))\\""
+                environment 'foo', 'bar'
+            }
+        """
+
+        when: "run task"
+        debug()
+        BuildResult result = run('sample')
+
+        then: "both variables visible"
+        result.task(':sample').outcome == TaskOutcome.SUCCESS
+        result.output.contains('variables: 1 bar')
+    }
 }

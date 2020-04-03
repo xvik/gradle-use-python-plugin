@@ -29,10 +29,17 @@ class PythonExtension {
     String pythonBinary
 
     /**
+     * System environment variables for executed python process (variables specified in gradle's
+     * {@link org.gradle.process.ExecSpec#environment(java.util.Map)} during python process execution).
+     */
+    Map<String, Object> envVars = [:]
+
+    /**
      * Minimal required python version. Full format: "major.minor.micro". Any precision could be used, for example:
      * '3' (python 3 or above), '3.2' (python. 3.2 or above), '3.6.1' (python 3.6.1 or above).
      */
     String minPythonVersion
+
     /**
      * Minimal required pip version. Format is the same as python version: "major.minor.micro". Any precision could
      * be used (9, 8.2, etc). By default pip 9 is required.
@@ -203,6 +210,16 @@ class PythonExtension {
      */
     void trustedHosts(Iterable<String> hosts) {
         this.trustedHosts.addAll(hosts)
+    }
+
+    /**
+     * Shortcut to set environment variables for all python tasks.
+     *
+     * @param var variable name
+     * @param value variable value
+     */
+    void envVar(String var, Object value) {
+        envVars.put(var, value)
     }
 
     /**

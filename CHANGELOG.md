@@ -15,7 +15,10 @@
   `pipInstall.options('--upgrade-strategy', 'only-if-needed')`.
   It is not possible to support every possible pip flag with api so this manual customization
   is required to cover wider range of use-cases.
-* Fix gradle deprecation warnings on some tasks properties (#9)       
+* Fix gradle deprecation warnings on some tasks properties (#9)
+* Add environment variables configuration in extension: `python.envVar 'SAMPLE', 'value'`
+* Fix python tasks execution from gradle daemon: by default, set `workDir` for all python tasks 
+  to project root dir (in case of multi project - also current project dir, not root project)        
 
 ### 2.1.0 (2020-03-17)
 * Add environment variables support (#8):

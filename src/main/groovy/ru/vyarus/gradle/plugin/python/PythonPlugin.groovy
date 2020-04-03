@@ -80,6 +80,11 @@ class PythonPlugin implements Plugin<Project> {
                 task.conventionMapping.with {
                     pythonPath = { extension.pythonPath }
                     pythonBinary = { extension.pythonBinary }
+                    // important to copy map because each task must have independent instance
+                    environment = { extension.envVars ? new HashMap<>(extension.envVars) : null }
+                    // by default set root dir to project root (not root project!) to handle cases when tasks will
+                    // run by a daemon (and context directory will be different from project root)
+                    workDir = { project.rootDir.absolutePath }
                 }
                 // all python tasks must be executed after check task to use correct environment (switch to virtualenv)
                 if (task.taskIdentity.type != CheckPythonTask) {

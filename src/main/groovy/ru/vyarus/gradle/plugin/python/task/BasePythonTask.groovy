@@ -52,7 +52,9 @@ class BasePythonTask extends ConventionTask {
      */
     @Input
     @Optional
-    Map<String, Object> environment = [:]
+    // note: environment may be initialized with global variables from extension (by mapping)
+    // but not if task property configured directly (task.environment = ...)
+    Map<String, Object> environment
 
     /**
      * Working directory. Not required, but could be useful for some modules (e.g. generators).
@@ -93,7 +95,8 @@ class BasePythonTask extends ConventionTask {
      */
     @SuppressWarnings('ConfusingMethodName')
     void environment(String var, Object value) {
-        getEnvironment().put(var, value)
+        // do like this to unify variables logic (including potential global vars from extension)
+        environment([(var): value])
     }
 
     /**
@@ -105,7 +108,10 @@ class BasePythonTask extends ConventionTask {
     @SuppressWarnings('ConfusingMethodName')
     void environment(Map<String, Object> vars) {
         if (vars) {
-            getEnvironment().putAll(vars)
+            Map<String, Object> envs = getEnvironment() ?: [:]
+            envs.putAll(vars)
+            // do like this to workaround convention mapping mechanism which will treat empty map as incorrect value
+            setEnvironment(envs)
         }
     }
 
@@ -120,6 +126,6 @@ class BasePythonTask extends ConventionTask {
                 .logLevel(getLogLevel())
                 .workDir(getWorkDir())
                 .pythonArgs(getPythonArgs())
-                .environment(environment)
+                .environment(getEnvironment())
     }
 }

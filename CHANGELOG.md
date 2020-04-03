@@ -1,3 +1,8 @@
+* Add support for `pip` flags: [--trusted-host](https://pip.pypa.io/en/stable/reference/pip/#trusted-host) 
+  and [--extra-index-url](https://pip.pypa.io/en/stable/reference/pip_install/#install-extra-index-url) (#10)
+  May be set in `python` extension or directly for `pip` tasks. Flags applied only 
+  to compatible pip commands.
+
 ### 2.1.0 (2020-03-17)
 * Add environment variables support (#8):
     - Python object: `Python.environment` (single and map)

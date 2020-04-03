@@ -24,7 +24,9 @@ class Pip {
     public static final String USER = '--user'
     public static final String NO_CACHE = '--no-cache-dir'
     private static final String INSTALL_TASK = 'install'
-    private static final List<String> USER_AWARE_COMMANDS = [INSTALL_TASK, 'list', 'freeze']
+    private static final String LIST_TASK = 'list'
+    private static final List<String> USER_AWARE_COMMANDS = [INSTALL_TASK, LIST_TASK, 'freeze']
+    private static final List<String> EXTRA_INDEX_AWARE_COMMANDS = [INSTALL_TASK, LIST_TASK, 'download', 'wheel']
 
     private final Python python
     // --user for install, list and freeze tasks
@@ -32,7 +34,9 @@ class Pip {
     // --no-cache-dir for install task
     // may be changed externally
     boolean useCache
+    // --extra-index-url
     List<String> extraIndexUrls
+    // --trusted-host
     List<String> trustedHosts
 
     Pip(Project project) {
@@ -45,16 +49,10 @@ class Pip {
     }
 
     Pip(Project project, String pythonPath, String binary, boolean userScope, boolean useCache) {
-        this(project, pythonPath, binary, userScope, useCache, [], [])
-    }
-
-    Pip(Project project, String pythonPath, String binary, boolean userScope, boolean useCache, List<String> extraIndexUrls, List<String> trustedHosts) {
         python = new Python(project, pythonPath, binary)
                 .logLevel(LogLevel.LIFECYCLE)
         this.userScope = userScope
         this.useCache = useCache
-        this.extraIndexUrls = extraIndexUrls
-        this.trustedHosts = trustedHosts
     }
 
     /**
@@ -172,7 +170,7 @@ class Pip {
     private String applyFlags(String cmd) {
         // -- user
         // explicit virtualenv check is required because flag will fail under virtualenv
-        if (!cmd.contains(USER) && userScope && USER_AWARE_COMMANDS.contains(cmd.split(' ')[0].toLowerCase())
+        if (!cmd.contains(USER) && userScope && USER_AWARE_COMMANDS.contains(extractCommand(cmd))
                 && !python.virtualenv) {
             cmd += " $USER"
         }
@@ -181,16 +179,20 @@ class Pip {
             cmd += " $NO_CACHE"
         }
 
-        if (!extraIndexUrls.empty && cmd.startsWith(INSTALL_TASK)) {
-            extraIndexUrls.each {extraIndexUrl ->
+        if (extraIndexUrls && EXTRA_INDEX_AWARE_COMMANDS.contains(extractCommand(cmd))) {
+            extraIndexUrls.each { extraIndexUrl ->
                 cmd += " --extra-index-url $extraIndexUrl"
             }
         }
-        if (!trustedHosts.empty && cmd.startsWith(INSTALL_TASK)) {
-            trustedHosts.each{trustedHost ->
+        if (trustedHosts && cmd.startsWith(INSTALL_TASK)) {
+            trustedHosts.each { trustedHost ->
                 cmd += " --trusted-host $trustedHost"
             }
         }
         cmd
+    }
+
+    private String extractCommand(String cmdLine) {
+        return cmdLine.split(' ')[0].toLowerCase()
     }
 }

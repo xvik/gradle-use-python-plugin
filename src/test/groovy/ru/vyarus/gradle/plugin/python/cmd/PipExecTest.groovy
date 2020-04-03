@@ -89,10 +89,15 @@ class PipExecTest extends AbstractCliMockSupport {
         then: "flag applied"
         logger.res =~ /\[python] python(3)? -m pip install mod --user --extra-index-url http:\/\/extra-url\.com --extra-index-url http:\/\/another-url\.com/
 
-        when: "call different command"
+        when: "call list with extra index urls"
         pip.exec('list')
+        then: "flag applied"
+        logger.res =~ /\[python] python(3)? -m pip list --user --extra-index-url http:\/\/extra-url\.com --extra-index-url http:\/\/another-url\.com/
+
+        when: "call freeze command"
+        pip.exec('freeze')
         then: "no flag applied"
-        logger.res =~ /\[python] python(3)? -m pip list --user/
+        logger.res =~ /\[python] python(3)? -m pip freeze --user/
 
         cleanup:
         pip.extraIndexUrls = []
@@ -101,12 +106,12 @@ class PipExecTest extends AbstractCliMockSupport {
     def "Check pip trustedHosts for installation"() {
         setup:
         mockExec(project, null, 0)
-        pip.trustedHosts = ["http://extra-url.com", "http://another-url.com"]
+        pip.trustedHosts = ["extra-url.com", "another-url.com"]
 
         when: "call install with extra index urls"
         pip.install('mod')
         then: "flag applied"
-        logger.res =~ /\[python] python(3)? -m pip install mod --user --trusted-host http:\/\/extra-url\.com --trusted-host http:\/\/another-url\.com/
+        logger.res =~ /\[python] python(3)? -m pip install mod --user --trusted-host extra-url\.com --trusted-host another-url\.com/
 
         when: "call different command"
         pip.exec('list')

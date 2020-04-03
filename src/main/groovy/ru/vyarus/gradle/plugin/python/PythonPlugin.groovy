@@ -100,8 +100,8 @@ class PythonPlugin implements Plugin<Project> {
                 // in case of virtualenv checkPython will manually disable it
                 userScope = { extension.scope != PythonExtension.Scope.GLOBAL }
                 useCache = { extension.usePipCache }
-                trustedHost = { extension.trustedHost }
-                extraIndexUrl = { extension.extraIndexUrl }
+                trustedHosts = { extension.trustedHosts }
+                extraIndexUrls = { extension.extraIndexUrls }
             }
         }
 

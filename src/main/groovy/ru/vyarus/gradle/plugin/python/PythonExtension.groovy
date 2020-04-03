@@ -62,6 +62,35 @@ class PythonExtension {
     boolean alwaysInstallModules
 
     /**
+     * By default, pip cache all installed packages. Sometimes this may lead to incorrect dependency version
+     * resolution (when newer version from cache installed instead of specified). Since pip 20 vcs dependencies
+     * (module build from vcs revision) are also cached, so if you need to force rebuild each time you will
+     * need to disable cache (may be useful for testing).
+     * <p>
+     * Essentially, disabling this option adds {@code --no-cache-dir} for all pip calls.
+     *
+     * @see <a href="https://pip.pypa.io/en/stable/reference/pip_install/#caching">--no-cache-dir</a>
+     */
+    boolean usePipCache = true
+
+    /**
+     * This can be used to if you host your own pypi besides the default global one.
+     * Applies to {@code pip install}, {@code pip download}, {@code pip list} and {@code pip wheel}.
+     *
+     * @see <a href="https://pip.pypa.io/en/stable/reference/pip_install/#install-extra-index-url">--extra-index-url</a>
+     */
+    List<String> extraIndexUrls
+
+    /**
+     * Mark a host as trusted for pip even when it has no tls, or the certificate is invalid.
+     * Can be used in combination with {@link #extraIndexUrls} to use your own pypi server.
+     * Applies only for {@code pip install} (other commends does not support this option).
+     *
+     * @see <a href="https://pip.pypa.io/en/stable/reference/pip/#trusted-host">--trusted-host</a>
+     */
+    List<String> trustedHosts
+
+    /**
      * Target scope for pip packages installation.
      */
     Scope scope = Scope.VIRTUALENV_OR_USER
@@ -99,33 +128,6 @@ class PythonExtension {
      * By default use default virtualenv behaviour: symlink environment.
      */
     boolean envCopy
-
-    /**
-     * This can be used to if you host your own pypi besides the default global one.
-     *
-     * https://pip.pypa.io/en/stable/reference/pip_install/#install-extra-index-url
-     */
-    List<String> extraIndexUrls
-
-    /**
-     * Mark a host as trusted for pip even when it has no tls, or the certificate is invalid.
-     * Can be used in combination with extraIndexUrl to use your own pypi server.
-     *
-     * https://pip.pypa.io/en/stable/reference/pip/#trusted-host
-     */
-    List<String> trustedHosts
-
-    /**
-     * By default, pip cache all installed packages. Sometimes this may lead to incorrect dependency version
-     * resolution (when newer version from cache installed instead of specified). Since pip 20 vcs dependencies
-     * (module build from vcs revision) are also cached, so if you need to force rebuild each time you will
-     * need to disable cache (may be useful for testing).
-     * <p>
-     * Essentially, disabling this option adds {@code --no-cache-dir} for all pip calls.
-     *
-     * @see <a href="https://pip.pypa.io/en/stable/reference/pip_install/#caching">--no-cache-dir</a>
-     */
-    boolean usePipCache = true
 
     PythonExtension(Project project) {
         // by default storing environment inside the root project and use relative path (for simpler logs)

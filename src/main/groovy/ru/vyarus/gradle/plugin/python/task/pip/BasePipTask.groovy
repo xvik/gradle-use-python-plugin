@@ -36,29 +36,35 @@ class BasePipTask extends BasePythonTask {
     boolean userScope
 
     /**
-     * Affects only {@link pip install} by applying {@code --no-cache-dir}. Disables cache during package resolution.
+     * Affects only {@code pip install} by applying {@code --no-cache-dir}. Disables cache during package resolution.
      * May be useful in problematic cases (when cache leads to incorrect version installation or to force vcs
      * modules re-building each time (pip 20 cache vcs resolved modules by default)).
      * <p>
-     * Enabled by default (see {@link ru.vyarus.gradle.plugin.python.PythonExtension#usePipCache)
+     * Enabled by default (see {@link ru.vyarus.gradle.plugin.python.PythonExtension#usePipCache )
      */
     @Input
     boolean useCache = true
 
     /**
-     * Affects only {@link pip install} by applying {@code --trusted-host}.
+     * Affects only {@code pip install} by applying {@code --trusted-host} (other pip commands does not support
+     * this option).
      * <p>
-     * No extra indec urls are given by default (see {@link ru.vyarus.gradle.plugin.python.PythonExtension#trustedHosts)
+     * No extra index urls are given by default (see
+     * {@link ru.vyarus.gradle.plugin.python.PythonExtension#trustedHosts )
      */
     @Input
+    @Optional
     List<String> trustedHosts = []
 
     /**
-     * Affects only {@link pip install} by applying {@code --extra-index-url}.
+     * Affects only {@code pip install}, {@code pip download}, {@code pip list} and {@code pip wheel} by applying
+     * {@code --extra-index-url}.
      * <p>
-     * No extra indec urls are given by default (see {@link ru.vyarus.gradle.plugin.python.PythonExtension#extraIndexUrls)
+     * No extra index urls are given by default (see
+     * {@link ru.vyarus.gradle.plugin.python.PythonExtension#extraIndexUrls )
      */
     @Input
+    @Optional
     List<String> extraIndexUrls = []
 
     /**
@@ -105,6 +111,9 @@ class BasePipTask extends BasePythonTask {
     @Memoized
     @SuppressWarnings('UnnecessaryGetter')
     protected Pip getPip() {
-        return new Pip(project, getPythonPath(), getPythonBinary(), getUserScope(), getUseCache(), getExtraIndexUrls(), getTrustedHosts())
+        Pip pip = new Pip(project, getPythonPath(), getPythonBinary(), getUserScope(), getUseCache())
+        pip.trustedHosts = getTrustedHosts()
+        pip.extraIndexUrls = getExtraIndexUrls()
+        pip
     }
 }

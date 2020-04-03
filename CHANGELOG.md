@@ -14,7 +14,8 @@
 * Add free options to `pipInstall`:  
   `pipInstall.options('--upgrade-strategy', 'only-if-needed')`.
   It is not possible to support every possible pip flag with api so this manual customization
-  is required to cover wider range of use-cases.     
+  is required to cover wider range of use-cases.
+* Fix gradle deprecation warnings on some tasks properties (#9)       
 
 ### 2.1.0 (2020-03-17)
 * Add environment variables support (#8):

@@ -12,6 +12,7 @@ import ru.vyarus.gradle.plugin.python.task.pip.module.ModuleFactory
  * @since 11.11.2017
  */
 @CompileStatic
+@SuppressWarnings('ConfusingMethodName')
 class PythonExtension {
 
     /**
@@ -69,7 +70,7 @@ class PythonExtension {
      * <p>
      * Essentially, disabling this option adds {@code --no-cache-dir} for all pip calls.
      *
-     * @see <a href="https://pip.pypa.io/en/stable/reference/pip_install/#caching" > --no-cache-dir</a>
+     * @see <a href="https://pip.pypa.io/en/stable/reference/pip_install/#caching">--no-cache-dir</a>
      */
     boolean usePipCache = true
 
@@ -77,7 +78,7 @@ class PythonExtension {
      * This can be used to if you host your own pypi besides the default global one.
      * Applies to {@code pip install}, {@code pip download}, {@code pip list} and {@code pip wheel}.
      *
-     * @see <a href="https://pip.pypa.io/en/stable/reference/pip_install/#install-extra-index-url" > --extra-index-url</a>
+     * @see <a href="https://pip.pypa.io/en/stable/reference/pip_install/#install-extra-index-url">--extra-index-url</a>
      */
     List<String> extraIndexUrls = []
 
@@ -86,7 +87,7 @@ class PythonExtension {
      * Can be used in combination with {@link #extraIndexUrls} to use your own pypi server.
      * Applies only for {@code pip install} (other commends does not support this option).
      *
-     * @see <a href="https://pip.pypa.io/en/stable/reference/pip/#trusted-host" > --trusted-host</a>
+     * @see <a href="https://pip.pypa.io/en/stable/reference/pip/#trusted-host">--trusted-host</a>
      */
     List<String> trustedHosts = []
 

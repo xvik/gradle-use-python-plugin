@@ -92,8 +92,21 @@ class BasePipTask extends BasePythonTask {
      * @return pip modules to install
      */
     @Internal
-    @Memoized
     protected List<PipModule> getModulesList() {
+        buildModulesList()
+    }
+
+    /**
+     * @return configured pip utility instance
+     */
+    @Internal
+    @SuppressWarnings('UnnecessaryGetter')
+    protected Pip getPip() {
+        buildPip()
+    }
+
+    @Memoized
+    private List<PipModule> buildModulesList() {
         Map<String, PipModule> mods = [:] // linked map
         // sequential parsing in order to override duplicate definitions
         // (latter defined module overrides previous definition) and preserve definition order
@@ -104,13 +117,8 @@ class BasePipTask extends BasePythonTask {
         return new ArrayList(mods.values())
     }
 
-    /**
-     * @return configured pip utility instance
-     */
-    @Internal
     @Memoized
-    @SuppressWarnings('UnnecessaryGetter')
-    protected Pip getPip() {
+    private Pip buildPip() {
         return new Pip(python, getUserScope(), getUseCache())
                 .trustedHosts(getTrustedHosts())
                 .extraIndexUrls(getExtraIndexUrls())

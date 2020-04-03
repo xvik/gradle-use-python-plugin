@@ -110,8 +110,12 @@ class BasePythonTask extends ConventionTask {
     }
 
     @Internal
-    @Memoized
     protected Python getPython() {
+        buildPython()
+    }
+
+    @Memoized
+    private Python buildPython() {
         new Python(project, getPythonPath(), getPythonBinary())
                 .logLevel(getLogLevel())
                 .workDir(getWorkDir())

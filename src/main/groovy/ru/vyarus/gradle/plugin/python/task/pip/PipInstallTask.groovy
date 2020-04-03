@@ -80,9 +80,13 @@ class PipInstallTask extends BasePipTask {
         }
     }
 
-    @Memoized
     @Internal
     protected List<String> getModulesToInstall() {
+        buildModulesToInstall()
+    }
+
+    @Memoized
+    private List<String> buildModulesToInstall() {
         List<String> res = []
         if (!modulesList.empty) {
             // use list of installed modules to check if 'pip install' is required for module

@@ -69,7 +69,7 @@ class PythonExtension {
      * <p>
      * Essentially, disabling this option adds {@code --no-cache-dir} for all pip calls.
      *
-     * @see <a href="https://pip.pypa.io/en/stable/reference/pip_install/#caching">--no-cache-dir</a>
+     * @see <a href="https://pip.pypa.io/en/stable/reference/pip_install/#caching" > --no-cache-dir</a>
      */
     boolean usePipCache = true
 
@@ -77,18 +77,18 @@ class PythonExtension {
      * This can be used to if you host your own pypi besides the default global one.
      * Applies to {@code pip install}, {@code pip download}, {@code pip list} and {@code pip wheel}.
      *
-     * @see <a href="https://pip.pypa.io/en/stable/reference/pip_install/#install-extra-index-url">--extra-index-url</a>
+     * @see <a href="https://pip.pypa.io/en/stable/reference/pip_install/#install-extra-index-url" > --extra-index-url</a>
      */
-    List<String> extraIndexUrls
+    List<String> extraIndexUrls = []
 
     /**
      * Mark a host as trusted for pip even when it has no tls, or the certificate is invalid.
      * Can be used in combination with {@link #extraIndexUrls} to use your own pypi server.
      * Applies only for {@code pip install} (other commends does not support this option).
      *
-     * @see <a href="https://pip.pypa.io/en/stable/reference/pip/#trusted-host">--trusted-host</a>
+     * @see <a href="https://pip.pypa.io/en/stable/reference/pip/#trusted-host" > --trusted-host</a>
      */
-    List<String> trustedHosts
+    List<String> trustedHosts = []
 
     /**
      * Target scope for pip packages installation.
@@ -101,7 +101,7 @@ class PythonExtension {
      */
     boolean installVirtualenv = true
     /**
-     * Used only when virtualenv is installed automatically ({@link #installVirtualenv). It's better to install
+     * Used only when virtualenv is installed automatically ({@link #installVirtualenv ). It's better to install
      * exact version, known to work well to avoid side effects. For example, virtualenv 20.0.x is a major rewrite and
      * it contains some minor regressions in behaviour (which would be fixed eventually, ofc).
      * <p>
@@ -166,6 +166,42 @@ class PythonExtension {
      */
     void pip(Iterable<String> modules) {
         this.modules.addAll(modules)
+    }
+
+    /**
+     * Shortcut for {@link #extraIndexUrls(java.lang.String [ ])}.
+     *
+     * @param urls extra pip repositories
+     */
+    void extraIndexUrls(String... urls) {
+        extraIndexUrls(Arrays.asList(urls))
+    }
+
+    /**
+     * Add additional pip repositories to use. Applies only for some pip tasks (see {@link #extraIndexUrls}).
+     *
+     * @param urls extra pip repositories
+     */
+    void extraIndexUrls(Iterable<String> urls) {
+        this.extraIndexUrls.addAll(urls)
+    }
+
+    /**
+     * Shortcut for {@link #trustedHosts(java.lang.Iterable)}.
+     *
+     * @param hosts trusted hosts (host only or with port).
+     */
+    void trustedHosts(String... hosts) {
+        trustedHosts(Arrays.asList(hosts))
+    }
+
+    /**
+     * Add trusted hosts for pip. Applies only for {@code pip install} (see {@link #trustedHosts}).
+     *
+     * @param hosts hosts trusted hosts (host only or with port).
+     */
+    void trustedHosts(Iterable<String> hosts) {
+        this.trustedHosts.addAll(hosts)
     }
 
     /**

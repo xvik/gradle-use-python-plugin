@@ -122,6 +122,32 @@ class PipInstallTaskKitTest extends AbstractKitTest {
         result.output =~ /python(3)? -m pip list/
     }
 
+    def "Check extra index urls and trusted hosts options "() {
+
+        setup:
+        build """
+            plugins {
+                id 'ru.vyarus.use-python'
+            }
+            
+            python {
+                scope = USER
+                pip 'click:6.7'
+                alwaysInstallModules = true
+                extraIndexUrls "http://extra-url.com"
+                trustedHosts "extra-url.com" 
+            }
+        """
+
+        when: "run task"
+        BuildResult result = run('pipInstall')
+
+        then: "arguments applied"
+        result.task(':checkPython').outcome == TaskOutcome.SUCCESS
+        result.task(':pipInstall').outcome == TaskOutcome.SUCCESS
+        result.output =~ /python(3)? -m pip install click==6.7 --user --extra-index-url http:\/\/extra-url.com --trusted-host extra-url.com/
+    }
+
     def "Check applying custom arguments"() {
 
         setup:

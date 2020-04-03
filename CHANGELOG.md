@@ -4,7 +4,17 @@
   to compatible pip commands.
 * Allow dashes in vcs module name (for example, now it is possible to specify `#egg=my-module-11.2`).
   NOTE: This may lead to problems with versions also containing dashes (1.1-alpha.1), but
-  it may be easily changed manually (to version without dashes: 1.1.alpha.1)  
+  it may be easily changed manually (to version without dashes: 1.1.alpha.1)
+* Move python configuration options from `PythonTask` to `BasePythonTask`:
+  `pythonArgs`, `environment`, `workDir`, `logLevel`. Now pip tasks could use 
+  these options to fine tune python execution (under pip call).
+  NOTE: extraArgs was not moved because exact tasks (like pipInstall) could perform
+  multiple commands calls and applying args to all of them is not correct (most likely, fail the build).
+  Instead, tasks must implement their own support for additional args.
+* Add free options to `pipInstall`:  
+  `pipInstall.options('--upgrade-strategy', 'only-if-needed')`.
+  It is not possible to support every possible pip flag with api so this manual customization
+  is required to cover wider range of use-cases.     
 
 ### 2.1.0 (2020-03-17)
 * Add environment variables support (#8):

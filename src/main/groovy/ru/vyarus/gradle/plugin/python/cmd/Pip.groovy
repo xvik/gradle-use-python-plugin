@@ -49,8 +49,12 @@ class Pip {
     }
 
     Pip(Project project, String pythonPath, String binary, boolean userScope, boolean useCache) {
-        python = new Python(project, pythonPath, binary)
-                .logLevel(LogLevel.LIFECYCLE)
+        this(new Python(project, pythonPath, binary).logLevel(LogLevel.LIFECYCLE), userScope, useCache)
+    }
+
+    // preferred way for construction because allows configured python instance re-usage
+    Pip(Python python, boolean userScope, boolean useCache) {
+        this.python = python
         this.userScope = userScope
         this.useCache = useCache
     }

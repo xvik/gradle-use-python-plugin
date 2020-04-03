@@ -25,6 +25,7 @@ class PipInstallTask extends BasePipTask {
      */
     @Console
     boolean showInstalledVersions
+
     /**
      * True to always call 'pip install' for configured modules, otherwise pip install called only
      * if module is not installed or different version installed.
@@ -32,6 +33,14 @@ class PipInstallTask extends BasePipTask {
      */
     @Input
     boolean alwaysInstallModules
+
+    /**
+     * Extra {@code pip install} arguments not covered directly by api.
+     * @see <a href="https://pip.pypa.io/en/stable/reference/pip_install/#options">options</a>
+     */
+    @Input
+    @Optional
+    List<String> options = []
 
     PipInstallTask() {
         onlyIf { !modulesList.empty }
@@ -41,7 +50,10 @@ class PipInstallTask extends BasePipTask {
 
     @TaskAction
     void run() {
+        pip.python.extraArgs(getOptions())
         modulesToInstall.each { pip.install(it) }
+        // apply options only for install calls! otherwise, following pip calls will fail
+        pip.python.clearExtraArgs()
 
         // could be at first run (upToDateWhen requires at least one task execution)
         if (modulesToInstall.empty) {
@@ -53,6 +65,18 @@ class PipInstallTask extends BasePipTask {
             // note: if some modules are already installed in global scope and user scope is used,
             // then global modules will not be shown
             pip.exec('list --format=columns')
+        }
+    }
+
+    /**
+     * Add extra {@code pip install} options, applied to command.
+     *
+     * @param args arguments
+     */
+    @SuppressWarnings('ConfusingMethodName')
+    void options(String... args) {
+        if (args) {
+            getOptions().addAll(args)
         }
     }
 

@@ -121,4 +121,30 @@ class PipInstallTaskKitTest extends AbstractKitTest {
         result.output.contains('Requirement already satisfied: click==6.7')
         result.output =~ /python(3)? -m pip list/
     }
+
+    def "Check applying custom arguments"() {
+
+        setup:
+        build """
+            plugins {
+                id 'ru.vyarus.use-python'
+            }
+            
+            python {
+                scope = USER
+                pip 'click:6.7'
+                alwaysInstallModules = true
+            }
+            
+            pipInstall.options('--upgrade-strategy', 'only-if-needed')
+        """
+
+        when: "run task"
+        BuildResult result = run('pipInstall')
+
+        then: "arguments applied"
+        result.task(':checkPython').outcome == TaskOutcome.SUCCESS
+        result.task(':pipInstall').outcome == TaskOutcome.SUCCESS
+        result.output =~ /python(3)? -m pip install click==6.7 --user --upgrade-strategy only-if-needed/
+    }
 }

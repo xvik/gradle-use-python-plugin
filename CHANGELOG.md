@@ -1,7 +1,8 @@
+### 2.2.0 (2020-04-06)
 * Add support for `pip` flags: [--trusted-host](https://pip.pypa.io/en/stable/reference/pip/#trusted-host) 
   and [--extra-index-url](https://pip.pypa.io/en/stable/reference/pip_install/#install-extra-index-url) (#10)
-  May be set in `python` extension or directly for `pip` tasks. Flags applied only 
-  to compatible pip commands.
+  May be set in `python` extension or directly for `pip` tasks (`extraIndexUrls`, `trustedHosts`). 
+  Flags applied only to compatible pip commands.
 * Allow dashes in vcs module name (for example, now it is possible to specify `#egg=my-module-11.2`).
   NOTE: This may lead to problems with versions also containing dashes (1.1-alpha.1), but
   it may be easily changed manually (to version without dashes: 1.1.alpha.1)
@@ -16,7 +17,7 @@
   It is not possible to support every possible pip flag with api so this manual customization
   is required to cover wider range of use-cases.
 * Fix gradle deprecation warnings on some tasks properties (#9)
-* Add environment variables configuration in extension: `python.envVar 'SAMPLE', 'value'`
+* Add environment variables configuration in extension: `python.environment 'SAMPLE', 'value'`
 * Fix checkPython execution when running from daemon (gradle work dir may differ from project root:
   confirmed case with gradle 6 on java 11).
 * Use relative path to virtualenv when possible instead of always absolute          

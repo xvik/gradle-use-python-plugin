@@ -52,7 +52,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'ru.vyarus:gradle-use-python-plugin:2.1.0'
+        classpath 'ru.vyarus:gradle-use-python-plugin:2.2.0'
     }
 }
 apply plugin: 'ru.vyarus.use-python'
@@ -62,7 +62,7 @@ OR
 
 ```groovy
 plugins {
-    id 'ru.vyarus.use-python' version '2.1.0'
+    id 'ru.vyarus.use-python' version '2.2.0'
 }
 ```  
 
@@ -72,7 +72,7 @@ Plugin compiled for java 8, compatible with java 11
 
 Gradle | Version
 --------|-------
-5-6     | 2.1.0
+5-6     | 2.2.0
 4.x     | [1.2.0](https://github.com/xvik/gradle-use-python-plugin/tree/1.2.0)
 
 #### Snapshots
@@ -351,6 +351,10 @@ Declares module `boson` version `0.9`, installed from git commit `b52727f7170acb
 `pipInstall` will be considered up-to-date if `boson==0.9` is already installed. Note that declared module version
 is completely free: you can set any version (0.10, 1.2, etc.), it is not checked and used only for up-to-date validation. 
 
+WARNING: module version part assumed to follow the last dash, so if you specify version like
+`somethinf-12.0-alpha.1` it would be parsed incorrectly (as package `somethinf-12.0` version `alpha.1`)!
+Don't use dashes in a version!
+
 Vcs module installation is: source checkout and module build (using setup.py). You may need to specify subdirectory
 as `&subdirectory=pkg_dir` ([see docs](https://pip.pypa.io/en/stable/reference/pip_install/#vcs-support))
 
@@ -369,6 +373,73 @@ disable it with `python.alwaysInstallModules = true` (pip always called). But th
 NOTE: since pip 20, compiled vcs module is cached (before it was build on each execution), but
 it is possible to disable cache (for all modules) with `python.usePipCache=false` configuration
 (applies [--no-cache-dir](https://pip.pypa.io/en/stable/reference/pip_install/#caching) pip flag)
+
+#### Extra pip repositories
+
+To add additional pip repositories (probably self-hosted):
+
+```groovy
+python {
+    extraIndexUrls = ["http://extra-url.com", "http://extra-url.com"]
+}
+```
+
+or with shortcut method (shortcut may be used multiple times):
+
+```groovy
+python {
+    extraIndexUrls "http://extra-url.com", "http://extra-url2.com" 
+}
+```
+
+Extra urls will be applied as [--extra-index-url](https://pip.pypa.io/en/stable/reference/pip_install/#install-extra-index-url)
+flag for pip commands supporting it: install, download, list and wheel. By default, it only affects `pipInstall` and `pipList` tasks.
+Applied for all `BasePipTask`, so if you have custom pip tasks, it would be affected too.
+
+In case of ssl problems (stale or self-signed certificated), mark domains as trusted:
+
+```groovy
+python {
+    trustedHosts = ["extra-url.com"]
+}
+```
+
+or
+
+```groovy
+python {
+    trustedHosts "extra-url.com"
+}
+```
+
+Applied as [--trusted-host](https://pip.pypa.io/en/stable/reference/pip/#trusted-host)
+option only for `pipInstall` (because `pip install` is the only command supporting this option).
+
+NOTE: if, for some reason, you don't want to specify it for all pip tasks, you can configure exact task,
+for example: `pipInstall.extraIndexUrls = ["http://extra-url.com", "http://extra-url2.com"]`
+
+#### Extra pip install options
+
+It is impossible to support directly all possible `pip install` [options](https://pip.pypa.io/en/stable/reference/pip_install/#options) 
+usages directly with api (safe way), so there is a direct configuration for an additional options. For example:
+
+```groovy
+pipInstall.options('--upgrade-strategy', 'only-if-needed')
+```
+
+Shortcut method above may be called multiple times:
+
+```groovy
+pipInstall.options('--a', 'value')
+pipInstall.options('--b', 'value')
+```
+
+Or you can use property directly:
+
+```groovy
+pipInstall.options = ['--a', 'value', '--b', 'value']
+```
+
 
 #### Virtualenv
 
@@ -564,6 +635,9 @@ Map based declaration (`environment(['foo': 'bar', 'baz': 'bag'])`) does not rem
 
 System variables will be available even after declaring custom variables (of course, custom variables could override global value).
 
+NOTE: environment variable could also be declared in extension to apply for all python commands:
+`python.environment 'some', 1` (if environments declared both globally (through extension) and directly on task, they would be merged)
+
 #### Configuration
 
 ##### Python location
@@ -614,7 +688,7 @@ python {
 ##### Pip
 
 By default, all installed python modules are printed to console after pip installations 
-using `pip list` (of course, if at least one module were declared for installation).
+using `pip list` (of course, if at least one module declared for installation).
 This should simplify problems resolution (show used transitive dependencies versions).
 
 To switch off:
@@ -656,6 +730,8 @@ python {
    pythonPath
    // python binary name (python or python3 by default)
    pythonBinary
+   // additional environment variables, visible for all python commands
+   environment = [:]
    
    // minimal required python version (m.m.m)
    minPythonVersion
@@ -666,6 +742,13 @@ python {
    showInstalledVersions = true
    // always call module install, even if correct version is already installed
    alwaysInstallModules = false
+   // may be used to disable pip cache (--no-cache-dir option)
+   usePipCache = true
+   // additional pip repositories (--extra-index-url option)
+   extraIndexUrls = []
+   // trusted hosts for pip install (--trusted-host option)
+   trustedHosts = []
+
    
     // pip modules installation scope (project local, os user dir, global) 
    scope = VIRTUALENV_OR_USER
@@ -677,9 +760,7 @@ python {
    // used virtualenv path (if virtualenv used, see 'scope')
    envPath = '.gradle/python'
    // copy virtualenv instead of symlink (when created)
-   envCopy = false
-   // may be used to disable pip cache (--no-cache-dir option)
-   usePipCache = true 
+   envCopy = false   
 }
 ```
 
@@ -729,13 +810,22 @@ Configuration:
 |----------|-------------|
 | pythonPath | Path to python binary. By default used path declared in global configuration |
 | pythonBinary | Python binary name. By default, python3 on linux and python otherwise. |
+| pythonArgs | Extra python arguments applied just after python binary. Useful for declaring common python options (-I, -S, etc.) |
+| environment | Process specific environment variables |
 | modules | Modules to install. In most cases configured indirectly with `pip(..)` task methods. By default, modules from global configuration. |
 | userScope | Use current user scope (`--user` flag). Enabled by default to avoid permission problems on *nix (global configuration). |
 | showInstalledVersions | Perform `pip list` after installation. By default use global configuration value |
 | alwaysInstallModules | Call `pip install module` for all declared modules, even if it is already installed with correct version. By default use global configuration value |
 | useCache | Can be used to disable pip cache (--no-cache-dir) |
+| extraIndexUrls | Additional pip repositories (--extra-index-url) |
+/ trustedHosts / trusted hosts (--trusted-host) /
+/ options / additional pip install options /
 
-And, as shown above, custom methods: `pip(String... modules)` and `pip(Iterable<String> modules)`
+And, as shown above, custom methods: 
+
+* `pip(String... modules)`
+* `pip(Iterable<String> modules)`
+* `options(String... options)`
 
 ### Use as base for specific module plugin
 
@@ -748,7 +838,7 @@ In your plugin, add plugin as dependency:
 
 ```groovy
 dependencies {
-    implementation 'ru.vyarus:gradle-use-python-plugin:2.0.0'
+    implementation 'ru.vyarus:gradle-use-python-plugin:2.2.0'
 }
 ```
 

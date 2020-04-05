@@ -81,7 +81,7 @@ class PythonPlugin implements Plugin<Project> {
                     pythonPath = { extension.pythonPath }
                     pythonBinary = { extension.pythonBinary }
                     // important to copy map because each task must have independent instance
-                    environment = { extension.envVars ? new HashMap<>(extension.envVars) : null }
+                    environment = { extension.environment ? new HashMap<>(extension.environment) : null }
                 }
                 // all python tasks must be executed after check task to use correct environment (switch to virtualenv)
                 if (task.taskIdentity.type != CheckPythonTask) {

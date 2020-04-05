@@ -32,7 +32,7 @@ class PythonExtension {
      * System environment variables for executed python process (variables specified in gradle's
      * {@link org.gradle.process.ExecSpec#environment(java.util.Map)} during python process execution).
      */
-    Map<String, Object> envVars = [:]
+    Map<String, Object> environment = [:]
 
     /**
      * Minimal required python version. Full format: "major.minor.micro". Any precision could be used, for example:
@@ -218,8 +218,8 @@ class PythonExtension {
      * @param var variable name
      * @param value variable value
      */
-    void envVar(String var, Object value) {
-        envVars.put(var, value)
+    void environment(String var, Object value) {
+        environment.put(var, value)
     }
 
     /**

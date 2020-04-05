@@ -94,7 +94,7 @@ class PythonTaskEnvironmentKitTest extends AbstractKitTest {
                 id 'ru.vyarus.use-python'
             }
             
-            python.envVar 'some', 1
+            python.environment 'some', 1
 
             task sample(type: PythonTask) {
                 command = "-c \\"import os;print('variables: '+os.getenv('some', 'null')+' '+os.getenv('foo', 'null'))\\""

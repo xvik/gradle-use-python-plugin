@@ -12,6 +12,8 @@ import ru.vyarus.gradle.plugin.python.util.DurationFormatter
 import ru.vyarus.gradle.plugin.python.util.OutputLogger
 import ru.vyarus.gradle.plugin.python.util.PythonExecutionFailed
 
+import java.nio.file.Paths
+
 /**
  * Python commands execution utility. Use global python or binary in provided python path.
  * <p>
@@ -57,11 +59,12 @@ class Python {
 
     Python(Project project, String pythonPath, String binary) {
         this.project = project
-        this.executable = getPythonBinary(project, CliUtils.canonicalPath(pythonPath), binary)
+        String normalizedPath = pythonPath == null ? null : Paths.get(pythonPath).normalize().toString()
+        this.executable = getPythonBinary(project, normalizedPath, binary)
         // direct executable must be called with cmd (https://docs.gradle.org/4.1/dsl/org.gradle.api.tasks.Exec.html)
-        this.withCmd = pythonPath && Os.isFamily(Os.FAMILY_WINDOWS)
+        this.withCmd = normalizedPath && Os.isFamily(Os.FAMILY_WINDOWS)
         // custom python path used (which may be relative and conflict with workDir)
-        this.customBinaryPath = pythonPath as boolean
+        this.customBinaryPath = normalizedPath as boolean
     }
 
     /**
@@ -254,6 +257,16 @@ class Python {
     }
 
     /**
+     * By default, working dir should be set to project root on execution
+     * (see {@link org.gradle.process.ExecSpec).
+     *
+     * @return current working directory or null if not defined.
+     */
+    String getWorkDir() {
+        return workDir
+    }
+
+    /**
      * Warning: it is NOT based on {@link #getHomeDir()} which may return not actual python installation dir.
      * Binary dir extracted from actual python execution ({@code sys.executable}). Note that {@code sys.executable}
      * MAY return empty string instead and in this case binary path would be guessed from {@link #getHomeDir()}.
@@ -342,7 +355,7 @@ class Python {
         // on win non global python could be called only through cmd
         String exec = withCmd ? 'cmd'
                 // use absolute python path if work dir set (relative will simply not work)
-                : (wrkDirUsed && customBinaryPath ? project.file(executable).canonicalPath : executable)
+                : (wrkDirUsed && customBinaryPath ? CliUtils.canonicalPath(project.file(executable)) : executable)
         String[] cmd = withCmd ?
                 CliUtils.wincmdArgs(executable, project.projectDir, prepareArgs(args), wrkDirUsed)
                 : prepareArgs(args)
@@ -449,8 +462,8 @@ class Python {
             List<String> res = readScriptOutput(cmd)
             // remove possible relative section from path (/dd/dd/../tt -> /dd/tt)
             // without following symlinks (very important!)
-            res.set(1, CliUtils.canonicalPath(res.get(1)))
-            res.set(2, CliUtils.canonicalPath(res.get(2)))
+            res.set(1, CliUtils.canonicalPath(project.rootDir.absolutePath, res.get(1)))
+            res.set(2, CliUtils.canonicalPath(project.rootDir.absolutePath, res.get(2)))
 
             return res
         }

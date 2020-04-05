@@ -17,8 +17,9 @@
   is required to cover wider range of use-cases.
 * Fix gradle deprecation warnings on some tasks properties (#9)
 * Add environment variables configuration in extension: `python.envVar 'SAMPLE', 'value'`
-* Fix python tasks execution from gradle daemon: by default, set `workDir` for all python tasks 
-  to project root dir (in case of multi project - also current project dir, not root project)        
+* Fix checkPython execution when running from daemon (gradle work dir may differ from project root:
+  confirmed case with gradle 6 on java 11).
+* Use relative path to virtualenv when possible instead of always absolute          
 
 ### 2.1.0 (2020-03-17)
 * Add environment variables support (#8):

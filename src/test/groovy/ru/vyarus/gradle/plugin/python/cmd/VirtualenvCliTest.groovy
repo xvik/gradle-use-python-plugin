@@ -67,7 +67,7 @@ class VirtualenvCliTest extends AbstractTest {
         Virtualenv env = new Virtualenv(project, 'env')
         then: "path correct"
         env.path == 'env'
-        env.pythonPath == CliUtils.canonicalPath(isWin ? 'env/Scripts' : 'env/bin')
+        env.pythonPath == CliUtils.canonicalPath(project.rootDir.absolutePath, isWin ? 'env/Scripts' : 'env/bin')
 
         then: "version correct"
         env.version =~ /\d+\.\d+\.\d+/

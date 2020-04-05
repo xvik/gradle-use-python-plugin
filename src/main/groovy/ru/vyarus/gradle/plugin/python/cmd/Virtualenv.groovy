@@ -6,6 +6,8 @@ import org.gradle.api.Project
 import org.gradle.api.logging.LogLevel
 import ru.vyarus.gradle.plugin.python.util.CliUtils
 
+import java.nio.file.Paths
+
 /**
  * Pip commands execution utility. Use {@link Python} internally.
  *
@@ -17,6 +19,7 @@ class Virtualenv {
 
     public static final String PIP_NAME = 'virtualenv'
 
+    private final Project project
     private final Python python
 
     // module name
@@ -37,6 +40,7 @@ class Virtualenv {
      * @param path environment path (relative to project or absolute)
      */
     Virtualenv(Project project, String pythonPath, String binary, String path) {
+        this.project = project
         python = new Python(project, pythonPath, binary)
                 .logLevel(LogLevel.LIFECYCLE)
         this.path = path
@@ -44,6 +48,17 @@ class Virtualenv {
             throw new IllegalArgumentException('Virtualenv path not set')
         }
         location = project.file(path)
+    }
+
+    /**
+     * Shortcut for {@link Python#workDir(java.lang.String)}.
+     *
+     * @param workDir python working directory
+     * @return virtualenv instance for chained calls
+     */
+    Virtualenv workDir(String workDir) {
+        python.workDir(workDir)
+        return this
     }
 
     /**
@@ -112,7 +127,10 @@ class Virtualenv {
      */
     @Memoized
     String getPythonPath() {
-        return CliUtils.pythonBinPath(path)
+        String res = CliUtils.pythonBinPath(location.absolutePath)
+        return Paths.get(path).absolute ? res
+                // use shorter relative path
+                : project.relativePath(res)
     }
 
     /**

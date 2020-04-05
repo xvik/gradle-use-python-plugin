@@ -173,15 +173,14 @@ final class CliUtils {
     /**
      * Prepare arguments to call python with cmd.
      *
-     * @param executable python executable
+     * @param exec python exec (absolute path)
      * @param projectHome project home directory
      * @param args python arguments
      * @return arguments for cmd
      */
     static String[] wincmdArgs(String executable, File projectHome, String[] args, boolean workDirUsed) {
-        // it could be absolute or relative path
-        File file = executable.contains(':/') || executable.contains(':\\') ?
-                new File(executable) : new File(projectHome, executable)
+        // important to resolve relative to project dir
+        File file = Paths.get(executable).absolute ? new File(executable) : new File(projectHome, executable)
         // manual check to unify win/linux behaviour
         if (!file.exists()) {
             throw new ExecException("Cannot run program \"$executable\": error=2, No such file or directory")
@@ -192,43 +191,51 @@ final class CliUtils {
     }
 
     /**
-     * Shortcut for {@link #canonicalPath(java.io.File)}.
+     * Shortcut for {@link #canonicalPath(java.lang.String, java.lang.String)}.
      *
      * @param file file to get canonical path for
      * @return canonical path for file without following symlinks
      */
     static String canonicalPath(File file) {
-        canonicalPath(file.absolutePath)
+        canonicalPath(null, file.absolutePath)
     }
 
     /**
      * Format canonical path WITHOUT following symlinks (which {@link File#getCanonicalPath()} do). Used to
      * remove redundant ".." parts in path.
-     * <p>
-     * Relative path will remain relative!
      *
+     * @param home home dir (may be null if path is absolute)
      * @param file file or directory path
-     * @return canonical path
+     * @return canonical path (absolute) if target path exists and path as is if not
      */
-    static String canonicalPath(String file) {
+    static String canonicalPath(String home, String file) {
         String path = file?.trim()
         if (!path) {
             return path
         }
-        Path target = Paths.get(path)
+        // important to resolve file relative to project home, because work dir may be gradle daemon root.
+        Path relative = Paths.get(file)
+        if (!relative.absolute && home == null) {
+            throw new IllegalArgumentException('Home dir not specified for relative path validation: ' + file)
+        }
+        Path target = relative.absolute ? relative : new File(home, file).toPath()
         if (Files.exists(target)) {
+            // use absolute path
             return target.toRealPath(LinkOption.NOFOLLOW_LINKS).normalize().toString()
         }
         // return not existing path as is
-        return target.normalize().toString()
+        return relative.normalize().toString()
     }
 
     /**
-     * @param pythonHome python home path
+     * @param pythonHome python home path (always absolute)
      * @return python binaries path relative to provided python home
      */
     static String pythonBinPath(String pythonHome) {
-        canonicalPath(Os.isFamily(Os.FAMILY_WINDOWS) ? "$pythonHome/Scripts" : "$pythonHome/bin")
+        if (!Paths.get(pythonHome).absolute) {
+            throw new IllegalArgumentException('Non absolute home path provided: ' + pythonHome)
+        }
+        canonicalPath(null, Os.isFamily(Os.FAMILY_WINDOWS) ? "$pythonHome/Scripts" : "$pythonHome/bin")
     }
 
     private static boolean isPositionMatch(String[] ver, String[] req, int pos) {

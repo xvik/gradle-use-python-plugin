@@ -61,6 +61,17 @@ class Pip {
     }
 
     /**
+     * Shortcut for {@link Python#workDir(java.lang.String)}.
+     *
+     * @param workDir python working directory
+     * @return pip instance for chained calls
+     */
+    Pip workDir(String workDir) {
+        python.workDir(workDir)
+        return this
+    }
+
+    /**
      * Apply extra pip repositories (--extra-index-url). Applies only for commands supporting it.
      *
      * @param urls urls to pip repositories.

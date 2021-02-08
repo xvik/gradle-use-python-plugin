@@ -49,7 +49,7 @@ patched pip packages in some distributions.
 ```groovy
 buildscript {
     repositories {
-        jcenter()
+        mavenCentral()
     }
     dependencies {
         classpath 'ru.vyarus:gradle-use-python-plugin:2.2.0'

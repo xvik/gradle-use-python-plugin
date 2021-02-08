@@ -215,11 +215,11 @@ class PythonExtension {
     /**
      * Shortcut to set environment variables for all python tasks.
      *
-     * @param var variable name
+     * @param name variable name
      * @param value variable value
      */
-    void environment(String var, Object value) {
-        environment.put(var, value)
+    void environment(String name, Object value) {
+        environment.put(name, value)
     }
 
     /**

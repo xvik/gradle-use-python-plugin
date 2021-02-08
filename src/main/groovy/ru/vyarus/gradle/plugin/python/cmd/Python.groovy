@@ -146,12 +146,12 @@ class Python {
      * <p>
      * Specified variables could be cleared with {@link #clearEnvironment()}.
      *
-     * @param var environment variable
+     * @param name environment variable
      * @param value variable value
      * @return cli instance for chained calls
      */
-    Python environment(String var, Object value) {
-        envVars.put(var, value)
+    Python environment(String name, Object value) {
+        envVars.put(name, value)
         return this
     }
 

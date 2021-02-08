@@ -90,13 +90,13 @@ class BasePythonTask extends ConventionTask {
     /**
      * Add environment variable for python process (will override previously set value).
      *
-     * @param var variable name
+     * @param name variable name
      * @param value variable value
      */
     @SuppressWarnings('ConfusingMethodName')
-    void environment(String var, Object value) {
+    void environment(String name, Object value) {
         // do like this to unify variables logic (including potential global vars from extension)
-        environment([(var): value])
+        environment([(name): value])
     }
 
     /**

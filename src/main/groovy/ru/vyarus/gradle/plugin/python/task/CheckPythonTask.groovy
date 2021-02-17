@@ -160,7 +160,7 @@ class CheckPythonTask extends BasePipTask {
         }
 
         if (!python.isVirtualenv()) {
-            throw new GradleException("Convfigured environment is not a virtualenv: ${env.location.absolutePath}. " +
+            throw new GradleException("Configured environment is not a virtualenv: ${env.location.absolutePath}. " +
                     'Most likely, issue appear due to incorrect `python.envPath` configuration.')
         }
     }

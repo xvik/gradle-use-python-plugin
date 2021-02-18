@@ -119,7 +119,7 @@ class PythonExtension {
      * it manually then you know what you are doing, otherwise "known to be working" version should be installed to
      * avoid problems.
      */
-    String virtualenvVersion = '16.7.9'
+    String virtualenvVersion = '20.4.2'
     /**
      * Virtual environment path to use. Used only when {@link #scope} is configured to use virtualenv.
      * Virtualenv will be created automatically if not yet exists.

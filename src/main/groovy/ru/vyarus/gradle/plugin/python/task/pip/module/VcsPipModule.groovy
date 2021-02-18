@@ -39,4 +39,15 @@ class VcsPipModule extends PipModule {
     String toPipInstallString() {
         return declaration
     }
+
+    @Override
+    String toPipString() {
+        // Behavior changed near pip 21: now pip -freeze always show exact version path, instead of pure version!
+        // todo must be pip version dependent
+
+        // Separator would be always present due to forced validation in
+        // ru.vyarus.gradle.plugin.python.task.pip.module.ModuleFactory.parseVcsModule
+        String hash = declaration[0..declaration.lastIndexOf('#') - 1]
+        return "$name @ $hash"
+    }
 }

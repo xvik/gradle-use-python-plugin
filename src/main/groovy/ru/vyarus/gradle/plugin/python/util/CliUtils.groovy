@@ -4,10 +4,7 @@ import groovy.transform.CompileStatic
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.process.internal.ExecException
 
-import java.nio.file.Files
-import java.nio.file.LinkOption
-import java.nio.file.Path
-import java.nio.file.Paths
+import java.nio.file.*
 
 /**
  * Cli helper utilities.
@@ -220,8 +217,15 @@ final class CliUtils {
         }
         Path target = relative.absolute ? relative : new File(home, file).toPath()
         if (Files.exists(target)) {
-            // use absolute path
-            return target.toRealPath(LinkOption.NOFOLLOW_LINKS).normalize().toString()
+            try {
+                // use absolute path
+                return target.toRealPath(LinkOption.NOFOLLOW_LINKS).normalize().toString()
+            } catch (AccessDeniedException ignored) {
+                // can't correctly access path. NP, using original path instead (hopefully its ok).
+                // As an example, this happens for windows python installations from windows store (where
+                // prefix points to not accessible path)
+                return target
+            }
         }
         // return not existing path as is
         return relative.normalize().toString()

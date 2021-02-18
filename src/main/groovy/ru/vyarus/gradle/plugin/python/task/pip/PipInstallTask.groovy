@@ -97,6 +97,7 @@ class PipInstallTask extends BasePipTask {
             modulesList.each { PipModule mod ->
                 // don't install if already installed (assume dependencies are also installed)
                 if (!installed.contains(mod.toPipString().toLowerCase())) {
+                    logger.info('Required pip module not installed: {}', mod)
                     res.add(mod.toPipInstallString())
                 }
             }

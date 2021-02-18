@@ -67,7 +67,7 @@ class ModuleParseTest extends Specification {
         res.name == 'MyProject'
         res.version == '6.6'
         res.toString() == "MyProject 6.6 (git+https://git.example.com/MyProject@v1.0#egg=MyProject)"
-        res.toPipString() == 'MyProject==6.6'
+        res.toPipString() == 'MyProject @ git+https://git.example.com/MyProject@v1.0'
         res.toPipInstallString() == res.declaration
 
         when:
@@ -77,7 +77,7 @@ class ModuleParseTest extends Specification {
         res.name == 'MyProject'
         res.version == '6.6'
         res.toString() == "MyProject 6.6 (git+https://git.example.com/MyProject@v1.0#egg=MyProject&subdirectory=pkg_dir)"
-        res.toPipString() == "MyProject==6.6"
+        res.toPipString() == "MyProject @ git+https://git.example.com/MyProject@v1.0"
         res.toPipInstallString() == res.declaration
     }
 
@@ -90,7 +90,7 @@ class ModuleParseTest extends Specification {
         res.name == 'MyProject'
         res.version == '6.6'
         res.toString() == "MyProject 6.6 (git+https://git.example.com/MyProject@v1.0#egg=MyProject)"
-        res.toPipString() == 'MyProject==6.6'
+        res.toPipString() == 'MyProject @ git+https://git.example.com/MyProject@v1.0'
         res.toPipInstallString() == res.declaration
     }
 
@@ -103,7 +103,7 @@ class ModuleParseTest extends Specification {
         res.name == 'my-project'
         res.version == '6.6'
         res.toString() == "my-project 6.6 (git+https://git.example.com/my-project@v1.0#egg=my-project)"
-        res.toPipString() == 'my-project==6.6'
+        res.toPipString() == 'my-project @ git+https://git.example.com/my-project@v1.0'
         res.toPipInstallString() == res.declaration
     }
 

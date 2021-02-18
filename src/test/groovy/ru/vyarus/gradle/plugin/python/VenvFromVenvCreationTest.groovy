@@ -22,7 +22,7 @@ class VenvFromVenvCreationTest extends AbstractTest {
         Virtualenv env2 = new Virtualenv(project, env.pythonPath, null, "second")
         env2.python.extraArgs('-v') // enable logs
         Pip pip = new Pip(project, env.pythonPath, null, false)
-        pip.install(env2.name + "==16.7.9")
+        pip.install(env2.name + "==20.4.0")
         env2.createPythonOnly()
 
         when: "validating pip in second environment"

@@ -120,7 +120,7 @@ class PythonPluginTest extends AbstractTest {
         then: "one module"
         res.size() == 1
         res[0] instanceof VcsPipModule
-        res[0].toPipString() == "foo==2"
+        res[0].toPipString() == "foo @ git+https://git.example.com/foo@v2.0"
 
 
         when: "opposite override"

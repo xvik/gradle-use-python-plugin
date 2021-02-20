@@ -24,7 +24,7 @@ class PythonUsedInSubmoduleKitTest extends AbstractKitTest {
                 apply plugin: 'ru.vyarus.use-python' 
                 
                 python {
-                    pip 'click:6.7'
+                    pip 'extract-msg:0.28.0'
                 }
                 
                 task sample(type: PythonTask) {
@@ -39,7 +39,7 @@ class PythonUsedInSubmoduleKitTest extends AbstractKitTest {
 
         then: "task successful"
         result.task(':sub:sample').outcome == TaskOutcome.SUCCESS
-        result.output =~ /click\s+6.7/
+        result.output =~ /extract-msg\s+0.28.0/
         result.output.contains('samplee')
 
         then: "virtualenv created at the root level"
@@ -64,7 +64,7 @@ class PythonUsedInSubmoduleKitTest extends AbstractKitTest {
             subprojects {
                         
                  python {
-                    pip 'click:6.7'
+                    pip 'extract-msg:0.28.0'
                 }
                                                                                 
                 task sample(type: PythonTask) {
@@ -79,7 +79,7 @@ class PythonUsedInSubmoduleKitTest extends AbstractKitTest {
 
         then: "task successful"
         result.task(':sub:sample').outcome == TaskOutcome.SUCCESS
-        result.output =~ /click\s+6.7/
+        result.output =~ /extract-msg\s+0.28.0/
         result.output.contains('samplee')
 
         then: "virtualenv created at the root level"
@@ -108,7 +108,7 @@ class PythonUsedInSubmoduleKitTest extends AbstractKitTest {
             }
             
             python {
-                pip 'click:6.7'
+                pip 'extract-msg:0.28.0'
             }
             
             task rsample(type: PythonTask) {
@@ -122,7 +122,7 @@ class PythonUsedInSubmoduleKitTest extends AbstractKitTest {
 
         then: "task successful"
         result.task(':rsample').outcome == TaskOutcome.SUCCESS
-        result.output =~ /click\s+6.7/
+        result.output =~ /extract-msg\s+0.28.0/
         result.output.contains('rsamplee')
 
 
@@ -131,7 +131,7 @@ class PythonUsedInSubmoduleKitTest extends AbstractKitTest {
 
         then: "task successful"
         result.task(':sub:sample').outcome == TaskOutcome.SUCCESS
-        !(result.output =~ /click\s+6.7/)
+        !(result.output =~ /extract-msg\s+0.28.0/)
         result.output.contains('samplee')
 
         then: "virtualenv created at the root level"
@@ -155,7 +155,7 @@ class PythonUsedInSubmoduleKitTest extends AbstractKitTest {
                 python {
                     envPath = 'python'
                     
-                    pip 'click:6.7'
+                    pip 'extract-msg:0.28.0'
                 }
                                                                                            
                 task sample(type: PythonTask) {
@@ -169,7 +169,7 @@ class PythonUsedInSubmoduleKitTest extends AbstractKitTest {
 
         then: "task successful"
         result.task(':sub:sample').outcome == TaskOutcome.SUCCESS
-        result.output =~ /click\s+6.7/
+        result.output =~ /extract-msg\s+0.28.0/
         result.output.contains('samplee')
 
         then: "virtualenv created at module level"
@@ -193,7 +193,7 @@ class PythonUsedInSubmoduleKitTest extends AbstractKitTest {
             
             subprojects {  
                 python {
-                    pip 'click:6.7'
+                    pip 'extract-msg:0.28.0'
                 }
                                                                                      
                 task sample(type: PythonTask) {

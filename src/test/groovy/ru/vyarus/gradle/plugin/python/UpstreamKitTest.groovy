@@ -20,7 +20,7 @@ class UpstreamKitTest extends AbstractKitTest {
 
             python {
                 scope = USER
-                pip 'click:6.7'
+                pip 'extract-msg:0.28.0'
             }
             
             task sample(type: PythonTask) {
@@ -34,7 +34,7 @@ class UpstreamKitTest extends AbstractKitTest {
 
         then: "task successful"
         result.task(':sample').outcome == TaskOutcome.SUCCESS
-        result.output =~ /click\s+6.7/
+        result.output =~ /extract-msg\s+0.28.0/
         result.output.contains('samplee')
     }
 }

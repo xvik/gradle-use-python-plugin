@@ -100,7 +100,7 @@ class WorkflowKitTest extends AbstractKitTest {
                 id 'ru.vyarus.use-python'
             }
                    
-            python.pip 'click:6.7'     
+            python.pip 'extract-msg:0.28.0'     
             python.pythonPath = '${env.pythonPath.replace("\\", "\\\\")}'
             python.installVirtualenv = false
         """
@@ -123,7 +123,7 @@ class WorkflowKitTest extends AbstractKitTest {
             }
                      
             python.envCopy = true
-            python.pip 'click:6.7'
+            python.pip 'extract-msg:0.28.0'
         """
 
         when: "run task"
@@ -146,7 +146,7 @@ class WorkflowKitTest extends AbstractKitTest {
             }
                         
             python.pythonPath = '${env.pythonPath.replace("\\", "\\\\")}'            
-            python.pip 'click:6.7'
+            python.pip 'extract-msg:0.28.0'
         """
 
         when: "run task"
@@ -166,7 +166,7 @@ class WorkflowKitTest extends AbstractKitTest {
                 id 'ru.vyarus.use-python'
             }
                         
-            python.pip 'click:6.7'
+            python.pip 'extract-msg:0.28.0'
         """
 
         when: "run task"
@@ -190,7 +190,7 @@ class WorkflowKitTest extends AbstractKitTest {
                 pythonPath = '${env.pythonPath.replace("\\", "\\\\")}'
                 installVirtualenv = false
                 scope = VIRTUALENV             
-                pip 'click:6.7'
+                pip 'extract-msg:0.28.0'
             }
         """
 

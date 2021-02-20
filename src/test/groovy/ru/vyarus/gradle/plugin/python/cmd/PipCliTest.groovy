@@ -19,14 +19,14 @@ class PipCliTest extends AbstractTest {
         true
 
         when: "pip install"
-        pip.install('click==6.7')
+        pip.install('extract-msg==0.28.0')
         then: "ok"
-        pip.isInstalled('click')
+        pip.isInstalled('extract-msg')
 
         when: "pip uninstall"
-        pip.uninstall('click')
+        pip.uninstall('extract-msg')
         then: "ok"
-        !pip.isInstalled('click')
+        !pip.isInstalled('extract-msg')
     }
 
     def "Check pip utils"() {

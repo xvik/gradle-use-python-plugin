@@ -15,7 +15,7 @@ class PipInstallTaskKitTest extends AbstractKitTest {
     @Override
     def setup() {
         // make sure correct version installed
-        new Pip(ProjectBuilder.builder().build()).install('click==6.7')
+        new Pip(ProjectBuilder.builder().build()).install('extract-msg==0.28.0')
     }
 
     def "Check no declared modules"() {
@@ -47,7 +47,7 @@ class PipInstallTaskKitTest extends AbstractKitTest {
             }
 
             python {
-                pip 'click:6.7'
+                pip 'extract-msg:0.28.0'
                 scope = USER
                 showInstalledVersions = false
             }
@@ -60,7 +60,7 @@ class PipInstallTaskKitTest extends AbstractKitTest {
         then: "no all modules list printed"
         result.task(':checkPython').outcome == TaskOutcome.SUCCESS
         result.task(':pipInstall').outcome == TaskOutcome.SUCCESS
-        !result.output.contains('python -m pip install click')
+        !result.output.contains('python -m pip install extract-msg')
         !result.output.contains('python -m pip list')
 
         when: "run one more time"
@@ -80,7 +80,7 @@ class PipInstallTaskKitTest extends AbstractKitTest {
 
             python {
                 scope = USER
-                pip 'click:6.7'
+                pip 'extract-msg:0.28.0'
                 alwaysInstallModules = true
             }
 
@@ -89,10 +89,10 @@ class PipInstallTaskKitTest extends AbstractKitTest {
         when: "run task"
         BuildResult result = run('pipInstall')
 
-        then: "click install called"
+        then: "extract-msg install called"
         result.task(':checkPython').outcome == TaskOutcome.SUCCESS
         result.task(':pipInstall').outcome == TaskOutcome.SUCCESS
-        result.output.contains('Requirement already satisfied: click==6.7')
+        result.output.contains('Requirement already satisfied: extract-msg==0.28.0')
         result.output =~ /python(3)? -m pip list/
     }
 
@@ -106,7 +106,7 @@ class PipInstallTaskKitTest extends AbstractKitTest {
             python.scope = USER
             
             task customPip(type: PipInstallTask) {                
-                pip 'click:6.7'
+                pip 'extract-msg:0.28.0'
                 alwaysInstallModules = true
             }
 
@@ -115,10 +115,10 @@ class PipInstallTaskKitTest extends AbstractKitTest {
         when: "run task"
         BuildResult result = run('customPip')
 
-        then: "click install called"
+        then: "extract-msg install called"
         result.task(':checkPython').outcome == TaskOutcome.SUCCESS
         result.task(':customPip').outcome == TaskOutcome.SUCCESS
-        result.output.contains('Requirement already satisfied: click==6.7')
+        result.output.contains('Requirement already satisfied: extract-msg==0.28.0')
         result.output =~ /python(3)? -m pip list/
     }
 
@@ -132,7 +132,7 @@ class PipInstallTaskKitTest extends AbstractKitTest {
             
             python {
                 scope = USER
-                pip 'click:6.7'
+                pip 'extract-msg:0.28.0'
                 alwaysInstallModules = true
                 extraIndexUrls "http://extra-url.com"
                 trustedHosts "extra-url.com" 
@@ -145,7 +145,7 @@ class PipInstallTaskKitTest extends AbstractKitTest {
         then: "arguments applied"
         result.task(':checkPython').outcome == TaskOutcome.SUCCESS
         result.task(':pipInstall').outcome == TaskOutcome.SUCCESS
-        result.output =~ /python(3)? -m pip install click==6.7 --user --extra-index-url http:\/\/extra-url.com --trusted-host extra-url.com/
+        result.output =~ /python(3)? -m pip install extract-msg==0.28.0 --user --extra-index-url http:\/\/extra-url.com --trusted-host extra-url.com/
     }
 
     def "Check applying custom arguments"() {
@@ -158,7 +158,7 @@ class PipInstallTaskKitTest extends AbstractKitTest {
             
             python {
                 scope = USER
-                pip 'click:6.7'
+                pip 'extract-msg:0.28.0'
                 alwaysInstallModules = true
             }
             
@@ -171,6 +171,6 @@ class PipInstallTaskKitTest extends AbstractKitTest {
         then: "arguments applied"
         result.task(':checkPython').outcome == TaskOutcome.SUCCESS
         result.task(':pipInstall').outcome == TaskOutcome.SUCCESS
-        result.output =~ /python(3)? -m pip install click==6.7 --user --upgrade-strategy only-if-needed/
+        result.output =~ /python(3)? -m pip install extract-msg==0.28.0 --user --upgrade-strategy only-if-needed/
     }
 }

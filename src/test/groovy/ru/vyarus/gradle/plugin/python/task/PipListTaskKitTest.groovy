@@ -16,7 +16,7 @@ class PipListTaskKitTest extends AbstractKitTest {
 
         setup:
         // to show at least something
-        new Pip(ProjectBuilder.builder().build()).install('click==6.6')
+        new Pip(ProjectBuilder.builder().build()).install('extract-msg==0.28.0')
 
         build """
             plugins {
@@ -29,17 +29,17 @@ class PipListTaskKitTest extends AbstractKitTest {
         when: "run task"
         BuildResult result = run('pipList')
 
-        then: "click update detected"
+        then: "extract-msg update detected"
         result.task(':pipList').outcome == TaskOutcome.SUCCESS
         result.output.contains('pip list --format=columns --user')
-        result.output =~ /click\s+6.6/
+        result.output =~ /extract-msg\s+0.28.0/
     }
 
     def "Check list all task"() {
 
         setup:
         // to show at least something
-        new Pip(ProjectBuilder.builder().build()).install('click==6.6')
+        new Pip(ProjectBuilder.builder().build()).install('extract-msg==0.28.0')
 
         build """
             plugins {
@@ -54,9 +54,9 @@ class PipListTaskKitTest extends AbstractKitTest {
         when: "run task"
         BuildResult result = run('pipList')
 
-        then: "click update detected"
+        then: "extract-msg update detected"
         result.task(':pipList').outcome == TaskOutcome.SUCCESS
         !result.output.contains('pip list --format=columns --user')
-        result.output =~ /click\s+6.6/
+        result.output =~ /extract-msg\s+0.28.0/
     }
 }

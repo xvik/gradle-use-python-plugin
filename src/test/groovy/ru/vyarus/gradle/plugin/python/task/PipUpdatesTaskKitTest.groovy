@@ -17,7 +17,7 @@ class PipUpdatesTaskKitTest extends AbstractKitTest {
 
         setup:
         // make sure old version installed
-        new Pip(ProjectBuilder.builder().build()).install('click==6.6')
+        new Pip(ProjectBuilder.builder().build()).install('extract-msg==0.28.0')
 
         build """
             plugins {
@@ -26,7 +26,7 @@ class PipUpdatesTaskKitTest extends AbstractKitTest {
 
             python {
                 scope = USER
-                pip 'click:6.6'
+                pip 'extract-msg:0.28.0'
             }
 
         """
@@ -34,10 +34,10 @@ class PipUpdatesTaskKitTest extends AbstractKitTest {
         when: "run task"
         BuildResult result = run('pipUpdates')
 
-        then: "click update detected"
+        then: "extract-msg update detected"
         result.task(':pipUpdates').outcome == TaskOutcome.SUCCESS
         result.output.contains('The following modules could be updated:')
-        result.output =~ /click\s+6.6/
+        result.output =~ /extract-msg\s+0.28.0/
     }
 
     def "Check updates detected in environment"() {
@@ -50,7 +50,7 @@ class PipUpdatesTaskKitTest extends AbstractKitTest {
 
             python {
                 scope = VIRTUALENV
-                pip 'click:6.6'
+                pip 'extract-msg:0.28.0'
             }
 
         """
@@ -59,16 +59,16 @@ class PipUpdatesTaskKitTest extends AbstractKitTest {
         BuildResult result = run('pipInstall')
         then: "installed"
         result.task(':pipInstall').outcome == TaskOutcome.SUCCESS
-        result.output.contains('pip install click')
+        result.output.contains('pip install extract-msg')
 
 
         when: "run task"
         result = run('pipUpdates')
 
-        then: "click update detected"
+        then: "extract-msg update detected"
         result.task(':pipUpdates').outcome == TaskOutcome.SUCCESS
         result.output.contains('The following modules could be updated:')
-        result.output =~ /click\s+6.6/
+        result.output =~ /extract-msg\s+0.28.0/
     }
 
     def "Check no modules"() {
@@ -92,7 +92,7 @@ class PipUpdatesTaskKitTest extends AbstractKitTest {
 
         setup:
         // use the latest version
-        new Python(ProjectBuilder.builder().build()).callModule('pip', 'install click --upgrade --user')
+        new Python(ProjectBuilder.builder().build()).callModule('pip', 'install extract-msg --upgrade --user')
 
         build """
             plugins {
@@ -101,7 +101,7 @@ class PipUpdatesTaskKitTest extends AbstractKitTest {
 
             python {
                 scope = USER
-                pip 'click:6.7' // version does not matter here
+                pip 'extract-msg:0.28.0' // version does not matter here
             }
 
         """
@@ -118,7 +118,7 @@ class PipUpdatesTaskKitTest extends AbstractKitTest {
 
         setup:
         // use the latest version
-        new Pip(ProjectBuilder.builder().build()).install('click==6.6')
+        new Pip(ProjectBuilder.builder().build()).install('extract-msg==0.28.0')
 
         build """
             plugins {

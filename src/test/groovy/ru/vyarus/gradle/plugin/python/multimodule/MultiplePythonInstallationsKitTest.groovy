@@ -28,7 +28,7 @@ class MultiplePythonInstallationsKitTest extends AbstractKitTest {
 
                     // here different python version could be configured, but for test it's not important
                     
-                    pip 'click:6.7'
+                    pip 'extract-msg:0.28.0'
                 }
                 
                 task sample(type: PythonTask) {
@@ -42,7 +42,7 @@ class MultiplePythonInstallationsKitTest extends AbstractKitTest {
 
         then: "task successful"
         result.task(':sub1:sample').outcome == TaskOutcome.SUCCESS
-        result.output =~ /click\s+6.7/
+        result.output =~ /extract-msg\s+0.28.0/
         result.output.contains('samplee')
         result.output.contains("${projectName()}${File.separator}sub1${File.separator}python")
 
@@ -52,7 +52,7 @@ class MultiplePythonInstallationsKitTest extends AbstractKitTest {
 
         then: "task successful"
         result.task(':sub2:sample').outcome == TaskOutcome.SUCCESS
-        result.output =~ /click\s+6.7/
+        result.output =~ /extract-msg\s+0.28.0/
         result.output.contains('samplee')
         result.output.contains("${projectName()}${File.separator}sub2${File.separator}python")
     }

@@ -141,7 +141,15 @@ class CheckPythonTask extends BasePipTask {
                     pip.python.binaryDir, ext.envPath)
         }
 
-        logger.lifecycle("Using virtualenv $env.version ($ext.envPath)")
+        logger.lifecycle("Using $env.versionLine (in '$ext.envPath')")
+
+        if (!CliUtils.isVersionMatch(env.version, ext.minVirtualenvVersion)) {
+            throw new GradleException("Installed virtualenv verion $env.version does not match minimal " +
+                    "required version: $ext.minVirtualenvVersion. Use 'pip install -U virtualenv==" +
+                    "${ext.virtualenvVersion}' to upgrade virtualenv. Or just remove virtualenv and plugin will " +
+                    "install the correct version itself")
+        }
+
         // symlink by default (copy if requested by user config)
         env.create(ext.envCopy)
         return true

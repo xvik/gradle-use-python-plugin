@@ -7,6 +7,8 @@ import org.gradle.api.logging.LogLevel
 import ru.vyarus.gradle.plugin.python.util.CliUtils
 
 import java.nio.file.Paths
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 
 /**
  * Pip commands execution utility. Use {@link Python} internally.
@@ -16,6 +18,8 @@ import java.nio.file.Paths
  */
 @CompileStatic
 class Virtualenv {
+
+    private static final Pattern VERSION = Pattern.compile('virtualenv ([\\d.]+)')
 
     public static final String PIP_NAME = 'virtualenv'
 
@@ -66,7 +70,24 @@ class Virtualenv {
      */
     @Memoized
     String getVersion() {
-        python.withHiddenLog {
+        // first try to parse line to avoid duplicate python call
+        Matcher matcher = VERSION.matcher(versionLine)
+        if (matcher.find()) {
+            // note: this will drop beta postfix (e.g. for 10.0.0b2 version will be 10.0.0)
+            return matcher.group(1)
+        }
+        // if can't recognize version, ask directly
+        return python.withHiddenLog {
+            python.readOutput("-c \"import $name; print(${name}.__version__)\"")
+        }
+    }
+
+    /**
+     * @return virtualenv --version output
+     */
+    @Memoized
+    String getVersionLine() {
+        return python.withHiddenLog {
             python.readOutput("-m $name --version")
         }
     }

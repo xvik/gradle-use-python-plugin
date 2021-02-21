@@ -121,6 +121,18 @@ class PythonExtension {
      */
     String virtualenvVersion = '20.4.2'
     /**
+     * Minimal required virtualenv version. It is important to use virtualenv 20 instead of 16 or older because
+     * it was a complete rewrite (and now it is stable enough). The most important moment is pip installation
+     * behaviour: virtualenv &lt;=15  was always downloading the latest pip which compromise build stability.
+     * Moreover, pip 21 drops python 2 support, so using old virtualenv with it would always lead to
+     * unusable environment.
+     * <p>
+     * Used exact version 20.0.11 because it fixes Windows Store compatibility
+     * (https://github.com/pypa/virtualenv/issues/1709). But specified version could actually have any precision:
+     * e.g. '20' or '20.1'.
+     */
+    String minVirtualenvVersion = '20.0.11'
+    /**
      * Virtual environment path to use. Used only when {@link #scope} is configured to use virtualenv.
      * Virtualenv will be created automatically if not yet exists.
      * <p>

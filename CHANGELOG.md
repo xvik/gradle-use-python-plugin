@@ -1,6 +1,10 @@
 * Support python installation from Windows Store (#14)
 * Changed virtualenv version used by default from 16.7.9 to 20.4.2
   (because only recent versions could work correctly with python installed from Windows Store)
+* Add minimal required virtualenv check: by defautl it's virtualenv 20.0.11 (compatible with Windows Store python)
+  Configured with python.minVirtualenvVersion. Important because v20 changes pip installation
+    strategy in environment to the same version as bundled with virtualenv instead of always
+    downloading new pip (extremely important for python 2 support because pip 21 does not support it anymore)
 
 ### 2.2.0 (2020-04-06)
 * Add support for `pip` flags: [--trusted-host](https://pip.pypa.io/en/stable/reference/pip/#trusted-host) 

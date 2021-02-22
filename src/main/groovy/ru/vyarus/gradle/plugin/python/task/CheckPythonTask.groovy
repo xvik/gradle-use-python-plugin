@@ -147,7 +147,7 @@ class CheckPythonTask extends BasePipTask {
             throw new GradleException("Installed virtualenv verion $env.version does not match minimal " +
                     "required version: $ext.minVirtualenvVersion. Use 'pip install -U virtualenv==" +
                     "${ext.virtualenvVersion}' to upgrade virtualenv. Or just remove virtualenv and plugin will " +
-                    "install the correct version itself")
+                    'install the correct version itself')
         }
 
         // symlink by default (copy if requested by user config)

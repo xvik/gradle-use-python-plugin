@@ -51,8 +51,23 @@ class PipModule {
      * Must be used for module up to date detection.
      *
      * @return module declaration in pip format
+     * @deprecated freeze command output changed in pip 21 for vcs modules and so now exact pip version is required
+     * for proper up-to-date check
      */
+    @Deprecated
     String toPipString() {
+        return toFreezeString()
+    }
+
+    /**
+     * Module record as it appears in {@code pip freeze} command.
+     * Must be used for module up to date detection.
+     *
+     * @param pipVersion current pip version (because command output could change)
+     * @return module declaration in the same format as freeze will print
+     */
+    @SuppressWarnings('UnusedMethodParameter')
+    String toFreezeString(String pipVersion = '21') {
         // exact version matching!
         // pip will re-install even newer package to an older version
         return "$name==$version"
@@ -64,7 +79,7 @@ class PipModule {
      * @return module installation declaration
      */
     String toPipInstallString() {
-        return toPipString()
+        return "$name==$version"
     }
 
     boolean equals(Object o) {

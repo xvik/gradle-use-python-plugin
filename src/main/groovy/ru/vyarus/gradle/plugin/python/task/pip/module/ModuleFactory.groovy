@@ -70,7 +70,7 @@ class ModuleFactory {
      *
      * @param desc descriptor
      * @return parsed module instance
-     * @see <ahref="https://pip.pypa.io/en/stable/reference/pip_install/#vcs-support"  >  pip vsc support</a>
+     * @see <a href="https://pip.pypa.io/en/stable/reference/pip_install/#vcs-support"  >  pip vsc support</a>
      */
     private static PipModule parseVcsModule(String desc) {
         if (!desc.contains('@')) {

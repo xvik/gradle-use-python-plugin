@@ -2,6 +2,7 @@ package ru.vyarus.gradle.plugin.python.task.pip.module
 
 import groovy.transform.CompileStatic
 import ru.vyarus.gradle.plugin.python.task.pip.PipModule
+import ru.vyarus.gradle.plugin.python.util.CliUtils
 
 /**
  * Supported vsc module format: vcs+protocol://repo_url/@vcsVersion#egg=pkg-pkgVersion. It requires both commit version
@@ -41,13 +42,16 @@ class VcsPipModule extends PipModule {
     }
 
     @Override
-    String toPipString() {
-        // Behavior changed near pip 21: now pip -freeze always show exact version path, instead of pure version!
-        // todo must be pip version dependent
+    String toFreezeString(String pipVersion) {
+        if (CliUtils.isVersionMatch(pipVersion, '21')) {
+            // In pip 21 freeze command shows exact version path, instead of pure version!
 
-        // Separator would be always present due to forced validation in
-        // ru.vyarus.gradle.plugin.python.task.pip.module.ModuleFactory.parseVcsModule
-        String hash = declaration[0..declaration.lastIndexOf('#') - 1]
-        return "$name @ $hash"
+            // Separator would be always present due to forced validation in
+            // ru.vyarus.gradle.plugin.python.task.pip.module.ModuleFactory.parseVcsModule
+            String hash = declaration[0..declaration.lastIndexOf('#') - 1]
+            return "$name @ $hash"
+        }
+        // older pips didn't differentiate vcs modules
+        return super.toFreezeString(pipVersion)
     }
 }

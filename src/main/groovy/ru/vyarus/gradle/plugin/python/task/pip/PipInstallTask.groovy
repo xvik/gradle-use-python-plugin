@@ -95,8 +95,14 @@ class PipInstallTask extends BasePipTask {
                     : pip.inGlobalScope { pip.readOutput('freeze') } as String).toLowerCase().readLines()
             // install modules
             modulesList.each { PipModule mod ->
+                boolean found = false
+                mod.toFreezeStrings().each {
+                    if (installed.contains(it.toLowerCase())) {
+                        found = true
+                    }
+                }
                 // don't install if already installed (assume dependencies are also installed)
-                if (!installed.contains(mod.toFreezeString(pip.version).toLowerCase())) {
+                if (!found) {
                     logger.info('Required pip module not installed: {}', mod)
                     res.add(mod.toPipInstallString())
                 }

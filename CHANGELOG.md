@@ -5,6 +5,7 @@
   Configured with python.minVirtualenvVersion. Important because v20 changes pip installation
     strategy in environment to the same version as bundled with virtualenv instead of always
     downloading new pip (extremely important for python 2 support because pip 21 does not support it anymore)
+* Fix up-to-date check in pipInstall task for VCS modules (the latest pip changed freeze output syntax)  
 
 ### 2.2.0 (2020-04-06)
 * Add support for `pip` flags: [--trusted-host](https://pip.pypa.io/en/stable/reference/pip/#trusted-host) 

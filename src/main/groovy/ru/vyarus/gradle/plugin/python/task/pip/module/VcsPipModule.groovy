@@ -2,7 +2,6 @@ package ru.vyarus.gradle.plugin.python.task.pip.module
 
 import groovy.transform.CompileStatic
 import ru.vyarus.gradle.plugin.python.task.pip.PipModule
-import ru.vyarus.gradle.plugin.python.util.CliUtils
 
 /**
  * Supported vsc module format: vcs+protocol://repo_url/@vcsVersion#egg=pkg-pkgVersion. It requires both commit version
@@ -42,16 +41,16 @@ class VcsPipModule extends PipModule {
     }
 
     @Override
-    String toFreezeString(String pipVersion) {
-        if (CliUtils.isVersionMatch(pipVersion, '21')) {
-            // In pip 21 freeze command shows exact version path, instead of pure version!
+    List<String> toFreezeStrings() {
+        List<String> res = super.toFreezeStrings()
+        // In pip 21 (actually latest 20.x and 19.x too) freeze command shows exact version path,
+        // instead of pure version!
 
-            // Separator would be always present due to forced validation in
-            // ru.vyarus.gradle.plugin.python.task.pip.module.ModuleFactory.parseVcsModule
-            String hash = declaration[0..declaration.lastIndexOf('#') - 1]
-            return "$name @ $hash"
-        }
-        // older pips didn't differentiate vcs modules
-        return super.toFreezeString(pipVersion)
+        // Separator would be always present due to forced validation in
+        // ru.vyarus.gradle.plugin.python.task.pip.module.ModuleFactory.parseVcsModule
+        String hash = declaration[0..declaration.lastIndexOf('#') - 1]
+        // put new syntax first
+        res.add(0, "$name @ $hash" as String)
+        return res
     }
 }

@@ -56,21 +56,21 @@ class PipModule {
      */
     @Deprecated
     String toPipString() {
-        return toFreezeString()
+        return toFreezeStrings()[0]
     }
 
     /**
      * Module record as it appears in {@code pip freeze} command.
-     * Must be used for module up to date detection.
+     * Must be used for module up to date detection. Multiple results required to properly support
+     * changed pip output syntax between versions.
      *
      * @param pipVersion current pip version (because command output could change)
-     * @return module declaration in the same format as freeze will print
+     * @return list of possible module declarations in the same format as freeze will print
      */
-    @SuppressWarnings('UnusedMethodParameter')
-    String toFreezeString(String pipVersion = '21') {
+    List<String> toFreezeStrings() {
         // exact version matching!
         // pip will re-install even newer package to an older version
-        return "$name==$version"
+        return ["$name==$version" as String]
     }
 
     /**

@@ -13,8 +13,9 @@ environment:
 
 install:
   - set PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%
-  - pip install -U virtualenv==20.4.2
-  - pip install codecov --user
+  - python --version
+  - python -m pip install -U virtualenv==20.4.2
+  - python -m pip install codecov --user
 
 build_script:
   - ./gradlew assemble --no-daemon

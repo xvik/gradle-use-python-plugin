@@ -19,7 +19,7 @@ class ModuleParseTest extends Specification {
         PipModule mod = PipModule.parse('click:6.7')
         then: "parsed"
         mod.toString() == 'click 6.7'
-        mod.toFreezeString() == 'click==6.7'
+        mod.toFreezeStrings() == ['click==6.7']
         mod.toPipInstallString() == 'click==6.7'
 
         when: "error declaration"
@@ -67,8 +67,7 @@ class ModuleParseTest extends Specification {
         res.name == 'MyProject'
         res.version == '6.6'
         res.toString() == "MyProject 6.6 (git+https://git.example.com/MyProject@v1.0#egg=MyProject)"
-        res.toFreezeString() == 'MyProject @ git+https://git.example.com/MyProject@v1.0'
-        res.toFreezeString('20') == 'MyProject==6.6'
+        res.toFreezeStrings() == ['MyProject @ git+https://git.example.com/MyProject@v1.0', 'MyProject==6.6']
         res.toPipInstallString() == res.declaration
 
         when:
@@ -78,8 +77,7 @@ class ModuleParseTest extends Specification {
         res.name == 'MyProject'
         res.version == '6.6'
         res.toString() == "MyProject 6.6 (git+https://git.example.com/MyProject@v1.0#egg=MyProject&subdirectory=pkg_dir)"
-        res.toFreezeString() == "MyProject @ git+https://git.example.com/MyProject@v1.0"
-        res.toFreezeString('20') == 'MyProject==6.6'
+        res.toFreezeStrings() == ["MyProject @ git+https://git.example.com/MyProject@v1.0", 'MyProject==6.6']
         res.toPipInstallString() == res.declaration
     }
 
@@ -92,8 +90,7 @@ class ModuleParseTest extends Specification {
         res.name == 'MyProject'
         res.version == '6.6'
         res.toString() == "MyProject 6.6 (git+https://git.example.com/MyProject@v1.0#egg=MyProject)"
-        res.toFreezeString() == 'MyProject @ git+https://git.example.com/MyProject@v1.0'
-        res.toFreezeString('20') == 'MyProject==6.6'
+        res.toFreezeStrings() == ['MyProject @ git+https://git.example.com/MyProject@v1.0', 'MyProject==6.6']
         res.toPipInstallString() == res.declaration
     }
 
@@ -106,8 +103,7 @@ class ModuleParseTest extends Specification {
         res.name == 'my-project'
         res.version == '6.6'
         res.toString() == "my-project 6.6 (git+https://git.example.com/my-project@v1.0#egg=my-project)"
-        res.toFreezeString() == 'my-project @ git+https://git.example.com/my-project@v1.0'
-        res.toFreezeString('20') == 'my-project==6.6'
+        res.toFreezeStrings() == ['my-project @ git+https://git.example.com/my-project@v1.0', 'my-project==6.6']
         res.toPipInstallString() == res.declaration
     }
 
@@ -173,7 +169,7 @@ class ModuleParseTest extends Specification {
         mod.version == '2.18.4'
         mod.name == 'requests'
         mod.toString() == 'requests[socks,security] 2.18.4'
-        mod.toFreezeString() == 'requests==2.18.4'
+        mod.toFreezeStrings() == ['requests==2.18.4']
         mod.toPipInstallString() == 'requests[socks,security]==2.18.4'
     }
 

@@ -87,9 +87,15 @@ class Virtualenv {
      */
     @Memoized
     String getVersionLine() {
-        return python.withHiddenLog {
+        // virtualenv 20 returns long version string including location path
+        String res = python.withHiddenLog {
             python.readOutput("-m $name --version")
         }
+        // virtualenv 16 and below return only raw version (backwards compatibility)
+        if (!res.startsWith(name)) {
+            res = "$name $res"
+        }
+        return res
     }
 
     /**

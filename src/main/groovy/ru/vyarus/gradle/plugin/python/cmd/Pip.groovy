@@ -5,6 +5,7 @@ import groovy.transform.Memoized
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.logging.LogLevel
+import ru.vyarus.gradle.plugin.python.util.CliUtils
 import ru.vyarus.gradle.plugin.python.util.PythonExecutionFailed
 
 import java.util.regex.Matcher
@@ -58,6 +59,9 @@ class Pip {
         this.python = python
         this.userScope = userScope
         this.useCache = useCache
+
+        // do not show passwords when external indexes used with credentials
+        python.logCommandCleaner { CliUtils.hidePipCredentials(it) }
     }
 
     /**

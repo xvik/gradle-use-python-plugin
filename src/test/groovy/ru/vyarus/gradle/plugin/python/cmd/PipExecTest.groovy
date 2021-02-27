@@ -103,6 +103,34 @@ class PipExecTest extends AbstractCliMockSupport {
         pip.extraIndexUrls = []
     }
 
+    def "Check pip extraIndexUrls with credentials"() {
+        setup:
+        mockExec(project, null, 0)
+        pip.extraIndexUrls = ["http://user:pass@extra-url.com"]
+
+        when: "call install with extra index urls"
+        pip.install('mod')
+        then: "flag applied"
+        logger.res =~ /\[python] python(3)? -m pip install mod --user --extra-index-url http:\/\/user:\*{5}@extra-url\.com/
+
+        cleanup:
+        pip.extraIndexUrls = []
+    }
+
+    def "Check pip extraIndexUrls with multiple credentials"() {
+        setup:
+        mockExec(project, null, 0)
+        pip.extraIndexUrls = ["http://user:pass@extra-url.com", "https://user22:pass22@another-url.com"]
+
+        when: "call list with extra index urls"
+        pip.exec('list')
+        then: "flag applied"
+        logger.res =~ /\[python] python(3)? -m pip list --user --extra-index-url http:\/\/user:\*{5}@extra-url\.com --extra-index-url https:\/\/user22:\*{5}@another-url\.com/
+
+        cleanup:
+        pip.extraIndexUrls = []
+    }
+
     def "Check pip trustedHosts for installation"() {
         setup:
         mockExec(project, null, 0)

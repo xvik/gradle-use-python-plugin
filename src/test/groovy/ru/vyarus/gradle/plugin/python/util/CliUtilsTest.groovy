@@ -72,11 +72,11 @@ class CliUtilsTest extends Specification {
         boolean isWindows = Os.isFamily(Os.FAMILY_WINDOWS)
 
         expect: 'wrapped'
-        CliUtils.wrapCommand('print(\'sample\')') == (isWindows ? 'print(\'sample\')': 'exec("print(\'sample\')")')
-        CliUtils.wrapCommand('"print(\'sample\')"') == (isWindows ? '"print(\'sample\')"': 'exec("print(\'sample\')")')
+        CliUtils.wrapCommand('print(\'sample\')') == (isWindows ? 'print(\'sample\')' : 'exec("print(\'sample\')")')
+        CliUtils.wrapCommand('"print(\'sample\')"') == (isWindows ? '"print(\'sample\')"' : 'exec("print(\'sample\')")')
         CliUtils.wrapCommand('exec("print(\'sample\')")') == 'exec("print(\'sample\')")'
-        CliUtils.wrapCommand('import sys;print(sys.prefix)') == (isWindows? 'import sys;print(sys.prefix)': 'exec("import sys;print(sys.prefix)")')
-        CliUtils.wrapCommand('"import sys;print(sys.prefix+\"smaple\")"') == (isWindows ? '"import sys;print(sys.prefix+"smaple")"' :'exec("import sys;print(sys.prefix+"smaple")")')
+        CliUtils.wrapCommand('import sys;print(sys.prefix)') == (isWindows ? 'import sys;print(sys.prefix)' : 'exec("import sys;print(sys.prefix)")')
+        CliUtils.wrapCommand('"import sys;print(sys.prefix+\"smaple\")"') == (isWindows ? '"import sys;print(sys.prefix+"smaple")"' : 'exec("import sys;print(sys.prefix+"smaple")")')
     }
 
     def "Check command line parsing"() {
@@ -122,5 +122,23 @@ class CliUtilsTest extends Specification {
 
         cleanup:
         home.deleteDir()
+    }
+
+    def "Check credentials cleanup"() {
+
+        expect:
+        CliUtils.hidePipCredentials(cmd) == res
+
+        where:
+        cmd                                                                                                                         | res
+        'something else'                                                                                                            | 'something else'
+        '-m pip no urls'                                                                                                            | '-m pip no urls'
+        '-m pip something --extra-index-url http://some-url.com'                                                                    | '-m pip something --extra-index-url http://some-url.com'
+        '-m pip something --extra-index-url http://user:pass@some-url.com'                                                          | '-m pip something --extra-index-url http://user:*****@some-url.com'
+        '-m pip something --extra-index-url  http://user:pass@some-url.com'                                                         | '-m pip something --extra-index-url  http://user:*****@some-url.com'
+        '-m pip something --extra-index-url http://user:pass@some-url.com --extra-index-url http://user2:pass2@another-url.com'     | '-m pip something --extra-index-url http://user:*****@some-url.com --extra-index-url http://user2:*****@another-url.com'
+        '-m pip something --extra-index-url https://user:pass@some-url.com'                                                         | '-m pip something --extra-index-url https://user:*****@some-url.com'
+        '-m pip something --extra-index-url http://user:pass@some-url.com something else'                                           | '-m pip something --extra-index-url http://user:*****@some-url.com something else'
+        '-m pip --extra-index-url http://user:pass@some-url.com something --extra-index-url http://user2:pass2@another-url.com end' | '-m pip --extra-index-url http://user:*****@some-url.com something --extra-index-url http://user2:*****@another-url.com end'
     }
 }

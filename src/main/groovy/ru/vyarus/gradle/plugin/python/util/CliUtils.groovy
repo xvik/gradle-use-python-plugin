@@ -5,6 +5,8 @@ import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.process.internal.ExecException
 
 import java.nio.file.*
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 
 /**
  * Cli helper utilities.
@@ -19,6 +21,7 @@ final class CliUtils {
     private static final String SPACE = ' '
     private static final String VERSION_SPLIT = '\\.'
     private static final String BACKSLASH = '\\'
+    private static final Pattern PIP_CREDENTIALS = Pattern.compile(' --extra-index-url +https?://[^:]+:([^@]+)@')
 
     private CliUtils() {
     }
@@ -240,6 +243,34 @@ final class CliUtils {
             throw new IllegalArgumentException('Non absolute home path provided: ' + pythonHome)
         }
         canonicalPath(null, Os.isFamily(Os.FAMILY_WINDOWS) ? "$pythonHome/Scripts" : "$pythonHome/bin")
+    }
+
+    /**
+     * Hides credentials from external index urls in pip commands (pip do the same in its output).
+     * For example: {@code python -m pip install inner-pkg --extra-index-url http://user:pass@some-url.com}
+     * must be printed as {@code [python] -m pip install inner-pkg --extra-index-url http://user:*****@some-url.com}
+     *
+     * @param cmd python command
+     * @return string with cleared passwords
+     */
+    static String hidePipCredentials(String cmd) {
+        if (!cmd.contains(' --extra-index-url ')) {
+            return cmd
+        }
+        int lastIndex = 0
+        StringBuilder output = new StringBuilder()
+        Matcher matcher = PIP_CREDENTIALS.matcher(cmd)
+        while (matcher.find()) {
+            output.append(cmd, lastIndex, matcher.start(1))
+                    .append('*****')
+                    .append(cmd, matcher.end(1), matcher.end())
+
+            lastIndex = matcher.end()
+        }
+        if (lastIndex < cmd.length()) {
+            output.append(cmd, lastIndex, cmd.length())
+        }
+        return output.toString()
     }
 
     private static boolean isPositionMatch(String[] ver, String[] req, int pos) {

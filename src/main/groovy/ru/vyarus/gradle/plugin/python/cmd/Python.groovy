@@ -53,6 +53,9 @@ class Python {
     // set when calling custom binary by path instead of global (required to rewrite path to absolute)
     private final boolean customBinaryPath
 
+    // special cleaners for logged commands to hide sensitive data (like passwords)
+    private final List<LoggedCommandCleaner> logCleaners = []
+
     Python(Project project) {
         this(project, null, null)
     }
@@ -169,6 +172,18 @@ class Python {
         if (vars) {
             envVars.putAll(vars)
         }
+        return this
+    }
+
+    /**
+     * Registers cleaner for logger command to hide sensitive data (called python command remains
+     * unchanged).
+     *
+     * @param cleaner cleaner to register
+     * @return cleared command for log
+     */
+    Python logCommandCleaner(LoggedCommandCleaner cleaner) {
+        logCleaners.add(cleaner)
         return this
     }
 
@@ -364,7 +379,8 @@ class Python {
         project.logger.info('Python arguments: {}', cmd)
 
         String commandLine = "$exec ${cmd.join(SPACE)}"
-        String formattedCommand = commandLine.replace('\r', '').replace('\n', SPACE)
+        String formattedCommand = cleanLoggedCommand(
+                commandLine.replace('\r', '').replace('\n', SPACE))
         project.logger.log(logLevel, "[python] $formattedCommand")
 
         long start = System.currentTimeMillis()
@@ -476,5 +492,11 @@ class Python {
 
         // IMPORTANT -S should not be used here as it affects behaviour a lot (even sys.prefix may be different)
         return readOutput("-c \"${cmd.join(';')}\"").readLines()
+    }
+
+    private String cleanLoggedCommand(String cmd) {
+        String res = cmd
+        logCleaners.each { res = it.clear(cmd) }
+        return res
     }
 }

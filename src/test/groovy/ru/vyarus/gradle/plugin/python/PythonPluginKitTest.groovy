@@ -135,4 +135,25 @@ class PythonPluginKitTest extends AbstractKitTest {
         result.output.contains('-m pip install virtualenv')
         !result.output.contains('-m pip install virtualenv=')
     }
+
+    def "Check min virtualenv verification"() {
+        setup:
+        build """
+            plugins {
+                id 'ru.vyarus.use-python'
+            }
+
+            python {                
+                minVirtualenvVersion '1000'
+                pip 'extract-msg:0.28.1'
+            }            
+        """
+
+        when: "run task"
+        BuildResult result = runFailed('checkPython')
+
+        then: "virtualenv version error"
+        result.output.contains('does not match minimal required version 1000')
+    }
+
 }

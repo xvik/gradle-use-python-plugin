@@ -1,10 +1,10 @@
 * Support python installation from Windows Store (#14)
-* Changed virtualenv version used by default from 16.7.9 to 20.4.2
+* Changed virtualenv version installed by default from 16.7.9 to 20.4.2
   (because only recent versions could work correctly with python installed from Windows Store)
-* Add minimal required virtualenv check: by defautl it's virtualenv 20.0.11 (compatible with Windows Store python)
-  Configured with python.minVirtualenvVersion. Important because v20 changes pip installation
-    strategy in environment to the same version as bundled with virtualenv instead of always
-    downloading new pip (extremely important for python 2 support because pip 21 does not support it anymore)
+* Add minimal required virtualenv check: by defautl it's virtualenv 16 (to not fail previously working environments). 
+  But it is recommended to use at least 20.0.11 (compatible with Windows Store python). V20 changes pip installation
+  strategy in environment to the same version as bundled with virtualenv instead of always downloading new pip (which increase builds stability).
+  Configured with python.minVirtualenvVersion. 
 * Fix up-to-date check in pipInstall task for VCS modules (the latest pip changed freeze output syntax)
 * Hide passwords in logs for pip extra index repository urls with credentials (extraIndexUrls config) (#12)
 * Add general logged command cleaning mechanism to Python object for plugin authors (Pip object uses it for passwords hiding)

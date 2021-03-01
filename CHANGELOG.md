@@ -1,3 +1,4 @@
+### 2.3.0 (2021-03-01)
 * Support python installation from Windows Store (#14)
 * Changed virtualenv version installed by default from 16.7.9 to 20.4.2
   (because only recent versions could work correctly with python installed from Windows Store)

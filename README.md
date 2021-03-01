@@ -52,7 +52,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'ru.vyarus:gradle-use-python-plugin:2.2.0'
+        classpath 'ru.vyarus:gradle-use-python-plugin:2.3.0'
     }
 }
 apply plugin: 'ru.vyarus.use-python'
@@ -62,7 +62,7 @@ OR
 
 ```groovy
 plugins {
-    id 'ru.vyarus.use-python' version '2.2.0'
+    id 'ru.vyarus.use-python' version '2.3.0'
 }
 ```  
 
@@ -72,7 +72,7 @@ Plugin compiled for java 8, compatible with java 11
 
 Gradle | Version
 --------|-------
-5-6     | 2.2.0
+5-6     | 2.3.0
 4.x     | [1.2.0](https://github.com/xvik/gradle-use-python-plugin/tree/1.2.0)
 
 #### Snapshots
@@ -153,6 +153,13 @@ pip3 --version
 choco install python
 ```
 
+In Windows 10 python 3.9 could be installed from Windows Store:
+just type 'python' in console and windows will open Windows Store's python page.
+No additional actions required after installation.
+
+Note that windows store python will require minium virtualenv 20.0.11 (or above). 
+(if virtualenv not yet installed then no worry - plugin will install the correct version)
+
 ##### Linux/Macos install
 
 On most *nix distributions python is already installed, but often without pip.
@@ -172,7 +179,7 @@ pip3 install -U pip
 To install exact pip version:
 
 ```bash
-pip3 install -U pip==10.0.0
+pip3 install -U pip==20.0.11
 ```
 
 Note that on ubuntu pip installed with `python3-pip` package is 9.0.1, but it did not(!) downgrade
@@ -229,10 +236,9 @@ To make plugin work on [travis](https://travis-ci.org/) you'll need to install p
 
 ```yaml
 language: java  
-dist: xenial
+dist: bionic
 jdk: openjdk8
 
-sudo: required
 addons:
   apt:
     packages:
@@ -244,9 +250,7 @@ before_install:
   - sudo pip3 install -U pip
 ``` 
 
-It will be python 3.5 by default.
-
-NOTE: travis does not require manual `sudo` support enable anymore (enabled by default) 
+It will be python 3.6 by default (for bionic).
 
 #### Appveyour CI configuration
 
@@ -256,13 +260,21 @@ To make plugin work on [appveyour](https://www.appveyor.com/) you'll need to add
 environment:
     matrix:
         - JAVA_HOME: C:\Program Files\Java\jdk1.8.0
-          PYTHON: "C:\\Python35-x64"
+          PYTHON: "C:\\Python36-x64"
 
 install:
   - set PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%
 ```         
 
-Now plugin would be able to find python binary.   
+Now plugin would be able to find python binary. 
+
+To use python 3.9 you'll need to switch image:
+
+```yaml
+image: Visual Studio 2019
+```
+
+See [available pythons matrix](https://www.appveyor.com/docs/windows-images-software/#python) for more info.
 
 ### Usage
 
@@ -756,7 +768,10 @@ python {
    installVirtualenv = true
    // if virtualenv not installed (in --user scope), plugin will install exactly this version
    // (known to be working version) to avoid side effects
-   virtualenvVersion = '16.7.9'
+   virtualenvVersion = '20.4.2'
+   // minimal required virtualenv (v20 is recommended, but by default 16 set to not fail previous
+  // setups)
+   minVirtualenvVersion = '16'
    // used virtualenv path (if virtualenv used, see 'scope')
    envPath = '.gradle/python'
    // copy virtualenv instead of symlink (when created)
@@ -838,7 +853,7 @@ In your plugin, add plugin as dependency:
 
 ```groovy
 dependencies {
-    implementation 'ru.vyarus:gradle-use-python-plugin:2.2.0'
+    implementation 'ru.vyarus:gradle-use-python-plugin:2.3.0'
 }
 ```
 
@@ -971,6 +986,39 @@ python.pip 'sommodule:0.9'
 
 NOTE: all pip declarations are supported so direct module version could be overridden with VCS declaration
 and vice-versa (only the declaration order is important).
+
+#### Hide sensitive data in logged command
+
+By default, plugin always logs executed python commands, but sometimes such commands could 
+contain sensitive data (like passwords).
+
+For example, pip's --extra-index-url may contain password:
+
+```
+--extra-index-url http://user:pass@something.com
+```
+
+In logged command password should be replaced with *****.
+
+To deal with such cases, Python object supports registration of `LoggedCommandCleaner` object:
+
+```java
+python.logCommandCleaner(new CleanerInstance)
+```
+
+As an example see Pip object, which register special cleaner for extra index passwords right in its constructor:
+
+```java
+Pip(Python python, boolean userScope, boolean useCache) {
+      ...
+        
+      // do not show passwords when external indexes used with credentials
+      python.logCommandCleaner { CliUtils.hidePipCredentials(it) }
+  }
+```
+
+See `CliUtils.hidePipCredentials` for an implementation example (using regexps). 
+Most likely, implementation would be the same in your case. 
 
 ### Might also like
 

@@ -15,7 +15,7 @@ addons:
 
 before_install:
   - chmod +x gradlew
-  - sudo pip3 install -U pip
+  - pip3 install -U pip
 env:
   - TRAVIS=true
 

@@ -247,7 +247,7 @@ addons:
     - "python3-setuptools" 
 
 before_install:
-  - sudo pip3 install -U pip
+  - pip3 install -U pip
 ``` 
 
 It will be python 3.6 by default (for bionic).
@@ -264,6 +264,7 @@ environment:
 
 install:
   - set PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%
+  - python --version
 ```         
 
 Now plugin would be able to find python binary. 

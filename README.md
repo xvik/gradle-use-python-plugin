@@ -21,6 +21,8 @@ Features:
 * Could be used as basement for building plugins for specific python modules (like 
 [mkdocs plugin](https://github.com/xvik/gradle-mkdocs-plugin))
 
+**[Who's using (usage examples)](https://github.com/xvik/gradle-use-python-plugin/discussions/18)**
+
 ##### Summary
 
 * Configuration: `python`

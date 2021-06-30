@@ -12,7 +12,7 @@ class PipExecUnderVirtualenvTest extends AbstractCliMockSupport {
 
     @Override
     void setup() {
-        String root = dir.root.absolutePath
+        String root = dir.absolutePath
         String binPath = CliUtils.pythonBinPath(root)
         File bin = new File(binPath, 'activate')
         bin.mkdirs()

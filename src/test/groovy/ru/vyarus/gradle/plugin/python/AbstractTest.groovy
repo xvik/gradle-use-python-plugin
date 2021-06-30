@@ -3,9 +3,8 @@ package ru.vyarus.gradle.plugin.python
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
-import org.junit.Rule
-import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
+import spock.lang.TempDir
 
 /**
  * Base class for plugin configuration tests.
@@ -17,19 +16,18 @@ abstract class AbstractTest extends Specification {
 
     boolean isWin = Os.isFamily(Os.FAMILY_WINDOWS)
 
-    @Rule
-    final TemporaryFolder testProjectDir = new TemporaryFolder()
+    @TempDir File testProjectDir
 
     Project project(Closure<Project> config = null) {
         projectBuilder(config).build()
     }
 
     ExtendedProjectBuilder projectBuilder(Closure<Project> root = null) {
-        new ExtendedProjectBuilder().root(testProjectDir.root, root)
+        new ExtendedProjectBuilder().root(testProjectDir, root)
     }
 
     File file(String path) {
-        new File(testProjectDir.root, path)
+        new File(testProjectDir, path)
     }
 
     File fileFromClasspath(String toFile, String source) {
@@ -104,7 +102,7 @@ abstract class AbstractTest extends Specification {
 
         private void linkSubprojectsEvaluation(Project project) {
             project.evaluationDependsOnChildren()
-            project.subprojects.each {linkSubprojectsEvaluation(it)}
+            project.subprojects.each { linkSubprojectsEvaluation(it) }
         }
     }
 }

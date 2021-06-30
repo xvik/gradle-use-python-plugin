@@ -6,11 +6,10 @@ import org.gradle.initialization.DefaultBuildCancellationToken
 import org.gradle.internal.file.PathToFileResolver
 import org.gradle.process.internal.DefaultExecAction
 import org.gradle.util.ConfigureUtil
-import org.junit.Rule
-import org.junit.rules.TemporaryFolder
 import ru.vyarus.gradle.plugin.python.util.ExecRes
 import ru.vyarus.gradle.plugin.python.util.TestLogger
 import spock.lang.Specification
+import spock.lang.TempDir
 
 import java.util.concurrent.Executors
 
@@ -21,8 +20,7 @@ import java.util.concurrent.Executors
 abstract class AbstractCliMockSupport extends Specification {
 
     // used to overcome manual file existence check on win
-    @Rule
-    TemporaryFolder dir
+    @TempDir File dir
 
     Project project
     TestLogger logger
@@ -32,15 +30,15 @@ abstract class AbstractCliMockSupport extends Specification {
     boolean isWin = Os.isFamily(Os.FAMILY_WINDOWS)
 
     File file(String path) {
-        new File(dir.root, path)
+        new File(dir, path)
     }
 
     void setup() {
         project = Stub(Project)
         logger = new TestLogger()
         project.getLogger() >> { logger }
-        project.getProjectDir() >> { dir.root }
-        project.file(_) >> { new File(dir.root, it[0]) }
+        project.getProjectDir() >> { dir }
+        project.file(_) >> { new File(dir, it[0]) }
     }
 
     // use to provide specialized output for executed commands

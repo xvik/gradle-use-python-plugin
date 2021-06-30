@@ -2,9 +2,8 @@ package ru.vyarus.gradle.plugin.python
 
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.TaskOutcome
-import org.junit.Rule
-import org.junit.rules.TemporaryFolder
 import ru.vyarus.gradle.plugin.python.util.CliUtils
+import spock.lang.TempDir
 
 /**
  * @author Vyacheslav Rusakov
@@ -12,8 +11,7 @@ import ru.vyarus.gradle.plugin.python.util.CliUtils
  */
 class AbsoluteVirtualenvLocationKitTest extends AbstractKitTest {
 
-    @Rule
-    final TemporaryFolder envDir = new TemporaryFolder()
+    @TempDir File envDir
 
     def "Check virtualenv configuration with absolute path"() {
 
@@ -24,7 +22,7 @@ class AbsoluteVirtualenvLocationKitTest extends AbstractKitTest {
             }
                         
             python {
-                envPath = "${CliUtils.canonicalPath(envDir.root).replace('\\', '\\\\')}"
+                envPath = "${CliUtils.canonicalPath(envDir).replace('\\', '\\\\')}"
 
                 pip 'extract-msg:0.28.0'
             }
@@ -44,6 +42,6 @@ class AbsoluteVirtualenvLocationKitTest extends AbstractKitTest {
         result.output.contains('samplee')
 
         then: "virtualenv created at correct path"
-        result.output.contains("${CliUtils.canonicalPath(envDir.root)}${File.separator}")
+        result.output.contains("${CliUtils.canonicalPath(envDir)}${File.separator}")
     }
 }

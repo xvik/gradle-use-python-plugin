@@ -107,7 +107,7 @@ class Virtualenv {
 
     /**
      * Create virtualenv with setuptools and pip. Do nothing if already exists.
-     * To copy environment instead of symlinking, use {@code copy ( true )} otherwise don't specify parameter.
+     * To copy environment instead of symlinking, use {@code copy (true)} otherwise don't specify parameter.
      */
     @SuppressWarnings('BuilderMethodWithSideEffects')
     void create(boolean copy = false) {
@@ -116,7 +116,7 @@ class Virtualenv {
 
     /**
      * Create the lightest env without setuptools and pip. Do nothing if already exists.
-     * To copy environment instead of symlinking, use {@code copy ( true )} otherwise don't specify parameter.
+     * To copy environment instead of symlinking, use {@code copy (true)} otherwise don't specify parameter.
      */
     @SuppressWarnings('BuilderMethodWithSideEffects')
     void createPythonOnly(boolean copy = false) {
@@ -125,7 +125,7 @@ class Virtualenv {
 
     /**
      * Create virtualenv. Do nothing if already exists.
-     * To copy environment instead if symlinking, use {@code copy ( ? , ? , true )} otherwise omit last parameter.
+     * To copy environment instead if symlinking, use {@code copy (? , ? , true)} otherwise omit last parameter.
      *
      * @param setuptools do not install setuptools (--no-setuptools)
      * @param pip do not install pip and wheel (--no-pip --no-wheel)

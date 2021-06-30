@@ -286,7 +286,7 @@ class Python {
      * Binary dir extracted from actual python execution ({@code sys.executable}). Note that {@code sys.executable}
      * MAY return empty string instead and in this case binary path would be guessed from {@link #getHomeDir()}.
      * <p>
-     * {@code sysconfig.get_config_var( 'BINDIR' )} also may not be used as virtualenv may be created without
+     * {@code sysconfig.get_config_var('BINDIR')} also may not be used as virtualenv may be created without
      * setuptools.
      * <p>
      * In case when virtualenv created from another virtualenv, binary dir will return correct path, but
@@ -321,7 +321,7 @@ class Python {
 
     /**
      * Checks if current environment is a virtualenv. It is impossible to use {@code sys.base_path},
-     * {@code sys.real_path} or even {@code os.getenv( 'VIRTUAL_ENV' )} for detection because they might be not set
+     * {@code sys.real_path} or even {@code os.getenv('VIRTUAL_ENV')} for detection because they might be not set
      * even under execution within virtual environment. Instead, checked presence of "activation" script inside
      * python installation binary path: for virtual environment such script would be present.
      * <p>

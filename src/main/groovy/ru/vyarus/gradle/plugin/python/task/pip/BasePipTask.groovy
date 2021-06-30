@@ -40,7 +40,7 @@ class BasePipTask extends BasePythonTask {
      * May be useful in problematic cases (when cache leads to incorrect version installation or to force vcs
      * modules re-building each time (pip 20 cache vcs resolved modules by default)).
      * <p>
-     * Enabled by default (see {@link ru.vyarus.gradle.plugin.python.PythonExtension#usePipCache )
+     * Enabled by default (see {@link ru.vyarus.gradle.plugin.python.PythonExtension#usePipCache})
      */
     @Input
     boolean useCache = true
@@ -50,7 +50,7 @@ class BasePipTask extends BasePythonTask {
      * this option).
      * <p>
      * No extra index urls are given by default (see
-     * {@link ru.vyarus.gradle.plugin.python.PythonExtension#trustedHosts )
+     * {@link ru.vyarus.gradle.plugin.python.PythonExtension#trustedHosts})
      */
     @Input
     @Optional
@@ -61,7 +61,7 @@ class BasePipTask extends BasePythonTask {
      * {@code --extra-index-url}.
      * <p>
      * No extra index urls are given by default (see
-     * {@link ru.vyarus.gradle.plugin.python.PythonExtension#extraIndexUrls )
+     * {@link ru.vyarus.gradle.plugin.python.PythonExtension#extraIndexUrls})
      */
     @Input
     @Optional

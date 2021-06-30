@@ -4,10 +4,9 @@ import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.testfixtures.ProjectBuilder
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
-import org.junit.Rule
-import org.junit.rules.TemporaryFolder
 import ru.vyarus.gradle.plugin.python.cmd.Virtualenv
 import spock.lang.Specification
+import spock.lang.TempDir
 
 /**
  * Base class for Gradle TestKit based tests.
@@ -21,12 +20,11 @@ abstract class AbstractKitTest extends Specification {
     boolean debug
     boolean isWin = Os.isFamily(Os.FAMILY_WINDOWS)
 
-    @Rule
-    final TemporaryFolder testProjectDir = new TemporaryFolder()
+    @TempDir File testProjectDir
     File buildFile
 
     def setup() {
-        buildFile = testProjectDir.newFile('build.gradle')
+        buildFile = file('build.gradle')
         // jacoco coverage support
         fileFromClasspath('gradle.properties', 'testkit-gradle.properties')
     }
@@ -36,13 +34,16 @@ abstract class AbstractKitTest extends Specification {
     }
 
     File file(String path) {
-        new File(testProjectDir.root, path)
+        new File(testProjectDir, path)
     }
 
     File fileFromClasspath(String toFile, String source) {
         File target = file(toFile)
         target.parentFile.mkdirs()
-        target << (getClass().getResourceAsStream(source) ?: getClass().classLoader.getResourceAsStream(source)).text
+        target.withOutputStream {
+            it.write((getClass().getResourceAsStream(source) ?: getClass().classLoader.getResourceAsStream(source)).bytes)
+        }
+        target
     }
 
     /**
@@ -54,7 +55,7 @@ abstract class AbstractKitTest extends Specification {
     }
 
     String projectName() {
-        return testProjectDir.root.getName()
+        return testProjectDir.getName()
     }
 
     GradleRunner gradle(File root, String... commands) {
@@ -67,7 +68,7 @@ abstract class AbstractKitTest extends Specification {
     }
 
     GradleRunner gradle(String... commands) {
-        gradle(testProjectDir.root, commands)
+        gradle(testProjectDir, commands)
     }
 
     BuildResult run(String... commands) {
@@ -88,9 +89,15 @@ abstract class AbstractKitTest extends Specification {
         return gradle(commands).withGradleVersion(gradleVersion).buildAndFail()
     }
 
+    protected String unifyString(String input) {
+        return input
+        // cleanup win line break for simpler comparisons
+                .replace("\r", '')
+    }
+
     // custom virtualenv to use for simulations
     Virtualenv env(String path = '.gradle/python') {
         new Virtualenv(ProjectBuilder.builder()
-                .withProjectDir(testProjectDir.root).build(), path)
+                .withProjectDir(testProjectDir).build(), path)
     }
 }

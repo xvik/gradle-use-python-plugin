@@ -237,18 +237,20 @@ To make plugin work on [travis](https://travis-ci.org/) you'll need to install p
 
 ```yaml
 language: java  
-dist: bionic
+dist: xenial
 jdk: openjdk8
 
 addons:
   apt:
     packages:
-    - "python3"
-    - "python3-pip"
-    - "python3-setuptools" 
+    - python3
+    - python3-pip
+    - python3-setuptools 
 
 before_install:
-  - pip3 install -U pip
+  - python3 --version
+  - pip3 --version
+  - pip3 install -U pip<20
 ``` 
 
 It will be python 3.6 by default (for bionic).

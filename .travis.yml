@@ -17,7 +17,7 @@ before_install:
   - chmod +x gradlew
   - python3 --version
   - pip3 --version
-  - pip3 install -U pip<20
+  - pip3 install -U "pip<20"
 env:
   - TRAVIS=true
 

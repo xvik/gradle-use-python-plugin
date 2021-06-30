@@ -250,7 +250,7 @@ addons:
 before_install:
   - python3 --version
   - pip3 --version
-  - pip3 install -U pip<20
+  - pip3 install -U "pip<20"
 ``` 
 
 It will be python 3.6 by default (for bionic).

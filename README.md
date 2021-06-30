@@ -1,6 +1,6 @@
 # Gradle use-python plugin
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](http://www.opensource.org/licenses/MIT)
-[![Build Status](https://img.shields.io/travis/xvik/gradle-use-python-plugin.svg)](https://travis-ci.org/xvik/gradle-use-python-plugin)
+[![Build Status](https://travis-ci.com/xvik/gradle-use-python-plugin.svg?branch=master)](https://travis-ci.com/xvik/gradle-use-python-plugin)
 [![Appveyor build status](https://ci.appveyor.com/api/projects/status/github/xvik/gradle-use-python-plugin?svg=true)](https://ci.appveyor.com/project/xvik/gradle-use-python-plugin)
 [![codecov](https://codecov.io/gh/xvik/gradle-use-python-plugin/branch/master/graph/badge.svg)](https://codecov.io/gh/xvik/gradle-use-python-plugin)
 
@@ -44,7 +44,6 @@ patched pip packages in some distributions.
 
 ### Setup
 
-[![JCenter](https://img.shields.io/bintray/v/vyarus/xvik/gradle-use-python-plugin.svg?label=jcenter)](https://bintray.com/vyarus/xvik/gradle-use-python-plugin/_latestVersion)
 [![Maven Central](https://img.shields.io/maven-central/v/ru.vyarus/gradle-use-python-plugin.svg)](https://maven-badges.herokuapp.com/maven-central/ru.vyarus/gradle-use-python-plugin)
 [![Gradle Plugin Portal](https://img.shields.io/maven-metadata/v/https/plugins.gradle.org/m2/ru/vyarus/use-python/ru.vyarus.use-python.gradle.plugin/maven-metadata.xml.svg?colorB=007ec6&label=plugins%20portal)](https://plugins.gradle.org/plugin/ru.vyarus.use-python)
 

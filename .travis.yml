@@ -15,7 +15,9 @@ addons:
 
 before_install:
   - chmod +x gradlew
-  - pip3 install -U pip
+  - python3 --version
+  - pip3 --verison
+  - pip3 install -U pip<20
 env:
   - TRAVIS=true
 

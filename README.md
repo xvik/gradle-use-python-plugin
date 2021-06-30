@@ -237,7 +237,7 @@ To make plugin work on [travis](https://travis-ci.org/) you'll need to install p
 
 ```yaml
 language: java  
-dist: xenial
+dist: bionic
 jdk: openjdk8
 
 addons:
@@ -250,7 +250,7 @@ addons:
 before_install:
   - python3 --version
   - pip3 --version
-  - pip3 install -U "pip<20"
+  - pip3 install -U pip
 ``` 
 
 It will be python 3.6 by default (for bionic).

@@ -1,6 +1,6 @@
 # Gradle use-python plugin
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](http://www.opensource.org/licenses/MIT)
-[![Build Status](https://travis-ci.com/xvik/gradle-use-python-plugin.svg?branch=master)](https://travis-ci.com/xvik/gradle-use-python-plugin)
+[![CI](https://github.com/xvik/gradle-use-python-plugin/actions/workflows/CI.yml/badge.svg)](https://github.com/xvik/gradle-use-python-plugin/actions/workflows/CI.yml)
 [![Appveyor build status](https://ci.appveyor.com/api/projects/status/github/xvik/gradle-use-python-plugin?svg=true)](https://ci.appveyor.com/project/xvik/gradle-use-python-plugin)
 [![codecov](https://codecov.io/gh/xvik/gradle-use-python-plugin/branch/master/graph/badge.svg)](https://codecov.io/gh/xvik/gradle-use-python-plugin)
 

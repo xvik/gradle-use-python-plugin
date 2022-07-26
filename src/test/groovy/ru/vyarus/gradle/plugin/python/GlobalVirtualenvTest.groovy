@@ -25,7 +25,7 @@ class GlobalVirtualenvTest extends AbstractKitTest {
             python {
                 pythonPath = '${env.pythonPath.replace('\\', '\\\\')}'
                 scope = VIRTUALENV
-                pip 'extract-msg:0.36.1'
+                pip 'extract-msg:0.34.3'
             }
             
             task sample(type: PythonTask) {
@@ -39,7 +39,7 @@ class GlobalVirtualenvTest extends AbstractKitTest {
 
         then: "task successful"
         result.task(':sample').outcome == TaskOutcome.SUCCESS
-        result.output =~ /extract-msg\s+0.36.1/
+        result.output =~ /extract-msg\s+0.34.3/
         result.output.contains('samplee')
     }
 }

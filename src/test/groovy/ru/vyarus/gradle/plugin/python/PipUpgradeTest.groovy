@@ -21,7 +21,7 @@ class PipUpgradeTest extends AbstractKitTest {
             
             python {
                 pip 'pip:19.3.1'
-                pip 'extract-msg:0.36.1'
+                pip 'extract-msg:0.34.3'
                 
                 alwaysInstallModules = true
             }

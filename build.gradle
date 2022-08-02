@@ -25,7 +25,7 @@ dependencies {
         exclude group: 'org.codehaus.groovy'
     }
     testImplementation 'net.bytebuddy:byte-buddy:1.12.13'
-    testImplementation 'org.objenesis:objenesis:3.2'
+    testImplementation 'org.objenesis:objenesis:3.3'
 }
 
 group = 'ru.vyarus'

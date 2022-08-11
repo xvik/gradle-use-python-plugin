@@ -187,6 +187,10 @@ Note that on ubuntu pip installed with `python3-pip` package is 9.0.1, but it di
 module versions (e.g. `pip install click 6.6` when click 6.7 is installed will do nothing). 
 Maybe there are other differences, so it's highly recommended to upgrade pip with `pip3 install -U pip`.
 
+If you need to switch python versions often, you can use [pyenv](https://github.com/pyenv/pyenv):
+see [this article](https://www.liquidweb.com/kb/how-to-install-pyenv-on-ubuntu-18-04/) for ubuntu installation guide.
+But pay attention to PATH: plugin may not "see" pyenv due to [different PATH](#python-location) (when not launched from shell).
+
 #### Automatic pip upgrade
 
 As described above, there are different ways of pip installation in linux and, more important,
@@ -668,17 +672,24 @@ python {
 
 This will force python 2 for linux. Also, this may be handy if python binary is named differently. 
 
-To use non global python:
+To use non-global python:
 
 ```groovy
 python {
-    pythonPath = 'path/to/python/binray/'
+    pythonPath = 'path/to/python/binary/'
 }
 ```
 
-`pythonPath` must be set to directory containing python binary (e.g. 'path/to/python/binray/python.exe')
+`pythonPath` must be set to directory containing python binary (e.g. 'path/to/python/binary/python.exe')
 
 NOTE: `pythonPath` is ignored when virtualenv used (virtualenv located at `python.envPath` already exists).
+
+IMPORTANT: If python can't be found, please pay attention to PATH: most likely, it is different from your shell PATH
+(for example, this might happen when using pyenv). To check PATH, just put somewhere inside build script:
+
+```groovy
+println System.getenv('PATH')
+```
 
 ##### Minimal python and pip versions
 

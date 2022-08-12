@@ -212,7 +212,7 @@ class WorkflowKitTest extends AbstractKitTest {
             }
                         
             python {
-                pythonBinary = 'py'
+                pythonBinary = 'pyt'
                 validateSystemBinary = true
             }
         """
@@ -221,7 +221,7 @@ class WorkflowKitTest extends AbstractKitTest {
         BuildResult result = runFailed('checkPython')
 
         then: "error - python not found"
-        result.output.contains('\'py\' executable was not found in system. Please check PATH variable correctness (current process may not see the same PATH as your shell).')
+        result.output.contains('\'pyt\' executable was not found in system. Please check PATH variable correctness (current process may not see the same PATH as your shell).')
     }
 
     def "Check fail to detect python binary in environment"() {
@@ -235,7 +235,7 @@ class WorkflowKitTest extends AbstractKitTest {
             }
                         
             python {
-                pythonBinary = 'py'
+                pythonBinary = 'pyt'
                 validateSystemBinary = false
             }
         """

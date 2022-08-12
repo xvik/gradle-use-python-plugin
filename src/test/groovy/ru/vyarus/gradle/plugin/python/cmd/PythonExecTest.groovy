@@ -112,22 +112,22 @@ class PythonExecTest extends AbstractCliMockSupport {
 
         setup:
         mockExec(project, 'sample output', 0)
-        python = new Python(project, null, 'py', false)
+        python = new Python(project, null, 'pyt', false)
 
         when: "call module"
         python.exec('mmm')
         then: "ok"
-        logger.res == "[python] py mmm\n\t sample output\n"
+        logger.res == "[python] pyt mmm\n\t sample output\n"
     }
 
     def "Check global python validation"() {
 
         when: 'incorrect global binary declared'
-        python = new Python(project, null, 'py')
+        python = new Python(project, null, 'pyt')
 
         then: "failed"
         def ex = thrown(GradleException)
-        ex.message.contains("'py' executable was not found in system. Please check PATH variable correctness (current process may not see the same PATH as your shell).")
+        ex.message.contains("'pyt' executable was not found in system. Please check PATH variable correctness (current process may not see the same PATH as your shell).")
     }
 
 

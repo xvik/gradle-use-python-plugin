@@ -29,6 +29,17 @@ class PythonExtension {
     String pythonBinary
 
     /**
+     * Manual search for global python binary (declared in {@link #pythonBinary} in system paths (PATH variable)).
+     * This should quickly reveal cases when process PATH is different from shell path (which could happen, for example,
+     * with pyenv, when PATH modified only in bashrc and gradle is called not from shell).
+     * <p>
+     * Validation is performed only when {@link #pythonPath} is not declared (because otherwise it does not make sense).
+     * <p>
+     * Option was added ONLY to be able to disable validation in edge cases when validation behave incorrectly.
+     */
+    boolean validateSystemBinary = true
+
+    /**
      * System environment variables for executed python process (variables specified in gradle's
      * {@link org.gradle.process.ExecSpec#environment(java.util.Map)} during python process execution).
      */

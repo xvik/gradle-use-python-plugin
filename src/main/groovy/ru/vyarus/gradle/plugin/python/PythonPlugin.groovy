@@ -80,6 +80,7 @@ class PythonPlugin implements Plugin<Project> {
                 task.conventionMapping.with {
                     pythonPath = { extension.pythonPath }
                     pythonBinary = { extension.pythonBinary }
+                    validateSystemBinary = { extension.validateSystemBinary }
                     // important to copy map because each task must have independent instance
                     environment = { extension.environment ? new HashMap<>(extension.environment) : null }
                 }

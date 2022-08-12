@@ -38,7 +38,8 @@ class CheckPythonTask extends BasePipTask {
         boolean envRequested = ext.scope >= PythonExtension.Scope.VIRTUALENV_OR_USER
         Virtualenv env = envRequested
                 // synchronize work dir between python instances
-                ? new Virtualenv(project, ext.pythonPath, ext.pythonBinary, ext.envPath).workDir(getWorkDir()) : null
+                ? new Virtualenv(project, getPythonPath(), getPythonBinary(), getValidateSystemBinary(), ext.envPath)
+                .workDir(getWorkDir()) : null
 
         // use env right ahead (global python could even not exists), but only if allowed by scope
         if (envRequested && env.exists()) {
@@ -71,7 +72,7 @@ class CheckPythonTask extends BasePipTask {
 
     private void checkPython(PythonExtension ext) {
         // important because python could change on second execution
-        Python python = new Python(project, pythonPath, pythonBinary).workDir(getWorkDir())
+        Python python = new Python(project, pythonPath, pythonBinary, validateSystemBinary).workDir(getWorkDir())
         try {
             python.version
         } catch (ExecException ex) {
@@ -97,7 +98,8 @@ class CheckPythonTask extends BasePipTask {
 
     private void checkPip(PythonExtension ext) {
         // important because python could change on second execution
-        Pip pip = new Pip(project, ext.pythonPath, ext.pythonBinary, false).workDir(getWorkDir())
+        Pip pip = new Pip(project, isValidateSystemBinary(), getPythonPath(), getPythonBinary(), false, true)
+                .workDir(getWorkDir())
         try {
             pip.versionLine
         } catch (PythonExecutionFailed ex) {
@@ -118,7 +120,8 @@ class CheckPythonTask extends BasePipTask {
     }
 
     private boolean checkEnv(Virtualenv env, PythonExtension ext) {
-        Pip pip = new Pip(project, ext.pythonPath, ext.pythonBinary, true).workDir(getWorkDir())
+        Pip pip = new Pip(project, isValidateSystemBinary(), getPythonPath(), getPythonBinary(), true, true)
+                .workDir(getWorkDir())
         if (!pip.isInstalled(env.name)) {
             if (ext.installVirtualenv) {
                 // automatically install virtualenv if allowed (in --user)

@@ -51,7 +51,18 @@ class Pip {
     }
 
     Pip(Project project, String pythonPath, String binary, boolean userScope, boolean useCache) {
-        this(new Python(project, pythonPath, binary).logLevel(LogLevel.LIFECYCLE), userScope, useCache)
+        this(project, true, pythonPath, binary, userScope, useCache)
+    }
+
+    @SuppressWarnings('ParameterCount')
+    Pip(Project project,
+        boolean validateSystemBinary,
+        String pythonPath,
+        String binary,
+        boolean userScope,
+        boolean useCache) {
+        this(new Python(project, pythonPath, binary, validateSystemBinary)
+                .logLevel(LogLevel.LIFECYCLE), userScope, useCache)
     }
 
     // preferred way for construction because allows configured python instance re-usage

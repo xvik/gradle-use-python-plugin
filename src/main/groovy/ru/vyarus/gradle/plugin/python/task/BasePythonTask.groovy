@@ -37,6 +37,16 @@ class BasePythonTask extends ConventionTask {
     String pythonBinary
 
     /**
+     * Manual search for global python binary (declared in {@link #pythonBinary} in system paths (PATH variable)).
+     * Used to quickly reveal problems with process PATH (not the same as in user shell).
+     * Validation is performed only when {@link #pythonPath} is not declared (because otherwise it does not make sense).
+     * Automatically set from {@link ru.vyarus.gradle.plugin.python.PythonExtension#validateSystemBinary}, but could
+     * be overridden manually.
+     */
+    @Input
+    boolean validateSystemBinary
+
+    /**
      * Python arguments applied to all executed commands. Arguments applied before called command
      * (and so option may be useful for cases impossible with {@link PythonTask#extraArgs}, applied after command).
      * For example, it could be used for -I or -S flags (be aware that -S can cause side effects, especially
@@ -122,7 +132,7 @@ class BasePythonTask extends ConventionTask {
 
     @Memoized
     private Python buildPython() {
-        new Python(project, getPythonPath(), getPythonBinary())
+        new Python(project, getPythonPath(), getPythonBinary(), getValidateSystemBinary())
                 .logLevel(getLogLevel())
                 .workDir(getWorkDir())
                 .pythonArgs(getPythonArgs())

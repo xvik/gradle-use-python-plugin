@@ -61,9 +61,13 @@ class Python {
     }
 
     Python(Project project, String pythonPath, String binary) {
+        this(project, pythonPath, binary, true)
+    }
+
+    Python(Project project, String pythonPath, String binary, boolean validateSystemBinary) {
         this.project = project
         String normalizedPath = pythonPath == null ? null : Paths.get(pythonPath).normalize().toString()
-        this.executable = getPythonBinary(project, normalizedPath, binary)
+        this.executable = getPythonBinary(project, normalizedPath, binary, validateSystemBinary)
         // direct executable must be called with cmd (https://docs.gradle.org/4.1/dsl/org.gradle.api.tasks.Exec.html)
         this.withCmd = normalizedPath && Os.isFamily(Os.FAMILY_WINDOWS)
         // custom python path used (which may be relative and conflict with workDir)
@@ -406,7 +410,7 @@ class Python {
 
     @Memoized
     @CompileStatic(TypeCheckingMode.SKIP)
-    private static String getPythonBinary(Project project, String pythonPath, String binary) {
+    private static String getPythonBinary(Project project, String pythonPath, String binary, boolean validate) {
         String res = binary ?: 'python'
         boolean isWindows = Os.isFamily(Os.FAMILY_WINDOWS)
         if (pythonPath) {
@@ -426,6 +430,12 @@ class Python {
                     res = PYTHON3
                 }
             }
+        }
+        if (validate && !pythonPath) {
+            // manually searching in system path to point to possibly incorrect PATH variable used in process
+            // (might happen when process not started from user shell)
+            File found = CliUtils.searchSystemBinary(res)
+            project.logger.info('Found python binary: {}', found.absolutePath)
         }
         return res
     }

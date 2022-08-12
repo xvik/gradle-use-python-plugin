@@ -44,8 +44,21 @@ class Virtualenv {
      * @param path environment path (relative to project or absolute)
      */
     Virtualenv(Project project, String pythonPath, String binary, String path) {
+          this(project, pythonPath, binary, true, path)
+    }
+
+    /**
+     * Create virtualenv utility.
+     *
+     * @param project gradle project instance
+     * @param pythonPath python path (null to use global)
+     * @param binary python binary name (null to use default python3 or python)
+     * @param validateSystemBinary validate global python binary
+     * @param path environment path (relative to project or absolute)
+     */
+    Virtualenv(Project project, String pythonPath, String binary, boolean validateSystemBinary, String path) {
         this.project = project
-        python = new Python(project, pythonPath, binary)
+        python = new Python(project, pythonPath, binary, validateSystemBinary)
                 .logLevel(LogLevel.LIFECYCLE)
         this.path = path
         if (!path) {

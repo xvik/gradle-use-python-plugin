@@ -2,6 +2,7 @@ package ru.vyarus.gradle.plugin.python.util
 
 import groovy.transform.CompileStatic
 import org.apache.tools.ant.taskdefs.condition.Os
+import org.gradle.api.GradleException
 import org.gradle.process.internal.ExecException
 
 import java.nio.file.*
@@ -24,6 +25,37 @@ final class CliUtils {
     private static final Pattern PIP_CREDENTIALS = Pattern.compile(' --extra-index-url +https?://[^:]+:([^@]+)@')
 
     private CliUtils() {
+    }
+
+    /**
+     * Searches for binary in system path to reveal incorrect PATH variable. Intended to reveal different PATH
+     * in process (might be the case with pyenv).
+     *
+     * @param binary binary name
+     * @return found file
+     * @throws GradleException when binary not found
+     */
+    @SuppressWarnings('NestedForLoop')
+    static File searchSystemBinary(String binary) {
+        String path = System.getenv('PATH')
+        if (path == null || path.empty) {
+            throw new GradleException('PATH variable did not contain anything')
+        }
+        List<String> target = [binary]
+        if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+            target.add("${binary}.exe" as String)
+        }
+
+        for (final String p : path.split(File.pathSeparator)) {
+            for (String name : target) {
+                File e = new File(p, name)
+                if (e.file) {
+                    return e.absoluteFile
+                }
+            }
+        }
+        throw new GradleException("'$binary' executable was not found in system. Please check PATH variable " +
+                "correctness (current process may not see the same PATH as your shell). \n\t PATH=$path")
     }
 
     /**

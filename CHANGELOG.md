@@ -1,3 +1,6 @@
+* Add global python binary validation to reveal PATH problems (might not be the same as user shell PATH)
+  - Add validateSystemBinary configuration to be able to disable validation (in case it would not work properly)
+
 ### 2.3.0 (2021-03-01)
 * Support python installation from Windows Store (#14)
 * Changed virtualenv version installed by default from 16.7.9 to 20.4.2

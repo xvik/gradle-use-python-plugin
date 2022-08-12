@@ -1,5 +1,6 @@
 package ru.vyarus.gradle.plugin.python.cmd
 
+import org.gradle.api.GradleException
 import org.gradle.api.logging.LogLevel
 import ru.vyarus.gradle.plugin.python.util.PythonExecutionFailed
 
@@ -111,13 +112,24 @@ class PythonExecTest extends AbstractCliMockSupport {
 
         setup:
         mockExec(project, 'sample output', 0)
-        python = new Python(project, null, 'py')
+        python = new Python(project, null, 'py', false)
 
         when: "call module"
         python.exec('mmm')
         then: "ok"
         logger.res == "[python] py mmm\n\t sample output\n"
     }
+
+    def "Check global python validation"() {
+
+        when: 'incorrect global binary declared'
+        python = new Python(project, null, 'py')
+
+        then: "failed"
+        def ex = thrown(GradleException)
+        ex.message.contains("'py' executable was not found in system. Please check PATH variable correctness (current process may not see the same PATH as your shell).")
+    }
+
 
     def "Check custom path and binary"() {
 

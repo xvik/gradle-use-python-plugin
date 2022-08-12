@@ -96,8 +96,8 @@ abstract class AbstractKitTest extends Specification {
     }
 
     // custom virtualenv to use for simulations
-    Virtualenv env(String path = '.gradle/python') {
+    Virtualenv env(String path = '.gradle/python', String binary = null) {
         new Virtualenv(ProjectBuilder.builder()
-                .withProjectDir(testProjectDir).build(), path)
+                .withProjectDir(testProjectDir).build(), null, binary, path)
     }
 }

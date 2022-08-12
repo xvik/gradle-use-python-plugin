@@ -201,6 +201,29 @@ class WorkflowKitTest extends AbstractKitTest {
         result.output.contains('Virtualenv is not installed')
     }
 
+    def "Check global python binary validation"() {
+
+        setup: "detectable environment"
+        Virtualenv env = env()
+        env.createPythonOnly()
+        build """
+            plugins {
+                id 'ru.vyarus.use-python'
+            }
+                        
+            python {
+                pythonBinary = 'py'
+                validateSystemBinary = true
+            }
+        """
+
+        when: "run task"
+        BuildResult result = runFailed('checkPython')
+
+        then: "error - python not found"
+        result.output.contains('\'py\' executable was not found in system. Please check PATH variable correctness (current process may not see the same PATH as your shell).')
+    }
+
     def "Check fail to detect python binary in environment"() {
 
         setup: "detectable environment"
@@ -211,7 +234,10 @@ class WorkflowKitTest extends AbstractKitTest {
                 id 'ru.vyarus.use-python'
             }
                         
-            python.pythonBinary = 'py'
+            python {
+                pythonBinary = 'py'
+                validateSystemBinary = false
+            }
         """
 
         when: "run task"

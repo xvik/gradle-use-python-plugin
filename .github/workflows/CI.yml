@@ -7,28 +7,31 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: Java ${{ matrix.java }}
+    name: Java ${{ matrix.java }}, python ${{ matrix.python }}
     strategy:
       matrix:
         java: [8, 11]
+        python: [3.7, 3.10]
+        pip: [22.0.4]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Set up JDK ${{ matrix.java }}
         uses: actions/setup-java@v1
         with:
           java-version: ${{ matrix.java }}
 
-      - name: Set up Python 3.7
-        uses: actions/setup-python@v2
+      - name: Set up Python ${{ matrix.python }}
+        uses: actions/setup-python@v4
         with:
-          python-version: '3.7'
+          python-version: ${{matrix.python}}
 
       - name: Build
         run: |
           chmod +x gradlew
           python --version
+          pip install --upgrade pip==${{ matrix.pip }}
           pip --version
           ./gradlew assemble --no-daemon
 

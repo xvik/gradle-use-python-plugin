@@ -20,7 +20,7 @@ class PipUpgradeTest extends AbstractKitTest {
             }
             
             python {
-                pip 'pip:19.3.1'
+                pip 'pip:20.3.4'
                 pip 'extract-msg:0.34.3'
                 
                 alwaysInstallModules = true
@@ -33,12 +33,12 @@ class PipUpgradeTest extends AbstractKitTest {
 
         then: "pip installed"
         result.task(':pipInstall').outcome == TaskOutcome.SUCCESS
-        result.output.contains('pip==19.3.1')
+        result.output.contains('pip==20.3.4')
 
         when: "run one more time to check used pip"
         result = run('pipInstall')
-        then: "pip 19 used"
+        then: "pip 20 used"
         result.task(':pipInstall').outcome == TaskOutcome.SUCCESS
-        result.output.contains('Using pip 19.3.1 from')
+        result.output.contains('Using pip 20.3.4 from')
     }
 }

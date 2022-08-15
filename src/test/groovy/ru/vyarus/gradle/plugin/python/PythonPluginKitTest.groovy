@@ -173,7 +173,7 @@ class PythonPluginKitTest extends AbstractKitTest {
 
         then: "created"
         result.task(':checkPython').outcome == TaskOutcome.SUCCESS
-        result.output.contains('-m virtualenv .gradle/python')
+        result.output.contains('-m virtualenv .gradle/python'.replace('/', File.separator))
         file('.gradle/python').exists()
 
         when: "cleanup env"
@@ -188,7 +188,7 @@ class PythonPluginKitTest extends AbstractKitTest {
 
         then: "created"
         result.task(':checkPython').outcome == TaskOutcome.SUCCESS
-        result.output.contains('-m virtualenv .gradle/python')
+        result.output.contains('-m virtualenv .gradle/python'.replace('/', File.separator))
         file('.gradle/python').exists()
     }
 

@@ -77,7 +77,7 @@ class PythonPluginTest extends AbstractTest {
 
         then: "clean task configured"
         Delete clean = project.tasks.getByName('cleanPython')
-        clean.delete == ['.gradle/python'] as Set
+        clean.delete == ['.gradle/python'.replace('/', File.separator)] as Set
     }
 
 

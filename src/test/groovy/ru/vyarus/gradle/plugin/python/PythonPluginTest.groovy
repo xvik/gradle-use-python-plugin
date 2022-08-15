@@ -2,6 +2,7 @@ package ru.vyarus.gradle.plugin.python
 
 import org.gradle.api.GradleException
 import org.gradle.api.Project
+import org.gradle.api.tasks.Delete
 import ru.vyarus.gradle.plugin.python.task.pip.module.VcsPipModule
 
 /**
@@ -24,6 +25,7 @@ class PythonPluginTest extends AbstractTest {
         project.tasks.getByName('pipInstall')
         project.tasks.getByName('pipUpdates')
         project.tasks.getByName('pipList')
+        project.tasks.getByName('cleanPython')
     }
 
     def "Check extension usage"() {
@@ -72,6 +74,10 @@ class PythonPluginTest extends AbstractTest {
         pipList.pythonBinary == 'py'
         !pipList.userScope
         pipList.modules == ['sample:1', 'foo:2']
+
+        then: "clean task configured"
+        Delete clean = project.tasks.getByName('cleanPython')
+        clean.delete == ['.gradle/python'] as Set
     }
 
 

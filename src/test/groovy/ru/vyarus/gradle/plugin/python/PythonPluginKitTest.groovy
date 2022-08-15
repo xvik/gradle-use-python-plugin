@@ -156,4 +156,58 @@ class PythonPluginKitTest extends AbstractKitTest {
         result.output.contains('does not match minimal required version 1000')
     }
 
+    def "Check env cleanup"() {
+        setup:
+        build """
+            plugins {
+                id 'ru.vyarus.use-python'
+            }
+
+            python {                
+                pip 'extract-msg:0.28.1'
+            }            
+        """
+
+        when: "create env"
+        BuildResult result = run('checkPython')
+
+        then: "created"
+        result.task(':checkPython').outcome == TaskOutcome.SUCCESS
+        result.output.contains('-m virtualenv .gradle/python')
+        file('.gradle/python').exists()
+
+        when: "cleanup env"
+        result = run('cleanPython')
+
+        then: "cleared"
+        result.task(':cleanPython').outcome == TaskOutcome.SUCCESS
+        !file('.gradle/python').exists()
+
+        when: "create env again"
+        result = run('checkPython')
+
+        then: "created"
+        result.task(':checkPython').outcome == TaskOutcome.SUCCESS
+        result.output.contains('-m virtualenv .gradle/python')
+        file('.gradle/python').exists()
+    }
+
+    def "Check env cleanup disabled when virtualenv not used"() {
+        setup:
+        build """
+            plugins {
+                id 'ru.vyarus.use-python'
+            }
+
+            python {                
+                scope = ru.vyarus.gradle.plugin.python.PythonExtension.Scope.USER
+            }            
+        """
+
+        when: "clean"
+        BuildResult result = run('cleanPython')
+
+        then: "ignored"
+        result.task(':cleanPython').outcome == TaskOutcome.SKIPPED
+    }
 }

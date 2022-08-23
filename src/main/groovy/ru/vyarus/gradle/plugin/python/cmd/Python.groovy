@@ -38,6 +38,7 @@ class Python {
 
     private static final String PYTHON3 = 'python3'
     private static final String SPACE = ' '
+    private static final String NL = '\n'
 
     private final Project project
     private final String executable
@@ -384,7 +385,7 @@ class Python {
 
         String commandLine = "$exec ${cmd.join(SPACE)}"
         String formattedCommand = cleanLoggedCommand(
-                commandLine.replace('\r', '').replace('\n', SPACE))
+                commandLine.replace('\r', '').replace(NL, SPACE))
         project.logger.log(logLevel, "[python] $formattedCommand")
 
         long start = System.currentTimeMillis()
@@ -404,8 +405,17 @@ class Python {
         project.logger.info('Python execution time: {}',
                 DurationFormatter.format(System.currentTimeMillis() - start))
         if (res.exitValue != 0) {
-            throw new PythonExecutionFailed("Python call failed: $formattedCommand")
+            // duplicating output in error message to be sure it would be visible
+            String out = reformatOutputForException(os)
+            throw new PythonExecutionFailed("Python call failed: $formattedCommand"
+                    + (out ? '\n\n\tOUTPUT:\n' + out : ''))
         }
+    }
+
+    private String reformatOutputForException(OutputStream os) {
+        os.flush()
+        String out = os
+        return out ? out.split(NL).collect { '\t\t' + it }.join(NL) + NL : ''
     }
 
     @Memoized

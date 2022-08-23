@@ -1,6 +1,7 @@
 * Add global python binary validation to reveal PATH problems (might not be the same as user shell PATH)
   - Add validateSystemBinary configuration to be able to disable validation (in case it would not work properly)
 * Add cleanPython task for removing project-specific virtualenv
+* Add python process output to exception message to be sure it will be visible on error (especially on CI)
 
 ### 2.3.0 (2021-03-01)
 * Support python installation from Windows Store (#14)

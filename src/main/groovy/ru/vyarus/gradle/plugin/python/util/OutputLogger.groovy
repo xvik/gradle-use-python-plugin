@@ -19,6 +19,8 @@ class OutputLogger extends LineOrientedOutputStream {
     private final LogLevel level
     private final String prefix
 
+    private final StringBuilder source = new StringBuilder()
+
     OutputLogger(Logger logger, LogLevel level, String prefix) {
         this.logger = logger
         this.level = level
@@ -26,8 +28,15 @@ class OutputLogger extends LineOrientedOutputStream {
     }
 
     @Override
+    String toString() {
+        // returns original output
+        return source.toString().trim()
+    }
+
+    @Override
     protected void processLine(String s) throws IOException {
         String msg = prefix ? "$prefix $s" : s
         logger.log(level, msg)
+        source.append(s).append('\n')
     }
 }

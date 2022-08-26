@@ -21,7 +21,7 @@ class ModuleFactory {
     private static final String VERSION_SEPARATOR = ':'
     private static final String VCS_VERSION_SEPARATOR = '-'
 
-    private static final Pattern FEATURE_FORMAT = Pattern.compile('(.+)\\[(.+)]:(.+)')
+    private static final Pattern FEATURE_FORMAT = Pattern.compile('(.+)\\[(.+)]\\s*:\\s*(.+)')
     private static final String QUALIFIER_START = '['
     private static final String QUALIFIER_END = ']'
 

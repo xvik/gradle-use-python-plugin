@@ -2,12 +2,18 @@
   - Add validateSystemBinary configuration to be able to disable validation (in case it would not work properly)
 * Add cleanPython task for removing project-specific virtualenv
 * Add python process output to exception message to be sure it will be visible on error (especially on CI)
+* Add requirements files support. 
+  - By default, requirements support is enabled in strict mode:
+    plugin reads file contents and expects only exact version matches (allows extracting module declarations
+    so external tools could easily parse and update dependencies).
+  - In non-strict mode, requirements file processing delegated to pip (no restrictions on declarations)
+  - New configuration section: python.requirements 
 
 ### 2.3.0 (2021-03-01)
 * Support python installation from Windows Store (#14)
 * Changed virtualenv version installed by default from 16.7.9 to 20.4.2
   (because only recent versions could work correctly with python installed from Windows Store)
-* Add minimal required virtualenv check: by defautl it's virtualenv 16 (to not fail previously working environments). 
+* Add minimal required virtualenv check: by default, it's virtualenv 16 (to not fail previously working environments). 
   But it is recommended to use at least 20.0.11 (compatible with Windows Store python). V20 changes pip installation
   strategy in environment to the same version as bundled with virtualenv instead of always downloading new pip (which increase builds stability).
   Configured with python.minVirtualenvVersion. 

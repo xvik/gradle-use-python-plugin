@@ -159,8 +159,20 @@ class PythonExtension {
      * By default use default virtualenv behaviour: symlink environment.
      */
     boolean envCopy
+    /**
+     * Requirements file support. By default, plugin will search for requirements.txt file and would read all
+     * declarations from there and use for manual installation (together with `python.modules` property). File could
+     * contain only the same declarations as direct modules declarations in gradle file (only exact version numbers).
+     * This way is more secure and allows other tools to read or update this file.
+     * <p>
+     * Pure python behaviour is also supported in non-strict mode (see {@link Requirements#strict}).
+     */
+    Requirements requirements = new Requirements()
+
+    private final Project project
 
     PythonExtension(Project project) {
+        this.project = project
         // by default storing environment inside the root project and use relative path (for simpler logs)
         envPath = project.relativePath(project.rootProject.file('.gradle/python'))
     }
@@ -274,11 +286,51 @@ class PythonExtension {
     /**
      * Checks if module is already declared (as usual or vcs module). Could be used by other plugins to test
      * if required module is manually declared or not (in order to apply defaults).
+     * <p>
+     * NOTE: this check ignores modules in requirements file!
      *
      * @param name module name to check
      * @return true of module already declared, false otherwise
      */
     boolean isModuleDeclared(String name) {
         return ModuleFactory.findModuleDeclaration(name, modules) != null
+    }
+
+    /**
+     * Utility method to support requirements configuration with closure.
+     *
+     * @param config configuration closure
+     */
+    void setRequirements(@DelegatesTo(Requirements) Closure config) {
+        project.configure(requirements, config)
+    }
+
+    /**
+     * Requirements file support.
+     */
+    static class Requirements {
+
+        /**
+         * Use requirements file. False to ignore it, even if exists.
+         */
+        boolean use = true
+
+        /**
+         * Requirements file path, relative to project root (in case of sub module - sub module root) or absolute path.
+         */
+        String file = 'requirements.txt'
+
+        /**
+         * Strict mode: only exact version declarations allowed (the same declarations as in gradle file). In strict
+         * mode plugin reads requirements file and use them the same way as if they would be declared directly in
+         * gradle file. This is more secure and allows external tools to read and update requirements.
+         * <p>
+         * By disabling strict mode, requirements dile processing is delegated to pip. Which means that there would
+         * be no restrictions on pip file format.
+         *
+         * @see <a href="https://pip.pypa.io/en/stable/reference/requirements-file-format/#requirements-file-format">
+         *     format</a>
+         */
+        boolean strict = true
     }
 }

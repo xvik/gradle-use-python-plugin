@@ -49,7 +49,7 @@ class CheckPythonTask extends BasePipTask {
 
             checkPython(ext)
 
-            if (!getModules().empty) {
+            if (modulesInstallationRequired) {
                 checkPip(ext)
                 // only if virtualenv usage requested
                 if (envRequested) {
@@ -167,8 +167,8 @@ class CheckPythonTask extends BasePipTask {
         this.pythonPath = ext.pythonPath
 
         checkPython(ext)
-        // only if pip required
-        if (!getModules().empty) {
+        // only if pip required or requirements file present
+        if (modulesInstallationRequired) {
             checkPip(ext)
         }
 

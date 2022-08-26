@@ -13,6 +13,7 @@ import ru.vyarus.gradle.plugin.python.task.pip.BasePipTask
 import ru.vyarus.gradle.plugin.python.task.pip.PipInstallTask
 import ru.vyarus.gradle.plugin.python.task.pip.PipListTask
 import ru.vyarus.gradle.plugin.python.task.pip.PipUpdatesTask
+import ru.vyarus.gradle.plugin.python.util.RequirementsReader
 
 /**
  * Use-python plugin. Plugin requires python installed globally or configured path to python binary.
@@ -117,6 +118,8 @@ class PythonPlugin implements Plugin<Project> {
                 useCache = { extension.usePipCache }
                 trustedHosts = { extension.trustedHosts }
                 extraIndexUrls = { extension.extraIndexUrls }
+                requirements = { RequirementsReader.find(project, extension.requirements) }
+                strictRequirements = { extension.requirements.strict }
             }
         }
 

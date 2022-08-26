@@ -3,13 +3,14 @@ package ru.vyarus.gradle.plugin.python.task.pip
 import groovy.transform.CompileStatic
 import groovy.transform.Memoized
 import org.gradle.api.tasks.*
+import ru.vyarus.gradle.plugin.python.util.RequirementsReader
 
 /**
  * Install required modules (with correct versions) into python using pip.
  * Default task is registered as pipInstall to install all modules declared in
- * {@link ru.vyarus.gradle.plugin.python.PythonExtension#modules}.
+ * {@link ru.vyarus.gradle.plugin.python.PythonExtension#modules} and (optional) requirements file.
  * {@link ru.vyarus.gradle.plugin.python.task.CheckPythonTask} always run before pip install task to validate
- * environment.
+ * (and create, if required) environment.
  * <p>
  * All {@link ru.vyarus.gradle.plugin.python.task.PythonTask}s are depend on pipInstall by default.
  *
@@ -43,20 +44,32 @@ class PipInstallTask extends BasePipTask {
     List<String> options = []
 
     PipInstallTask() {
-        onlyIf { !modulesList.empty }
+        // useful only when dependencies declared (directly or with requirements file)
+        onlyIf { modulesInstallationRequired }
         // task will always run for the first time (even if deps are ok), but all consequent runs will be up-to-date
+        // note: for requirements file up-to-date check will correctly count file modification date
         outputs.upToDateWhen { modulesToInstall.empty }
     }
 
     @TaskAction
+    @SuppressWarnings('UnnecessaryGetter')
     void run() {
         pip.python.extraArgs(getOptions())
+        File file = getRequirements()
+        boolean directReqsInstallRequired = !getStrictRequirements() && file && file.exists()
+        if (directReqsInstallRequired) {
+            // process requirements with pip
+            pip.exec("install -r ${RequirementsReader.relativePath(project, file)}")
+        }
+        // in non strict mode requirements would be parsed manually and installed as separate modules
+        // see BasePipTask.getAllModules()
+
         modulesToInstall.each { pip.install(it) }
         // apply options only for install calls! otherwise, following pip calls will fail
         pip.python.clearExtraArgs()
 
         // could be at first run (upToDateWhen requires at least one task execution)
-        if (modulesToInstall.empty) {
+        if (modulesToInstall.empty && !directReqsInstallRequired) {
             logger.lifecycle('All required modules are already installed with correct versions')
         }
 

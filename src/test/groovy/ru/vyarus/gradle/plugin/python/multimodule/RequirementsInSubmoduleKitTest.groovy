@@ -36,7 +36,7 @@ extract-msg == 0.34.3
 
         then: "task successful"
         result.task(':sub:pipInstall').outcome == TaskOutcome.SUCCESS
-        result.output.contains('-m virtualenv ../.gradle/python')
+        result.output.contains('-m virtualenv ../.gradle/python'.replace('/', File.separator))
         result.output =~ /extract-msg\s+0.34.3/
 
         then: "virtualenv created at the root level"

@@ -7,7 +7,8 @@
     plugin reads file contents and expects only exact version matches (allows extracting module declarations
     so external tools could easily parse and update dependencies).
   - In non-strict mode, requirements file processing delegated to pip (no restrictions on declarations)
-  - New configuration section: python.requirements 
+  - New configuration section: python.requirements
+* Fix potential memory leak due to gradle Project objects caching (#22)
 
 ### 2.3.0 (2021-03-01)
 * Support python installation from Windows Store (#14)

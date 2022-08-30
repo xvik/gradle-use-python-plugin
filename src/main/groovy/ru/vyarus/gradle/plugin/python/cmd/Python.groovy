@@ -3,16 +3,14 @@ package ru.vyarus.gradle.plugin.python.cmd
 import groovy.transform.CompileStatic
 import groovy.transform.Memoized
 import groovy.transform.TypeCheckingMode
-import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.Project
 import org.gradle.api.logging.LogLevel
 import org.gradle.process.ExecResult
 import ru.vyarus.gradle.plugin.python.util.CliUtils
 import ru.vyarus.gradle.plugin.python.util.DurationFormatter
 import ru.vyarus.gradle.plugin.python.util.OutputLogger
+import ru.vyarus.gradle.plugin.python.util.PythonBinary
 import ru.vyarus.gradle.plugin.python.util.PythonExecutionFailed
-
-import java.nio.file.Paths
 
 /**
  * Python commands execution utility. Use global python or binary in provided python path.
@@ -36,23 +34,18 @@ import java.nio.file.Paths
 @SuppressWarnings(['ConfusingMethodName', 'StaticMethodsBeforeInstanceMethods', 'DuplicateNumberLiteral'])
 class Python {
 
-    private static final String PYTHON3 = 'python3'
     private static final String SPACE = ' '
     private static final String NL = '\n'
 
     private final Project project
-    private final String executable
+    private final PythonBinary binary
+
     private String workDir
     private String outputPrefix = '\t'
     private LogLevel logLevel = LogLevel.INFO
     private final List<String> pythonArgs = []
     private final List<String> extraArgs = []
     private final Map<String, Object> envVars = [:]
-
-    // run through cmd on win (when direct executable called)
-    private final boolean withCmd
-    // set when calling custom binary by path instead of global (required to rewrite path to absolute)
-    private final boolean customBinaryPath
 
     // special cleaners for logged commands to hide sensitive data (like passwords)
     private final List<LoggedCommandCleaner> logCleaners = []
@@ -67,12 +60,7 @@ class Python {
 
     Python(Project project, String pythonPath, String binary, boolean validateSystemBinary) {
         this.project = project
-        String normalizedPath = pythonPath == null ? null : Paths.get(pythonPath).normalize().toString()
-        this.executable = getPythonBinary(project, normalizedPath, binary, validateSystemBinary)
-        // direct executable must be called with cmd (https://docs.gradle.org/4.1/dsl/org.gradle.api.tasks.Exec.html)
-        this.withCmd = normalizedPath && Os.isFamily(Os.FAMILY_WINDOWS)
-        // custom python path used (which may be relative and conflict with workDir)
-        this.customBinaryPath = normalizedPath as boolean
+        this.binary = new PythonBinary(project, pythonPath, binary, validateSystemBinary)
     }
 
     /**
@@ -135,7 +123,7 @@ class Python {
      * Args applied after command (at the end). Don't use it for python's own args because in many cases they will
      * not work at the end (as would assumed to belonging to called module)!
      * <p>
-     * For example, if we set extra arg '-a' then command call `-m mod something` will become '-m mod something -p'.
+     * For example, if we set extra arg '-a' then command call `-m mod something` will become '-m mod something -a'.
      *
      * @param args extra arguments (array, collection or simple string) to apply to all processed commands
      * (null value ignored for simplified usage)
@@ -300,20 +288,10 @@ class Python {
      * @return directory under python home containing python binary (always absolute path)
      */
     @Memoized
+    @SuppressWarnings('ClosureAsLastMethodParameter')
     String getBinaryDir() {
-        // use resolved executable to avoid incorrect resolution in case of venv inside venv
-        String path = customBinaryPath ? project.file(executable).absolutePath : resolveInfo()[2]?.trim()
-        int idx = path.lastIndexOf(File.separator)
-
-        if (path.empty || idx <= 0) {
-            // just guess by home dir (yes, I know, this MIGHT be incorrect in some cases, but should be ok
-            // for virtualenvs used in majority of cases)
-            path = homeDir
-            return CliUtils.pythonBinPath(path)
-        }
-
-        // cut off binary
-        return path[0..idx - 1]
+        // sys.executable and sys.prefix
+        return binary.getBinaryDir({ resolveInfo()[2]?.trim() }, { homeDir })
     }
 
     /**
@@ -365,20 +343,14 @@ class Python {
      * @return python binary used
      */
     String getUsedBinary() {
-        this.executable
+        this.binary.executable
     }
 
     @SuppressWarnings('UnnecessarySetter')
     @CompileStatic(TypeCheckingMode.SKIP)
     private void processExecution(Object args, OutputStream os) {
-        boolean wrkDirUsed = workDir as boolean
-        // on win non global python could be called only through cmd
-        String exec = withCmd ? 'cmd'
-                // use absolute python path if work dir set (relative will simply not work)
-                : (wrkDirUsed && customBinaryPath ? CliUtils.canonicalPath(project.file(executable)) : executable)
-        String[] cmd = withCmd ?
-                CliUtils.wincmdArgs(executable, project.projectDir, prepareArgs(args), wrkDirUsed)
-                : prepareArgs(args)
+        String exec = binary.getCommandBinary(workDir)
+        String[] cmd = binary.getCommandArguments(workDir, args, pythonArgs, extraArgs)
 
         // important to show arguments as array to easily spot args parsing problems
         project.logger.info('Python arguments: {}', cmd)
@@ -416,68 +388,6 @@ class Python {
         os.flush()
         String out = os
         return out ? out.split(NL).collect { '\t\t' + it }.join(NL) + NL : ''
-    }
-
-    @Memoized
-    @CompileStatic(TypeCheckingMode.SKIP)
-    private static String getPythonBinary(Project project, String pythonPath, String binary, boolean validate) {
-        String res = binary ?: 'python'
-        boolean isWindows = Os.isFamily(Os.FAMILY_WINDOWS)
-        if (pythonPath) {
-            String path = pythonPath + (pythonPath.endsWith(File.separator) ? '' : File.separator)
-            // $pythonPath/$binaryName(.exe)
-            res = isWindows ? "${path}${res}.exe" : "$path$res"
-        } else if (!binary && !isWindows) {
-            // check if python3 available
-            new ByteArrayOutputStream().withStream { os ->
-                ExecResult ret = project.exec {
-                    standardOutput = os
-                    errorOutput = os
-                    ignoreExitValue = true
-                    commandLine PYTHON3, '--version'
-                }
-                if (ret.exitValue == 0) {
-                    res = PYTHON3
-                }
-            }
-        }
-        if (validate && !pythonPath) {
-            // manually searching in system path to point to possibly incorrect PATH variable used in process
-            // (might happen when process not started from user shell)
-            File found = CliUtils.searchSystemBinary(res)
-            project.logger.info('Found python binary: {}', found.absolutePath)
-        }
-        return res
-    }
-
-    @SuppressWarnings('Instanceof')
-    private String[] prepareArgs(Object args) {
-        String[] cmd = CliUtils.parseArgs(args)
-        detectAndWrapCommand(cmd)
-        if (this.pythonArgs) {
-            cmd = CliUtils.mergeArgs(pythonArgs, cmd)
-        }
-        if (this.extraArgs) {
-            cmd = CliUtils.mergeArgs(cmd, extraArgs)
-        }
-        return cmd
-    }
-
-    /**
-     * Detect python command call (-c) and wrap command argument if required (on linux).
-     * @param cmd command to execute
-     */
-    private void detectAndWrapCommand(String[] cmd) {
-        boolean moduleCall = false
-        cmd.eachWithIndex { String arg, int i ->
-            if (arg == '-m') {
-                moduleCall = true
-            }
-            if (!moduleCall && arg == '-c' && i + 2 == cmd.length) {
-                // wrap command to grant cross-platform compatibility (simple -c "string" is not always executed)
-                cmd[i + 1] = CliUtils.wrapCommand(cmd[i + 1])
-            }
-        }
     }
 
     /**

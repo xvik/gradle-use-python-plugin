@@ -50,4 +50,126 @@ class ParallelExecutionKitTest extends AbstractKitTest {
             result.task(":mod$it:checkPython").outcome == TaskOutcome.SUCCESS
         }
     }
+
+
+    def "Check concurrent pip installation into the same environment"() {
+
+        setup:
+        // need source python without virtualenv
+        Virtualenv env = env('env')
+        env.create()
+
+        build("""
+            plugins {
+                id 'ru.vyarus.use-python'
+            }     
+
+            subprojects {
+                apply plugin: 'ru.vyarus.use-python'
+                
+                // NOTE inner virtualenv would be created at the root project!
+                python.pythonPath = "../${env.pythonPath.replace("\\", "\\\\")}"    
+                python.pip 'extract-msg:0.28.0'  
+            }
+        """)
+
+        // amount of modules in test project
+        int cnt = 20
+
+        file('settings.gradle') << ' include ' + (1..cnt).collect {
+            // work dir MUST exist otherwise process will fail to start!
+            assert file("mod$it").mkdir()
+            return "'mod$it'"
+        }.join(',')
+
+        when: "run check all modules to initiate concurrent virtualenv installation"
+        debug()
+        BuildResult result = run('pipInstall', '--parallel', '--max-workers=5')
+
+        then: "tasks successful"
+        (1..cnt).collect {
+            result.task(":mod$it:pipInstall").outcome == TaskOutcome.SUCCESS
+        }
+    }
+
+    def "Check concurrent pip installation into different environments"() {
+
+        setup:
+        // need source python without virtualenv
+        Virtualenv env = env('env')
+        env.create()
+
+        build("""
+            plugins {
+                id 'ru.vyarus.use-python'
+            }     
+
+            subprojects {
+                apply plugin: 'ru.vyarus.use-python'
+                
+                // NOTE each module has its own virtualenv      
+                python.envPath = 'envx'
+                python.pythonPath = "../${env.pythonPath.replace("\\", "\\\\")}"                    
+                python.pip 'extract-msg:0.28.0'  
+            }
+        """)
+
+        // amount of modules in test project
+        int cnt = 20
+
+        file('settings.gradle') << ' include ' + (1..cnt).collect {
+            // work dir MUST exist otherwise process will fail to start!
+            assert file("mod$it").mkdir()
+            return "'mod$it'"
+        }.join(',')
+
+        when: "run check all modules to initiate concurrent virtualenv installation"
+        debug()
+        BuildResult result = run('pipInstall', '--parallel', '--max-workers=5')
+
+        then: "tasks successful"
+        (1..cnt).collect {
+            result.task(":mod$it:pipInstall").outcome == TaskOutcome.SUCCESS
+        }
+    }
+
+    def "Check concurrent pip installation into global environment"() {
+
+        setup:
+        // need source python without virtualenv
+        Virtualenv env = env('env')
+        env.create()
+
+        build("""
+            plugins {
+                id 'ru.vyarus.use-python'
+            }     
+
+            subprojects {
+                apply plugin: 'ru.vyarus.use-python'
+                
+                python.scope = USER
+                python.pythonPath = "../${env.pythonPath.replace("\\", "\\\\")}"    
+                python.pip 'extract-msg:0.28.0'  
+            }
+        """)
+
+        // amount of modules in test project
+        int cnt = 20
+
+        file('settings.gradle') << ' include ' + (1..cnt).collect {
+            // work dir MUST exist otherwise process will fail to start!
+            assert file("mod$it").mkdir()
+            return "'mod$it'"
+        }.join(',')
+
+        when: "run check all modules to initiate concurrent virtualenv installation"
+        debug()
+        BuildResult result = run('pipInstall', '--parallel', '--max-workers=5')
+
+        then: "tasks successful"
+        (1..cnt).collect {
+            result.task(":mod$it:pipInstall").outcome == TaskOutcome.SUCCESS
+        }
+    }
 }

@@ -1,7 +1,6 @@
 package ru.vyarus.gradle.plugin.python.task
 
 import groovy.transform.CompileStatic
-import groovy.transform.TypeCheckingMode
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.TaskAction
 import org.gradle.process.internal.ExecException
@@ -125,7 +124,6 @@ class CheckPythonTask extends BasePipTask {
         logger.lifecycle('Using {}', pip.versionLine)
     }
 
-    @CompileStatic(TypeCheckingMode.SKIP)
     private boolean checkEnv(Virtualenv env, PythonExtension ext) {
         Pip pip = new Pip(project, isValidateSystemBinary(), getPythonPath(), getPythonBinary(), true, true)
                 .workDir(getWorkDir())
@@ -133,14 +131,14 @@ class CheckPythonTask extends BasePipTask {
         Boolean venvInstalled = project.rootProject.findProperty(PROP_VENV_INSTALLED)
         if (venvInstalled == null) {
             venvInstalled = pip.isInstalled(env.name)
-            project.rootProject.ext.setProperty(PROP_VENV_INSTALLED, venvInstalled)
+            project.rootProject.extensions.extraProperties.set(PROP_VENV_INSTALLED, venvInstalled)
         }
         if (!venvInstalled) {
             if (ext.installVirtualenv) {
                 // automatically install virtualenv if allowed (in --user)
                 // by default, exact (configured) version used to avoid side effects!)
                 pip.install(env.name + (ext.virtualenvVersion ? "==$ext.virtualenvVersion" : ''))
-                project.rootProject.ext.setProperty(PROP_VENV_INSTALLED, true)
+                project.rootProject.extensions.extraProperties.set(PROP_VENV_INSTALLED, true)
             } else if (ext.scope == PythonExtension.Scope.VIRTUALENV) {
                 // virtualenv strictly required - fail
                 throw new GradleException('Virtualenv is not installed. Please install it ' +

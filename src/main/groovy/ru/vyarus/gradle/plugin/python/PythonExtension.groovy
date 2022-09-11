@@ -111,6 +111,8 @@ class PythonExtension {
 
     /**
      * Target scope for pip packages installation.
+     * NOTE: Enum values might be specified directly like {@code USER} or {@code GLOBAL} (shortcuts registered by
+     * plugin).
      */
     Scope scope = Scope.VIRTUALENV_OR_USER
     /**

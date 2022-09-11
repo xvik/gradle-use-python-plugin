@@ -5,6 +5,8 @@ import groovy.transform.Memoized
 import org.gradle.api.tasks.*
 import ru.vyarus.gradle.plugin.python.util.RequirementsReader
 
+import java.util.concurrent.ConcurrentHashMap
+
 /**
  * Install required modules (with correct versions) into python using pip.
  * Default task is registered as pipInstall to install all modules declared in
@@ -19,6 +21,9 @@ import ru.vyarus.gradle.plugin.python.util.RequirementsReader
  */
 @CompileStatic
 class PipInstallTask extends BasePipTask {
+
+    // sync to avoid parallel installation into THE SAME environment
+    private static final Map<String, Object> SYNC = new ConcurrentHashMap<>()
 
     /**
      * True to show list of all installed python modules (not only modules installed by plugin!).
@@ -57,14 +62,18 @@ class PipInstallTask extends BasePipTask {
         pip.python.extraArgs(getOptions())
         File file = getRequirements()
         boolean directReqsInstallRequired = !getStrictRequirements() && file && file.exists()
-        if (directReqsInstallRequired) {
-            // process requirements with pip
-            pip.exec("install -r ${RequirementsReader.relativePath(project, file)}")
-        }
-        // in non strict mode requirements would be parsed manually and installed as separate modules
-        // see BasePipTask.getAllModules()
+        // sync is required for multi-module projects with parallel execution enabled to avoid concurrent
+        // installation into THE SAME environment
+        synchronized (getSync(pip.python.binaryDir)) {
+            if (directReqsInstallRequired) {
+                // process requirements with pip
+                pip.exec("install -r ${RequirementsReader.relativePath(project, file)}")
+            }
+            // in non strict mode requirements would be parsed manually and installed as separate modules
+            // see BasePipTask.getAllModules()
 
-        modulesToInstall.each { pip.install(it) }
+            modulesToInstall.each { pip.install(it) }
+        }
         // apply options only for install calls! otherwise, following pip calls will fail
         pip.python.clearExtraArgs()
 
@@ -96,6 +105,15 @@ class PipInstallTask extends BasePipTask {
     @Internal
     protected List<String> getModulesToInstall() {
         buildModulesToInstall()
+    }
+
+    // synchronization objects per target python path to avoid parallel installation into the same environment
+    @SuppressWarnings('SynchronizedMethod')
+    private synchronized static Object getSync(String path) {
+        if (!SYNC.containsKey(path)) {
+            SYNC.put(path, new Object())
+        }
+        return SYNC.get(path)
     }
 
     @Memoized

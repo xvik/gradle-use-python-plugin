@@ -145,7 +145,7 @@ final class PythonBinary {
         // root project property used for cache execution result in multi-module project
         if (project.rootProject.findProperty(PROP_PYTHON3) == null) {
             if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-                project.rootProject.ext.setProperty(PROP_PYTHON3, false)
+                project.rootProject.extensions.extraProperties.set(PROP_PYTHON3, false)
             } else {
                 new ByteArrayOutputStream().withStream { os ->
                     ExecResult ret = project.exec {
@@ -154,7 +154,7 @@ final class PythonBinary {
                         ignoreExitValue = true
                         commandLine PYTHON3, '--version'
                     }
-                    project.rootProject.ext.setProperty(PROP_PYTHON3, ret.exitValue == 0)
+                    project.rootProject.extensions.extraProperties.set(PROP_PYTHON3, ret.exitValue == 0)
                 }
             }
         }

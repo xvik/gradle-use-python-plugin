@@ -1,6 +1,7 @@
 package ru.vyarus.gradle.plugin.python.task
 
 import groovy.transform.CompileStatic
+import groovy.transform.TypeCheckingMode
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.TaskAction
 import org.gradle.process.internal.ExecException
@@ -29,6 +30,8 @@ import ru.vyarus.gradle.plugin.python.util.PythonExecutionFailed
 @SuppressWarnings('UnnecessaryGetter')
 class CheckPythonTask extends BasePipTask {
 
+    private static final String PROP_VENV_INSTALLED = 'ru.vyarus.python.virtualenv.installed'
+    private static final Object SYNC = new Object()
     private boolean virtual = false
 
     @TaskAction
@@ -41,19 +44,22 @@ class CheckPythonTask extends BasePipTask {
                 ? new Virtualenv(project, getPythonPath(), getPythonBinary(), getValidateSystemBinary(), ext.envPath)
                 .workDir(getWorkDir()) : null
 
-        // use env right ahead (global python could even not exists), but only if allowed by scope
-        if (envRequested && env.exists()) {
-            virtual = true
-        } else {
-            // normal flow: check global installation - try to create virtualenv (if modules required)
+        // preventing simultaneous installation of virtualenv by multiple modules when parallel execution enabled
+        synchronized (SYNC) {
+            // use env right ahead (global python could even not exists), but only if allowed by scope
+            if (envRequested && env.exists()) {
+                virtual = true
+            } else {
+                // normal flow: check global installation - try to create virtualenv (if modules required)
 
-            checkPython(ext)
+                checkPython(ext)
 
-            if (modulesInstallationRequired) {
-                checkPip(ext)
-                // only if virtualenv usage requested
-                if (envRequested) {
-                    virtual = checkEnv(env, ext)
+                if (modulesInstallationRequired) {
+                    checkPip(ext)
+                    // only if virtualenv usage requested
+                    if (envRequested) {
+                        virtual = checkEnv(env, ext)
+                    }
                 }
             }
         }
@@ -119,14 +125,22 @@ class CheckPythonTask extends BasePipTask {
         logger.lifecycle('Using {}', pip.versionLine)
     }
 
+    @CompileStatic(TypeCheckingMode.SKIP)
     private boolean checkEnv(Virtualenv env, PythonExtension ext) {
         Pip pip = new Pip(project, isValidateSystemBinary(), getPythonPath(), getPythonBinary(), true, true)
                 .workDir(getWorkDir())
-        if (!pip.isInstalled(env.name)) {
+        // to avoid calling pip in EACH module (in multi-module project) to verify virtualenv existence
+        Boolean venvInstalled = project.rootProject.findProperty(PROP_VENV_INSTALLED)
+        if (venvInstalled == null) {
+            venvInstalled = pip.isInstalled(env.name)
+            project.rootProject.ext.setProperty(PROP_VENV_INSTALLED, venvInstalled)
+        }
+        if (!venvInstalled) {
             if (ext.installVirtualenv) {
                 // automatically install virtualenv if allowed (in --user)
                 // by default, exact (configured) version used to avoid side effects!)
                 pip.install(env.name + (ext.virtualenvVersion ? "==$ext.virtualenvVersion" : ''))
+                project.rootProject.ext.setProperty(PROP_VENV_INSTALLED, true)
             } else if (ext.scope == PythonExtension.Scope.VIRTUALENV) {
                 // virtualenv strictly required - fail
                 throw new GradleException('Virtualenv is not installed. Please install it ' +

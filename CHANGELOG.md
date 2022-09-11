@@ -9,6 +9,7 @@
   - In non-strict mode, requirements file processing delegated to pip (no restrictions on declarations)
   - New configuration section: python.requirements
 * Fix potential memory leak due to gradle Project objects caching (#22)
+* Fix concurrent virtualenv installation in multi-module project with parallel execution enabled (#19)
 
 ### 2.3.0 (2021-03-01)
 * Support python installation from Windows Store (#14)

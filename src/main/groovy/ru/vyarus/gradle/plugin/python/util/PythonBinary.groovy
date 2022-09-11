@@ -21,8 +21,8 @@ import java.nio.file.Paths
 @CompileStatic
 final class PythonBinary {
 
+    private static final String PROP_PYTHON3 = 'ru.vyarus.python3.detected'
     private static final String PYTHON3 = 'python3'
-    private static Boolean python3Detected
 
     private final Project project
     private final String executable
@@ -140,11 +140,12 @@ final class PythonBinary {
     // note: @Memoized not used because it would store link to Project object which could lead to significant
     // memory leak. And that's why this check is performed outside of getPythonBinary method
     @CompileStatic(TypeCheckingMode.SKIP)
-    private static boolean detectPython3Binary(Project project) {
-        // synchronization not required cause checkPython always executed before all other tasks
-        if (python3Detected == null) {
+    @SuppressWarnings('SynchronizedMethod')
+    private static synchronized boolean detectPython3Binary(Project project) {
+        // root project property used for cache execution result in multi-module project
+        if (project.rootProject.findProperty(PROP_PYTHON3) == null) {
             if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-                python3Detected = false
+                project.rootProject.ext.setProperty(PROP_PYTHON3, false)
             } else {
                 new ByteArrayOutputStream().withStream { os ->
                     ExecResult ret = project.exec {
@@ -153,11 +154,11 @@ final class PythonBinary {
                         ignoreExitValue = true
                         commandLine PYTHON3, '--version'
                     }
-                    python3Detected = ret.exitValue == 0
+                    project.rootProject.ext.setProperty(PROP_PYTHON3, ret.exitValue == 0)
                 }
             }
         }
-        return python3Detected
+        return project.rootProject.findProperty(PROP_PYTHON3)
     }
 
     // note: detectPython3Binary and findSystemBinary where extracted from this method to avoid holding

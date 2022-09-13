@@ -2,6 +2,8 @@ package ru.vyarus.gradle.plugin.python.cmd
 
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.Project
+import org.gradle.api.plugins.ExtensionContainer
+import org.gradle.api.plugins.ExtraPropertiesExtension
 import org.gradle.initialization.DefaultBuildCancellationToken
 import org.gradle.internal.file.PathToFileResolver
 import org.gradle.process.internal.DefaultExecAction
@@ -26,6 +28,7 @@ abstract class AbstractCliMockSupport extends Specification {
     TestLogger logger
     private boolean execMocked
     Map<Closure<String>, String> execCases = [:]
+    Map<String, Object> extraProps = [:]
 
     boolean isWin = Os.isFamily(Os.FAMILY_WINDOWS)
 
@@ -39,6 +42,16 @@ abstract class AbstractCliMockSupport extends Specification {
         project.getLogger() >> { logger }
         project.getProjectDir() >> { dir }
         project.file(_) >> { new File(dir, it[0]) }
+        project.getRootProject() >> { project }
+        project.findProperty(_ as String) >> { args -> extraProps.get(args[0])}
+
+        def ext = Stub(ExtensionContainer)
+        project.getExtensions() >> { ext }
+        def props = Stub(ExtraPropertiesExtension)
+        ext.getExtraProperties() >> { props }
+        props.set(_ as String, _) >> { args-> extraProps.put(args[0], args[1]) }
+        props.get(_ as String) >> { args -> extraProps.get(args[0]) }
+        props.has(_ as String) >> { args -> extraProps.containsKey(args[0]) }
     }
 
     // use to provide specialized output for executed commands

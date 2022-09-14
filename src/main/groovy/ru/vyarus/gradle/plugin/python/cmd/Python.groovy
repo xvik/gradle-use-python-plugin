@@ -5,9 +5,7 @@ import groovy.transform.Memoized
 import groovy.transform.TypeCheckingMode
 import org.gradle.api.Project
 import org.gradle.api.logging.LogLevel
-import org.gradle.process.ExecResult
 import ru.vyarus.gradle.plugin.python.util.CliUtils
-import ru.vyarus.gradle.plugin.python.util.DurationFormatter
 import ru.vyarus.gradle.plugin.python.util.OutputLogger
 import ru.vyarus.gradle.plugin.python.util.PythonBinary
 import ru.vyarus.gradle.plugin.python.util.PythonExecutionFailed
@@ -34,9 +32,6 @@ import ru.vyarus.gradle.plugin.python.util.PythonExecutionFailed
 @SuppressWarnings(['ConfusingMethodName', 'StaticMethodsBeforeInstanceMethods', 'DuplicateNumberLiteral'])
 class Python {
 
-    private static final String SPACE = ' '
-    private static final String NL = '\n'
-
     private final Project project
     private final PythonBinary binary
 
@@ -46,9 +41,6 @@ class Python {
     private final List<String> pythonArgs = []
     private final List<String> extraArgs = []
     private final Map<String, Object> envVars = [:]
-
-    // special cleaners for logged commands to hide sensitive data (like passwords)
-    private final List<LoggedCommandCleaner> logCleaners = []
 
     Python(Project project) {
         this(project, null, null)
@@ -176,7 +168,7 @@ class Python {
      * @return cleared command for log
      */
     Python logCommandCleaner(LoggedCommandCleaner cleaner) {
-        logCleaners.add(cleaner)
+        binary.addLogCleaner(cleaner)
         return this
     }
 
@@ -346,48 +338,9 @@ class Python {
         this.binary.executable
     }
 
-    @SuppressWarnings('UnnecessarySetter')
     @CompileStatic(TypeCheckingMode.SKIP)
     private void processExecution(Object args, OutputStream os) {
-        String exec = binary.getCommandBinary(workDir)
-        String[] cmd = binary.getCommandArguments(workDir, args, pythonArgs, extraArgs)
-
-        // important to show arguments as array to easily spot args parsing problems
-        project.logger.info('Python arguments: {}', cmd)
-
-        String commandLine = "$exec ${cmd.join(SPACE)}"
-        String formattedCommand = cleanLoggedCommand(
-                commandLine.replace('\r', '').replace(NL, SPACE))
-        project.logger.log(logLevel, "[python] $formattedCommand")
-
-        long start = System.currentTimeMillis()
-        ExecResult res = project.exec {
-            it.executable = exec
-            it.args(cmd)
-            standardOutput = os
-            errorOutput = os
-            ignoreExitValue = true
-            if (workDir) {
-                setWorkingDir(workDir)
-            }
-            if (envVars) {
-                it.environment(envVars)
-            }
-        }
-        project.logger.info('Python execution time: {}',
-                DurationFormatter.format(System.currentTimeMillis() - start))
-        if (res.exitValue != 0) {
-            // duplicating output in error message to be sure it would be visible
-            String out = reformatOutputForException(os)
-            throw new PythonExecutionFailed("Python call failed: $formattedCommand"
-                    + (out ? '\n\n\tOUTPUT:\n' + out : ''))
-        }
-    }
-
-    private String reformatOutputForException(OutputStream os) {
-        os.flush()
-        String out = os
-        return out ? out.split(NL).collect { '\t\t' + it }.join(NL) + NL : ''
+        binary.exec(args, pythonArgs, extraArgs, os, workDir, envVars, logLevel)
     }
 
     /**
@@ -422,11 +375,5 @@ class Python {
 
         // IMPORTANT -S should not be used here as it affects behaviour a lot (even sys.prefix may be different)
         return readOutput("-c \"${cmd.join(';')}\"").readLines()
-    }
-
-    private String cleanLoggedCommand(String cmd) {
-        String res = cmd
-        logCleaners.each { res = it.clear(cmd) }
-        return res
     }
 }

@@ -1,19 +1,17 @@
 package ru.vyarus.gradle.plugin.python.cmd
 
 import org.apache.tools.ant.taskdefs.condition.Os
+import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.plugins.ExtensionContainer
 import org.gradle.api.plugins.ExtraPropertiesExtension
-import org.gradle.initialization.DefaultBuildCancellationToken
 import org.gradle.internal.file.PathToFileResolver
-import org.gradle.process.internal.DefaultExecAction
-import org.gradle.util.ConfigureUtil
+import org.gradle.process.ExecSpec
+import org.gradle.process.internal.DefaultExecSpec
 import ru.vyarus.gradle.plugin.python.util.ExecRes
 import ru.vyarus.gradle.plugin.python.util.TestLogger
 import spock.lang.Specification
 import spock.lang.TempDir
-
-import java.util.concurrent.Executors
 
 /**
  * @author Vyacheslav Rusakov
@@ -64,13 +62,10 @@ abstract class AbstractCliMockSupport extends Specification {
     void mockExec(Project project, String output, int res) {
         assert !execMocked, "Exec can be mocked just once!"
         // check execution with logs without actual execution
-        project.exec(_) >> { Closure spec ->
-            DefaultExecAction act = ConfigureUtil.configure(spec,
-                    new DefaultExecAction(Stub(PathToFileResolver),
-                            Executors.newSingleThreadExecutor(),
-                            new DefaultBuildCancellationToken()))
-
-            String cmd = "${act.executable} ${act.args.join(' ')}"
+        project.exec(_) >> { Action<ExecSpec> action ->
+            ExecSpec spec = new DefaultExecSpec(Stub(PathToFileResolver))
+            action.execute(spec)
+            String cmd = "${spec.executable} ${spec.args.join(' ')}"
             println ">> Mocked exec: $cmd"
             String out = output
             execCases.each { k, v ->
@@ -83,7 +78,7 @@ abstract class AbstractCliMockSupport extends Specification {
                 println ">> Default execution, output: $out"
             }
 
-            OutputStream os = act.standardOutput
+            OutputStream os = spec.standardOutput
             if (out) {
                 os.write(out.bytes)
             }

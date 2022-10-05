@@ -83,10 +83,12 @@ class PythonTask extends BasePythonTask {
                 .outputPrefix(getOutputPrefix())
                 .extraArgs(getExtraArgs())
 
+        // task-specific logger required for exclusive docker usage, because otherwise project logger would
+        // show output below previous task (in exclusive mode logs would come from separate thread)
         if (mod) {
-            python.callModule(mod, cmd)
+            python.callModule(logger, mod, cmd)
         } else {
-            python.exec(cmd)
+            python.exec(logger, cmd)
         }
     }
 

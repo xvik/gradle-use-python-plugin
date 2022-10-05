@@ -1,10 +1,9 @@
 package ru.vyarus.gradle.plugin.python.util
 
-import org.apache.tools.ant.taskdefs.condition.Os
+
 import org.gradle.internal.impldep.com.google.common.io.Files
 import org.gradle.process.internal.ExecException
 import spock.lang.Specification
-
 
 /**
  * @author Vyacheslav Rusakov
@@ -69,14 +68,17 @@ class CliUtilsTest extends Specification {
 
     def "Check command wrapping"() {
 
-        boolean isWindows = Os.isFamily(Os.FAMILY_WINDOWS)
-
         expect: 'wrapped'
-        CliUtils.wrapCommand('print(\'sample\')') == (isWindows ? 'print(\'sample\')' : 'exec("print(\'sample\')")')
-        CliUtils.wrapCommand('"print(\'sample\')"') == (isWindows ? '"print(\'sample\')"' : 'exec("print(\'sample\')")')
-        CliUtils.wrapCommand('exec("print(\'sample\')")') == 'exec("print(\'sample\')")'
-        CliUtils.wrapCommand('import sys;print(sys.prefix)') == (isWindows ? 'import sys;print(sys.prefix)' : 'exec("import sys;print(sys.prefix)")')
-        CliUtils.wrapCommand('"import sys;print(sys.prefix+\"smaple\")"') == (isWindows ? '"import sys;print(sys.prefix+"smaple")"' : 'exec("import sys;print(sys.prefix+"smaple")")')
+        CliUtils.wrapCommand('print(\'sample\')', true) == 'print(\'sample\')'
+        CliUtils.wrapCommand('print(\'sample\')', false) == 'exec("print(\'sample\')")'
+        CliUtils.wrapCommand('"print(\'sample\')"', true) == '"print(\'sample\')"'
+        CliUtils.wrapCommand('"print(\'sample\')"', false) == 'exec("print(\'sample\')")'
+        CliUtils.wrapCommand('exec("print(\'sample\')")', true) == 'exec("print(\'sample\')")'
+        CliUtils.wrapCommand('exec("print(\'sample\')")', false) == 'exec("print(\'sample\')")'
+        CliUtils.wrapCommand('import sys;print(sys.prefix)', true) == 'import sys;print(sys.prefix)'
+        CliUtils.wrapCommand('import sys;print(sys.prefix)', false) == 'exec("import sys;print(sys.prefix)")'
+        CliUtils.wrapCommand('"import sys;print(sys.prefix+\"smaple\")"', true) == '"import sys;print(sys.prefix+"smaple")"'
+        CliUtils.wrapCommand('"import sys;print(sys.prefix+\"smaple\")"', false) == 'exec("import sys;print(sys.prefix+"smaple")")'
     }
 
     def "Check command line parsing"() {

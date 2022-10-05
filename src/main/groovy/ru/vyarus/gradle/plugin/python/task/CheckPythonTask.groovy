@@ -21,6 +21,10 @@ import ru.vyarus.gradle.plugin.python.util.PythonExecutionFailed
  * When virtualenv not exists, then global python checked. If pip modules required, pip existence checked and
  * then virtualenv existence checked (if scope allows). With default scope, when virtualenv module not found,
  * plugin fall back to os user dir. If virtualenv is strictly required (by scope) then build will fail.
+ * <p>
+ * When executing under docker it is required to re-use container between internal python calls, because
+ * restarted container would lost its state, but we need to install virtualenv and create environment
+ * (different commands).
  *
  * @author Vyacheslav Rusakov
  * @since 08.12.2017
@@ -40,8 +44,12 @@ class CheckPythonTask extends BasePipTask {
         boolean envRequested = ext.scope >= PythonExtension.Scope.VIRTUALENV_OR_USER
         Virtualenv env = envRequested
                 // synchronize work dir between python instances
-                ? new Virtualenv(project, getPythonPath(), getPythonBinary(), getValidateSystemBinary(), ext.envPath)
-                .workDir(getWorkDir()) : null
+                ? new Virtualenv(project, getPythonPath(), getPythonBinary(), ext.envPath)
+                .validateSystemBinary(getValidateSystemBinary())
+                .withDocker(getDocker().toConfig())
+                .workDir(getWorkDir())
+                .environment(getEnvironment())
+                .validate() : null
 
         // preventing simultaneous installation of virtualenv by multiple modules when parallel execution enabled
         synchronized (SYNC) {
@@ -77,7 +85,12 @@ class CheckPythonTask extends BasePipTask {
 
     private void checkPython(PythonExtension ext) {
         // important because python could change on second execution
-        Python python = new Python(project, pythonPath, pythonBinary, validateSystemBinary).workDir(getWorkDir())
+        Python python = new Python(project, pythonPath, pythonBinary)
+                .workDir(getWorkDir())
+                .environment(getEnvironment())
+                .validateSystemBinary(isValidateSystemBinary())
+                .withDocker(docker.toConfig())
+                .validate()
         try {
             python.version
         } catch (ExecException ex) {
@@ -103,8 +116,13 @@ class CheckPythonTask extends BasePipTask {
 
     private void checkPip(PythonExtension ext) {
         // important because python could change on second execution
-        Pip pip = new Pip(project, isValidateSystemBinary(), getPythonPath(), getPythonBinary(), false, true)
+        Pip pip = new Pip(project, getPythonPath(), getPythonBinary())
+                .userScope(false)
                 .workDir(getWorkDir())
+                .environment(getEnvironment())
+                .validateSystemBinary(isValidateSystemBinary())
+                .withDocker(getDocker().toConfig())
+                .validate()
         try {
             pip.versionLine
         } catch (PythonExecutionFailed ex) {
@@ -124,9 +142,15 @@ class CheckPythonTask extends BasePipTask {
         logger.lifecycle('Using {}', pip.versionLine)
     }
 
+    @SuppressWarnings('MethodSize')
     private boolean checkEnv(Virtualenv env, PythonExtension ext) {
-        Pip pip = new Pip(project, isValidateSystemBinary(), getPythonPath(), getPythonBinary(), true, true)
+        Pip pip = new Pip(project, getPythonPath(), getPythonBinary())
+                .userScope(true)
                 .workDir(getWorkDir())
+                .environment(getEnvironment())
+                .validateSystemBinary(isValidateSystemBinary())
+                .withDocker(getDocker().toConfig())
+                .validate()
         // to avoid calling pip in EACH module (in multi-module project) to verify virtualenv existence
         Boolean venvInstalled = project.rootProject.findProperty(PROP_VENV_INSTALLED)
         if (venvInstalled == null) {

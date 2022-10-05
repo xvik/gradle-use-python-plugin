@@ -14,7 +14,7 @@ class PythonExecTest extends AbstractCliMockSupport {
 
     @Override
     void setup() {
-        python = new Python(project)
+        python = new Python(project).validateSystemBinary(false)
     }
 
     def "Check success"() {
@@ -112,7 +112,7 @@ class PythonExecTest extends AbstractCliMockSupport {
 
         setup:
         mockExec(project, 'sample output', 0)
-        python = new Python(project, null, 'pyt', false)
+        python = new Python(project, null, 'pyt').validateSystemBinary(false)
 
         when: "call module"
         python.exec('mmm')
@@ -123,7 +123,7 @@ class PythonExecTest extends AbstractCliMockSupport {
     def "Check global python validation"() {
 
         when: 'incorrect global binary declared'
-        python = new Python(project, null, 'pyt')
+        python = new Python(project, null, 'pyt').validate()
 
         then: "failed"
         def ex = thrown(GradleException)

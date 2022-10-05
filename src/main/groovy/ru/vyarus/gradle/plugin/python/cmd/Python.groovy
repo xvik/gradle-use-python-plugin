@@ -5,9 +5,11 @@ import groovy.transform.Memoized
 import groovy.transform.TypeCheckingMode
 import org.gradle.api.Project
 import org.gradle.api.logging.LogLevel
+import org.gradle.api.logging.Logger
+import ru.vyarus.gradle.plugin.python.cmd.docker.DockerConfig
+import ru.vyarus.gradle.plugin.python.cmd.exec.PythonBinary
 import ru.vyarus.gradle.plugin.python.util.CliUtils
 import ru.vyarus.gradle.plugin.python.util.OutputLogger
-import ru.vyarus.gradle.plugin.python.util.PythonBinary
 import ru.vyarus.gradle.plugin.python.util.PythonExecutionFailed
 
 /**
@@ -35,24 +37,40 @@ class Python {
     private final Project project
     private final PythonBinary binary
 
-    private String workDir
     private String outputPrefix = '\t'
     private LogLevel logLevel = LogLevel.INFO
     private final List<String> pythonArgs = []
     private final List<String> extraArgs = []
-    private final Map<String, Object> envVars = [:]
 
     Python(Project project) {
         this(project, null, null)
     }
 
     Python(Project project, String pythonPath, String binary) {
-        this(project, pythonPath, binary, true)
+        this.project = project
+        this.binary = new PythonBinary(project, pythonPath, binary)
     }
 
-    Python(Project project, String pythonPath, String binary, boolean validateSystemBinary) {
-        this.project = project
-        this.binary = new PythonBinary(project, pythonPath, binary, validateSystemBinary)
+    /**
+     * System binary search is performed only for global python (when pythonPath is not specified). Enabled by default.
+     *
+     * @param validate true to search python binary in system path and fail if not found
+     * @return cli instance for chained calls
+     */
+    Python validateSystemBinary(boolean validate) {
+        this.binary.validateSystemBinary(validate)
+        return this
+    }
+
+    /**
+     * Enable docker support: all python commands would be executed under docker container.
+     *
+     * @param docker docker configuration (may be null)
+     * @return cli instance for chained calls
+     */
+    Python withDocker(DockerConfig docker) {
+        this.binary.withDocker(docker)
+        return this
     }
 
     /**
@@ -61,7 +79,7 @@ class Python {
      */
     Python workDir(String workDir) {
         if (workDir) {
-            this.workDir = workDir
+            binary.workDir(workDir)
         }
         return this
     }
@@ -139,7 +157,7 @@ class Python {
      * @return cli instance for chained calls
      */
     Python environment(String name, Object value) {
-        envVars.put(name, value)
+        binary.envVars.put(name, value)
         return this
     }
 
@@ -155,8 +173,20 @@ class Python {
      */
     Python environment(Map<String, Object> vars) {
         if (vars) {
-            envVars.putAll(vars)
+            binary.envVars.putAll(vars)
         }
+        return this
+    }
+
+    /**
+     * Perform pre-initialization and, if required, validate global python binary correctness. Calling this method is
+     * NOT REQUIRED: initialization will be performed automatically before first execution. But it might be called
+     * in order to throw possible initialization error before some other logic (related to exception handling).
+     *
+     * @return cli instance for chained calls
+     */
+    Python validate() {
+        binary.init()
         return this
     }
 
@@ -193,7 +223,7 @@ class Python {
     }
 
     Python clearEnvironment() {
-        this.envVars.clear()
+        binary.envVars.clear()
         return this
     }
 
@@ -226,16 +256,36 @@ class Python {
 
     /**
      * Execute python command. All output redirected to gradle log (line by line).
+     * <p>
+     * Shortcut for {@link #exec(org.gradle.api.logging.Logger, java.lang.Object)} with project logger.
      *
      * @param args command line arguments (array, collection or simple string)
      * @throws PythonExecutionFailed when process fails
      */
     void exec(Object args) {
-        new OutputLogger(project.logger, logLevel, outputPrefix).withStream { processExecution(args, it) }
+        exec(project.logger, args)
+    }
+
+    /**
+     * Execute python command. All output redirected to gradle log (line by line).
+     * <p>
+     * Custom logger is required ONLY for cases when log messages might come from different thread
+     * (like with exclusive docker execution) - in this case project logger might log near previous task (but direct
+     * task logger usage workarounds this problem).
+     *
+     * @param logger logger to use
+     * @param args args command line arguments (array, collection or simple string)
+     * @throws PythonExecutionFailed when process fails
+     */
+    void exec(Logger logger, Object args) {
+        new OutputLogger(logger, logLevel, outputPrefix).withStream { processExecution(args, it) }
     }
 
     /**
      * Calls command on module. Useful for integrations to avoid manual arguments merge for module.
+     * <p>
+     * Shortcut for {@link #callModule(org.gradle.api.logging.Logger, java.lang.String, java.lang.Object)} with
+     * project logger.
      *
      * @param module called python module name
      * @param args command line arguments (array, collection or simple string)
@@ -243,6 +293,22 @@ class Python {
      */
     void callModule(String module, Object args) {
         exec(CliUtils.mergeArgs("-m $module", args))
+    }
+
+    /**
+     * Calls command on module. Useful for integrations to avoid manual arguments merge for module.
+     * <p>
+     * Custom logger is required ONLY for cases when log messages might come from different thread
+     * (like with exclusive docker execution) - in this case project logger might log near previous task (but direct
+     * task logger usage workarounds this problem).
+     *
+     * @param logger logger to use
+     * @param module called python module name
+     * @param args command line arguments (array, collection or simple string)
+     * @throws PythonExecutionFailed when process fails
+     */
+    void callModule(Logger logger, String module, Object args) {
+        exec(logger, CliUtils.mergeArgs("-m $module", args))
     }
 
     /**
@@ -263,7 +329,7 @@ class Python {
      * @return current working directory or null if not defined.
      */
     String getWorkDir() {
-        return workDir
+        return binary.workDir
     }
 
     /**
@@ -284,6 +350,12 @@ class Python {
     String getBinaryDir() {
         // sys.executable and sys.prefix
         return binary.getBinaryDir({ resolveInfo()[2]?.trim() }, { homeDir })
+    }
+
+    // important for docker when virtualenv located inside project
+    @Memoized
+    String getLocalBinaryDir() {
+        binary.getLocalPath(binaryDir)
     }
 
     /**
@@ -308,8 +380,8 @@ class Python {
     @Memoized
     boolean isVirtualenv() {
         // always absolute path
-        String activationScript = binaryDir + File.separator + 'activate'
-        return new File(activationScript).exists()
+        String path = binaryDir + File.separator + 'activate'
+        return binary.exists(path)
     }
 
     /**
@@ -340,7 +412,7 @@ class Python {
 
     @CompileStatic(TypeCheckingMode.SKIP)
     private void processExecution(Object args, OutputStream os) {
-        binary.exec(args, pythonArgs, extraArgs, os, workDir, envVars, logLevel)
+        binary.exec(args, pythonArgs, extraArgs, os, logLevel)
     }
 
     /**

@@ -27,7 +27,7 @@ class DurationFormatter {
      */
     static String format(long duration) {
         if (duration == 0L) {
-            return '0s'
+            return '0ms'
         }
 
         StringBuilder result = new StringBuilder()
@@ -49,15 +49,23 @@ class DurationFormatter {
             append(result, minutes, 'm')
         }
 
-        // if at least one sec
-        boolean onlySecs = result.length() == 0
-        if (onlySecs || duration >= MILLIS_PER_SECOND) {
-            int secondsScale = onlySecs ? 3 : 0
+        boolean secs = false
+        if (duration >= MILLIS_PER_SECOND) {
+            // if only secs, show rounded value, otherwise get rid of ms
+            int secondsScale = result.length() == 0 ? 2 : 0
             append(result,
                     BigDecimal.valueOf(duration)
                             .divide(BigDecimal.valueOf(MILLIS_PER_SECOND))
-                            .setScale(secondsScale, 4),
+                            .setScale(secondsScale, 4)
+                            .stripTrailingZeros()
+                            .toPlainString(),
                     's')
+            secs = true
+            duration %= MILLIS_PER_SECOND
+        }
+
+        if (!secs && duration > 0) {
+            result.append(duration + 'ms')
         }
         return result.toString()
     }

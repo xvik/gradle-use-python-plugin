@@ -191,10 +191,10 @@ final class CliUtils {
      * called on linux at all (when used from java).
      *
      * @param command command expression to wrap
+     * @param isWindows for windows host
      * @return wrapped expression or original command if its already exec()
      */
-    static String wrapCommand(String command) {
-        boolean isWindows = Os.isFamily(Os.FAMILY_WINDOWS)
+    static String wrapCommand(String command, boolean isWindows) {
         if (isWindows || command.startsWith('exec(')) {
             return command
         }

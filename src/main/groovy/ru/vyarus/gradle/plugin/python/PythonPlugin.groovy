@@ -6,6 +6,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.Delete
 import org.gradle.api.tasks.TaskProvider
+import ru.vyarus.gradle.plugin.python.cmd.docker.DockerFactory
 import ru.vyarus.gradle.plugin.python.task.BasePythonTask
 import ru.vyarus.gradle.plugin.python.task.CheckPythonTask
 import ru.vyarus.gradle.plugin.python.task.PythonTask
@@ -17,6 +18,7 @@ import ru.vyarus.gradle.plugin.python.util.RequirementsReader
 
 /**
  * Use-python plugin. Plugin requires python installed globally or configured path to python binary.
+ * Alternatively, docker might be used.
  * <p>
  * Used to install required pip modules or revert installed versions if older required with {@code pipInstall} task
  * (guarantee exact modules versions). And use python modules, scripts, commands during gradle build
@@ -79,8 +81,10 @@ class PythonPlugin implements Plugin<Project> {
         }
 
         configureDefaults(project, extension, checkTask, installTask)
+        configureDocker(project)
     }
 
+    @SuppressWarnings('MethodSize')
     @CompileStatic(TypeCheckingMode.SKIP)
     private void configureDefaults(Project project,
                                    PythonExtension extension,
@@ -97,6 +101,10 @@ class PythonPlugin implements Plugin<Project> {
                     // important to copy map because each task must have independent instance
                     environment = { extension.environment ? new HashMap<>(extension.environment) : null }
                 }
+
+                // can't be implemented with convention mapping, only with properties
+                configureDockerInTask(project, extension.docker, task)
+
                 // all python tasks must be executed after check task to use correct environment (switch to virtualenv)
                 if (task.taskIdentity.type != CheckPythonTask) {
                     dependsOn checkTask
@@ -129,6 +137,21 @@ class PythonPlugin implements Plugin<Project> {
                 showInstalledVersions = { extension.showInstalledVersions }
                 alwaysInstallModules = { extension.alwaysInstallModules }
             }
+        }
+    }
+
+    private void configureDockerInTask(Project project, PythonExtension.Docker docker, BasePythonTask task) {
+        task.docker.use.convention(project.provider { docker.use })
+        task.docker.image.convention(project.provider { docker.image })
+        task.docker.windows.convention(project.provider { docker.windows })
+        task.docker.exclusive.convention(false)
+    }
+
+    private void configureDocker(Project project) {
+        project.gradle.buildFinished {
+            // close started docker containers at the end (mainly for tests, because docker instances are
+            // project-specific and there would be problem in gradle tests always started in new dir)
+            DockerFactory.shutdownAll()
         }
     }
 }

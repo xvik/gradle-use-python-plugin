@@ -21,6 +21,8 @@ wrapper {
 
 repositories { mavenLocal(); mavenCentral(); gradlePluginPortal() }
 dependencies {
+    implementation ('org.testcontainers:testcontainers:1.17.3')
+
     testImplementation('org.spockframework:spock-core:2.0-groovy-2.5') {
         exclude group: 'org.codehaus.groovy'
     }

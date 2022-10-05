@@ -1,6 +1,7 @@
 package ru.vyarus.gradle.plugin.python
 
 import groovy.transform.CompileStatic
+import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.Project
 import ru.vyarus.gradle.plugin.python.task.pip.module.ModuleFactory
 
@@ -171,6 +172,12 @@ class PythonExtension {
      */
     Requirements requirements = new Requirements()
 
+    /**
+     * Execute python inside docker container. When enabled, project (root) mapped to container and all
+     * python executions appear inside docker.
+     */
+    Docker docker = new Docker()
+
     private final Project project
 
     PythonExtension(Project project) {
@@ -308,6 +315,15 @@ class PythonExtension {
     }
 
     /**
+     * Configure docker container.
+     *
+     * @param config configuration closure
+     */
+    void setDocker(@DelegatesTo(Docker) Closure config) {
+        project.configure(docker, config)
+    }
+
+    /**
      * Requirements file support.
      */
     static class Requirements {
@@ -334,5 +350,51 @@ class PythonExtension {
          *     format</a>
          */
         boolean strict = true
+    }
+
+    /**
+     * Docker support is implemented with <a href="https://testcontainers.org">testcontainers</a>.
+     * By default, stateless mode used when container is removed after gradle execution. Root project
+     * directory is mounted into docker and all paths are automatically rewritten, so enabling docker should
+     * be almost invisible.
+     * <p>
+     * Be aware, that using docker would slow down your builds.
+     * To speed-up execution, docker container is started on first request and stay "alive" until gradle execution
+     * ends. When different containers used (e.g. in different modules), they all would be started once and used
+     * through entire gradle execution.
+     * <p>
+     * Each python task has it's own docker configuration. By default, it would be the same as in extension, but
+     * could be changed manually. If task configured differently (work dir, environment or specific docker config)
+     * then docker container would be re-started, applying exact task configuration.
+     * <p>
+     * LIMITATION: output from docker command would appear only after command execution. For long-lived
+     * process where output is important use
+     * {@link ru.vyarus.gradle.plugin.python.task.BasePythonTask.DockerEnv#getExclusive()} flag directly on task.
+     * This way, task would start new container, using python command as container command.
+     */
+    static class Docker {
+        /**
+         * Enable docker support. When disabled, direct python is used.
+         */
+        boolean use
+
+        /**
+         * Type of used image. Normally, image os must be aligned with host, but variations are possible,
+         * There is no automatic system detection in docker so you'll need to specify correct type to let plugin
+         * correctly format commands.
+         */
+        boolean windows = Os.isFamily(Os.FAMILY_WINDOWS)
+
+        /**
+         * Docker image to use. This is complete image path (potentially including repository and tag) and not just
+         * image name. It is highly suggested always specifying exact tag!
+         * <p>
+         * Normally, docker image must align with host. Windows image would not work on linux (without additional
+         * virtualization). But, on windows, it is possible to launch linux container. Anyway, in order to minimize
+         * problems, host-specific images would be used by default.
+         *
+         * @see <a href="https://hub.docker.com/_/python">python image</a>
+         */
+        String image = windows ? 'python:3.10.7-windowsservercore-1809' : 'python:3.10.7-alpine3.15'
     }
 }

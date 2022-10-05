@@ -5,6 +5,7 @@ import groovy.transform.Memoized
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.logging.LogLevel
+import ru.vyarus.gradle.plugin.python.cmd.docker.DockerConfig
 import ru.vyarus.gradle.plugin.python.util.CliUtils
 import ru.vyarus.gradle.plugin.python.util.PythonExecutionFailed
 
@@ -32,47 +33,75 @@ class Pip {
 
     private final Python python
     // --user for install, list and freeze tasks
-    private boolean userScope
+    private boolean userScope = true
     // --no-cache-dir for install task
     // may be changed externally
-    boolean useCache
+    boolean useCache = true
     // --extra-index-url
     List<String> extraIndexUrls = []
     // --trusted-host
     List<String> trustedHosts = []
 
     Pip(Project project) {
-        this(project, null, null, true)
+        this(project, null, null)
     }
 
-    // reamains for compatibility with older releases
-    Pip(Project project, String pythonPath, String binary, boolean userScope) {
-        this(project, pythonPath, binary, userScope, true)
-    }
-
-    Pip(Project project, String pythonPath, String binary, boolean userScope, boolean useCache) {
-        this(project, true, pythonPath, binary, userScope, useCache)
-    }
-
-    @SuppressWarnings('ParameterCount')
-    Pip(Project project,
-        boolean validateSystemBinary,
-        String pythonPath,
-        String binary,
-        boolean userScope,
-        boolean useCache) {
-        this(new Python(project, pythonPath, binary, validateSystemBinary)
-                .logLevel(LogLevel.LIFECYCLE), userScope, useCache)
+    Pip(Project project, String pythonPath, String binary) {
+        this(new Python(project, pythonPath, binary).logLevel(LogLevel.LIFECYCLE))
     }
 
     // preferred way for construction because allows configured python instance re-usage
-    Pip(Python python, boolean userScope, boolean useCache) {
+    Pip(Python python) {
         this.python = python
-        this.userScope = userScope
-        this.useCache = useCache
 
         // do not show passwords when external indexes used with credentials
         python.logCommandCleaner { CliUtils.hidePipCredentials(it) }
+    }
+
+    /**
+     * Execute install, list and freeze tasks with --user flag (in user scope).
+     * Enabled by default!
+     *
+     * @param inUserScope false to switch to global scope
+     * @return pip instance for chained calls
+     */
+    Pip userScope(boolean inUserScope) {
+        this.userScope = inUserScope
+        return this
+    }
+
+    /**
+     * By default pip install will use case, Set to false in order to disable pip installation cache (--no-cache-dir
+     * would be applied).
+     *
+     * @param cache false to disable pip install cache
+     * @return pip instance for chained calls
+     */
+    Pip useCache(boolean cache) {
+        this.useCache = cache
+        return this
+    }
+
+    /**
+     * System binary search is performed only for global python (when pythonPath is not specified). Enabled by default.
+     *
+     * @param validate true to search python binary in system path and fail if not found
+     * @return cli instance for chained calls
+     */
+    Pip validateSystemBinary(boolean validate) {
+        this.python.validateSystemBinary(validate)
+        return this
+    }
+
+    /**
+     * Enable docker support: all python commands would be executed under docker container.
+     *
+     * @param docker docker configuration (may be null)
+     * @return cli instance for chained calls
+     */
+    Pip withDocker(DockerConfig docker) {
+        this.python.withDocker(docker)
+        return this
     }
 
     /**
@@ -83,6 +112,17 @@ class Pip {
      */
     Pip workDir(String workDir) {
         python.workDir(workDir)
+        return this
+    }
+
+    /**
+     * Shortcut for {@link Python#environment(java.util.Map)}.
+     *
+     * @param env environment map
+     * @return pip instance for chained calls
+     */
+    Pip environment(Map<String, Object> env) {
+        python.environment(env)
         return this
     }
 
@@ -111,6 +151,18 @@ class Pip {
         if (hosts) {
             this.trustedHosts.addAll(hosts)
         }
+        return this
+    }
+
+    /**
+     * Perform pre-initialization and, if required, validate global python binary correctness. Calling this method is
+     * NOT REQUIRED: initialization will be performed automatically before first execution. But it might be called
+     * in order to throw possible initialization error before some other logic (related to exception handling).
+     *
+     * @return pip instance for chained calls
+     */
+    Pip validate() {
+        python.validate()
         return this
     }
 

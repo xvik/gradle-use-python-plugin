@@ -2,7 +2,6 @@ package ru.vyarus.gradle.plugin.python.cmd
 
 import org.gradle.api.Project
 import org.gradle.api.logging.LogLevel
-import org.gradle.testfixtures.ProjectBuilder
 import ru.vyarus.gradle.plugin.python.AbstractTest
 import ru.vyarus.gradle.plugin.python.util.PythonExecutionFailed
 
@@ -124,29 +123,29 @@ class PythonCliTest extends AbstractTest {
         when: "clear args"
         python.clearExtraArgs()
         then: 'set'
-        python.extraArgs.empty
+        python.clearEnvironment()
 
         when: "set vars"
         python.environment('foo', 1)
         python.environment('bar', 2)
         then: 'set'
-        python.envVars == ['foo': 1, 'bar' : 2]
+        python.binary.envVars == ['foo': 1, 'bar' : 2]
 
         when: 'clear vars'
         python.clearEnvironment()
         then: 'no vars'
-        python.envVars.size() == 0
+        python.binary.envVars.size() == 0
 
         when: 'mass variables set'
         python.environment(['foo': 2, 'bar' : 3])
         python.environment(['foo': 1, 'baz' : 4])
         then: 'aggregated'
-        python.envVars == ['foo': 1, 'bar' : 3, 'baz': 4]
+        python.binary.envVars == ['foo': 1, 'bar' : 3, 'baz': 4]
 
         when: 'additional var'
         python.environment('sample': 'sam')
         then: 'aggregated'
-        python.envVars == ['foo': 1, 'bar' : 3, 'baz': 4, 'sample': 'sam']
+        python.binary.envVars == ['foo': 1, 'bar' : 3, 'baz': 4, 'sample': 'sam']
 
     }
 }

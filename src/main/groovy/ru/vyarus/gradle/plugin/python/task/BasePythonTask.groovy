@@ -2,12 +2,17 @@ package ru.vyarus.gradle.plugin.python.task
 
 import groovy.transform.CompileStatic
 import groovy.transform.Memoized
+import org.gradle.api.Action
 import org.gradle.api.internal.ConventionTask
 import org.gradle.api.logging.LogLevel
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.Optional
+import org.gradle.util.ClosureBackedAction
 import ru.vyarus.gradle.plugin.python.cmd.Python
+import ru.vyarus.gradle.plugin.python.cmd.docker.DockerConfig
 
 /**
  * Base task for all python tasks.
@@ -81,6 +86,9 @@ class BasePythonTask extends ConventionTask {
     @Optional
     LogLevel logLevel = LogLevel.LIFECYCLE
 
+    @Nested
+    DockerEnv docker = project.objects.newInstance(DockerEnv)
+
     protected BasePythonTask() {
         group = 'python'
     }
@@ -125,6 +133,29 @@ class BasePythonTask extends ConventionTask {
         }
     }
 
+    /**
+     * Configure docker container for python execution inside docker.
+     *
+     * @param closure configuration closure
+     * @return configured docker sub-configuration object
+     */
+    @SuppressWarnings('ConfusingMethodName')
+    DockerEnv docker(@DelegatesTo(value = DockerEnv, strategy = Closure.DELEGATE_FIRST) Closure closure) {
+        docker(new ClosureBackedAction<DockerEnv>(closure))
+    }
+
+    /**
+     * Configure docker container for python execution inside docker.
+     *
+     * @param action  configuration action
+     * @return configured  docker sub-configuration object
+     */
+    @SuppressWarnings('ConfusingMethodName')
+    DockerEnv docker(Action<? super DockerEnv> action) {
+        action.execute(docker)
+        return docker
+    }
+
     @Internal
     protected Python getPython() {
         buildPython()
@@ -132,10 +163,81 @@ class BasePythonTask extends ConventionTask {
 
     @Memoized
     private Python buildPython() {
-        new Python(project, getPythonPath(), getPythonBinary(), getValidateSystemBinary())
+        new Python(project, getPythonPath(), getPythonBinary())
                 .logLevel(getLogLevel())
                 .workDir(getWorkDir())
                 .pythonArgs(getPythonArgs())
                 .environment(getEnvironment())
+                .validateSystemBinary(getValidateSystemBinary())
+                .withDocker(getDocker().toConfig())
+                .validate()
+    }
+
+    /**
+     * Task-specific configuration for docker environment. By default, copies configuration from extension
+     * {@link ru.vyarus.gradle.plugin.python.PythonExtension#docker}, but configuration might be changed for each task.
+     * <p>
+     * Docker container is re-used between python executions, but if task configuration differs from configuration
+     * used for already started container (work dit, environment, docker specific configs) then container would be
+     * re-started.
+     * <p>
+     * For a long-lived tasks use {@link DockerEnv#getExclusive()} mode.
+     *
+     * @see ru.vyarus.gradle.plugin.python.cmd.docker.DockerFactory
+     */
+    static abstract class DockerEnv {
+
+        /**
+         * @return true when docker container must be used
+         */
+        @Input
+        abstract Property<Boolean> getUse()
+
+        /**
+         * Docker image to use. This is complete image path (potentially including repository and tag) and not just
+         * image name. It is highly suggested always specifying exact tag!
+         * <p>
+         * Normally, docker image must align with host. Windows image would not work on linux (without additional
+         * virtualization). But, on windows, it is possible to launch linux container. Anyway, in order to minimize
+         * problems, host-specific images would be used by default.
+         *
+         * @see <a href="https://hub.docker.com/_/python">python image</a>
+         */
+        @Input
+        abstract Property<String> getImage()
+
+        /**
+         * Type of used image. Normally, image os must be aligned with host, but variations are possible,
+         * There is no automatic system detection in docker so you'll need to specify correct type to let plugin
+         * correctly format commands.
+         */
+        @Internal
+        abstract Property<Boolean> getWindows()
+
+        /**
+         * By default, same container instance is re-used between all python executions. But, this cause limitations:
+         * <ul>
+         *     <li>Task execution might be limited in time (due to http api used for docker control)
+         *     <li>Task logs would appear only AFTER task execution
+         * </ul>
+         * <p>
+         * For long-running processes it is better to start container exclusively (use python command as docker
+         * container command, which will hold container as long as command would be executed, moreover logs would be
+         * immediately visible). One example, is some dev-server which could work indefinitely (like mkdocs server,
+         * used in time of writing documentation).
+         */
+        @Input
+        abstract Property<Boolean> getExclusive()
+
+        /**
+         * @return docker configuration for managed container creation or null if docker not required
+         */
+        @SuppressWarnings('UnnecessaryGetter')
+        DockerConfig toConfig() {
+            getUse().get() ? new DockerConfig(
+                    image: getImage().get(),
+                    windows: getWindows().get(),
+                    exclusive: getExclusive().get()) : null
+        }
     }
 }

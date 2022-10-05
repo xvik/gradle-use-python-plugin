@@ -195,7 +195,9 @@ class BasePipTask extends BasePythonTask {
 
     @Memoized
     private Pip buildPip() {
-        return new Pip(python, getUserScope(), getUseCache())
+        return new Pip(python)
+                .userScope(getUserScope())
+                .useCache(getUseCache())
                 .trustedHosts(getTrustedHosts())
                 .extraIndexUrls(getExtraIndexUrls())
     }

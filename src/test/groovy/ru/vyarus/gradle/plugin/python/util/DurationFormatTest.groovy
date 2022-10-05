@@ -11,9 +11,11 @@ class DurationFormatTest extends Specification {
     def "Check time formatting"() {
 
         expect:
-        DurationFormatter.format(0) == '0s'
-        DurationFormatter.format(100) == '0.100s'
-        DurationFormatter.format(10_000) == '10.000s'
+        DurationFormatter.format(0) == '0ms'
+        DurationFormatter.format(100) == '100ms'
+        DurationFormatter.format(1200) == '1.2s'
+        DurationFormatter.format(1020) == '1.02s'
+        DurationFormatter.format(10_000) == '10s'
         DurationFormatter.format(1_000_000) == '16m 40s'
         DurationFormatter.format(1_000_000_000) == '11d 13h 46m 40s'
         DurationFormatter.format(1*24*60*60*1000) == '1d'

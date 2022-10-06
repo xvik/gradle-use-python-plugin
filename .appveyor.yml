@@ -24,7 +24,8 @@ install:
   - python -m pip --version
   - python -m pip install -U virtualenv==20.4.2
   - python -m pip install codecov --user
-  - ps: Set-Content -Path C:\ProgramData\Docker\config\daemon.json -Value "{""hosts"": [""tcp://0.0.0.0:2375""], ""experimental"": true}"
+  - ps: |
+      Set-Content -Path C:\ProgramData\Docker\config\daemon.json -Value '{"hosts": ["tcp://0.0.0.0:2375"], "experimental": true}'
   - docker info
 
 build_script:

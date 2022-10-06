@@ -26,6 +26,7 @@ install:
   - python -m pip install codecov --user
   - ps: |
       Set-Content -Path C:\ProgramData\Docker\config\daemon.json -Value '{"hosts": ["tcp://0.0.0.0:2375"], "experimental": true}'
+  - docker restart
   - docker info
 
 build_script:

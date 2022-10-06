@@ -2,6 +2,7 @@ version: '{build}'
 image: Visual Studio 2019
 
 environment:
+    DOCKER_HOST: "tcp://127.0.0.1:2375"
     matrix:
         - job_name: Java 8, python 3.8
           JAVA_HOME: C:\Program Files\Java\jdk1.8.0
@@ -23,8 +24,7 @@ install:
   - python -m pip --version
   - python -m pip install -U virtualenv==20.4.2
   - python -m pip install codecov --user
-  - type C:\ProgramData\Docker\config\daemon.json
-  - set DOCKER_HOST=tcp://127.0.0.1:2375
+  - ps: Set-Content -Path C:\ProgramData\Docker\config\daemon.json -Value "{""hosts"": [""tcp://0.0.0.0:2375""], ""experimental"": true}"
   - docker info
 
 build_script:

@@ -23,6 +23,8 @@ install:
   - python -m pip --version
   - python -m pip install -U virtualenv==20.4.2
   - python -m pip install codecov --user
+  - set DOCKER_HOST=tcp://localhost:2375
+  - docker info
 
 build_script:
   - ./gradlew assemble --no-daemon

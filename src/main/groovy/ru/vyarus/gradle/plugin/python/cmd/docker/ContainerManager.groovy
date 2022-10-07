@@ -240,7 +240,7 @@ class ContainerManager {
         }
     }
 
-    @SuppressWarnings('UnusedMethodParameter')
+    @SuppressWarnings(['UnusedMethodParameter', 'UnnecessaryGetter'])
     String formatContainerInfo(DockerConfig config, String workDir, Map<String, Object> env) {
         StringBuilder res = new StringBuilder()
         String labelPattern = '\t%-15s '
@@ -248,7 +248,7 @@ class ContainerManager {
                 .append(projectRootPath).append(':').append(projectDockerPath).append(NL)
         res.append(String.format(labelPattern, 'Work dir'))
                 .append(getDockerWorkDir(workDir)).append(NL)
-        if (env != null && !env.empty) {
+        if (env != null && !env.isEmpty()) {
             res.append(String.format(labelPattern, "Env (${env.size()})"))
             // only names because there might be secrets in values
                     .append(env.keySet().join(', ')).append(NL)
@@ -282,13 +282,13 @@ class ContainerManager {
                 formatContainerInfo(config.docker, config.workDir, config.env))
     }
 
-    @SuppressWarnings('UnusedPrivateMethodParameter')
+    @SuppressWarnings(['UnusedPrivateMethodParameter', 'UnnecessaryGetter'])
     private PythonContainer createContainer(DockerConfig config, String workDir, Map<String, Object> env) {
         PythonContainer container = new PythonContainer(image)
                 .withFileSystemBind(projectRootPath, projectDockerPath, BindMode.READ_WRITE)
                 .withWorkingDirectory(getDockerWorkDir(workDir))
 
-        if (env != null && !env.empty) {
+        if (env != null && !env.isEmpty()) {
             env.each { k, v ->
                 container.addEnv(k, String.valueOf(v))
             }

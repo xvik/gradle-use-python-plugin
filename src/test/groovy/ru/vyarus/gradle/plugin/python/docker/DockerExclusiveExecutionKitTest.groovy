@@ -3,11 +3,14 @@ package ru.vyarus.gradle.plugin.python.docker
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.TaskOutcome
 import ru.vyarus.gradle.plugin.python.AbstractKitTest
+import spock.lang.IgnoreIf
 
 /**
  * @author Vyacheslav Rusakov
  * @since 04.10.2022
  */
+// testcontainers doesn't work on windows server https://github.com/testcontainers/testcontainers-java/issues/2960
+@IgnoreIf({ env.containsKey('APPVEYOR') })
 class DockerExclusiveExecutionKitTest extends AbstractKitTest {
 
     def "Check exclusive execution"() {

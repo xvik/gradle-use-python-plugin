@@ -37,7 +37,7 @@ class DockerExclusiveExecutionKitTest extends AbstractKitTest {
 
         then: "task successful"
         result.task(':sample').outcome == TaskOutcome.SUCCESS
-        result.output.contains('[docker] executing command in exclusive container')
+        result.output.contains('[docker] exclusive container')
         result.output.contains('samplee')
     }
 
@@ -67,7 +67,7 @@ class DockerExclusiveExecutionKitTest extends AbstractKitTest {
 
         then: "task successful"
         result.task(':sample').outcome == TaskOutcome.SUCCESS
-        result.output.contains('[docker] executing command in exclusive container')
+        result.output.contains('[docker] exclusive container')
         result.output.contains('samplee')
     }
 

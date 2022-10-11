@@ -128,4 +128,32 @@ class DockerRunKitTest extends AbstractKitTest {
         result.task(':sample').outcome == TaskOutcome.FAILED
         result.output.contains('\'printTt\' is not defined')
     }
+
+    def "Check port mappings"() {
+        setup:
+        build """
+            plugins {
+                id 'ru.vyarus.use-python'
+            }
+
+            python {               
+                docker.use = true
+                docker.ports 5000, '5001:5020'
+            }
+            
+            task sample(type: PythonTask) {
+                command = '-c print(\\'samplee\\')'
+            }
+
+        """
+
+        when: "run task"
+        debug()
+        BuildResult result = run('sample')
+
+        then: "task successful"
+        result.task(':sample').outcome == TaskOutcome.SUCCESS
+        result.output.contains('[docker] container')
+        result.output.contains('samplee')
+    }
 }

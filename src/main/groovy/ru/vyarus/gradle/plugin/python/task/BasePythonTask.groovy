@@ -6,6 +6,7 @@ import org.gradle.api.Action
 import org.gradle.api.internal.ConventionTask
 import org.gradle.api.logging.LogLevel
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Nested
@@ -147,7 +148,7 @@ class BasePythonTask extends ConventionTask {
     /**
      * Configure docker container for python execution inside docker.
      *
-     * @param action  configuration action
+     * @param action configuration action
      * @return configured  docker sub-configuration object
      */
     @SuppressWarnings('ConfusingMethodName')
@@ -230,6 +231,28 @@ class BasePythonTask extends ConventionTask {
         abstract Property<Boolean> getExclusive()
 
         /**
+         * Required container port mappings - port to open from container to be accessible on host.
+         * Note that normally ports are not required because python code executed inside container. This could
+         * make sense for long-lived process like dev.server.
+         * <p>
+         * Single number (2011) for mapping on the same port and colo-separated numbers (2011:3011) for mapping
+         * on custom port.
+         */
+        @Input
+        abstract SetProperty<String> getPorts()
+
+        /**
+         * Specify ports to expose from container. Value could be either integer or string. By default, port would
+         * be mapped on the same port on host (no random), but if different port is required use 'port:port' string.
+         *
+         * @param ports ports to be mapped from container
+         */
+        @SuppressWarnings('UnnecessaryGetter')
+        void ports(Object... ports) {
+            ports.each { getPorts().add(String.valueOf(it)) }
+        }
+
+        /**
          * @return docker configuration for managed container creation or null if docker not required
          */
         @SuppressWarnings('UnnecessaryGetter')
@@ -237,7 +260,8 @@ class BasePythonTask extends ConventionTask {
             getUse().get() ? new DockerConfig(
                     image: getImage().get(),
                     windows: getWindows().get(),
-                    exclusive: getExclusive().get()) : null
+                    exclusive: getExclusive().get(),
+                    ports: getPorts().get() as Set<String>) : null
         }
     }
 }

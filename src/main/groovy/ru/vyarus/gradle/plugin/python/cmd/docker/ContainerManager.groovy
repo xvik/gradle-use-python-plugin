@@ -1,16 +1,15 @@
 package ru.vyarus.gradle.plugin.python.cmd.docker
 
 import groovy.transform.CompileStatic
+import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.testcontainers.containers.BindMode
 import org.testcontainers.containers.Container
 import org.testcontainers.containers.output.OutputFrame
-import org.testcontainers.containers.startupcheck.OneShotStartupCheckStrategy
 import ru.vyarus.gradle.plugin.python.util.DurationFormatter
 
 import java.nio.charset.StandardCharsets
 import java.time.Duration
-import java.util.concurrent.ExecutionException
 
 /**
  * Encapsulates work with single docker container. Normally, container is started before first python call and
@@ -42,7 +41,7 @@ import java.util.concurrent.ExecutionException
  * @since 12.09.2022
  * @see DockerFactory
  */
-@SuppressWarnings('SynchronizedMethod')
+@SuppressWarnings(['SynchronizedMethod', 'DuplicateStringLiteral'])
 @CompileStatic
 class ContainerManager {
 
@@ -156,16 +155,9 @@ class ContainerManager {
      */
     synchronized void stop() {
         if (container && container.running) {
-            long watch = System.currentTimeMillis()
-            String name = container.containerName
-            try {
-                container.stop()
-            } finally {
-                container = null
-                containerConfig = null
-            }
-            project.logger.lifecycle('[docker] container \'{}\' ({}) stopped in {}',
-                    image, name, DurationFormatter.format(System.currentTimeMillis() - watch))
+            doStop('container', container)
+            container = null
+            containerConfig = null
         }
     }
 
@@ -213,34 +205,39 @@ class ContainerManager {
      * @param env environment variables (or null)
      * @return 0 for successful execution and 1 in case of error (real error exit code unknown)
      */
+    @SuppressWarnings('BusyWait')
     int execExclusive(String[] command,
                       OutputStream out,
                       DockerConfig config,
                       String workDir,
                       Map<String, Object> env) {
-        long watch = System.currentTimeMillis()
         PythonContainer cont = createContainer(config, workDir, env)
                 .withCommand(command)
-                .withStartupCheckStrategy(new OneShotStartupCheckStrategy())
+                .withStartupTimeout(Duration.ofSeconds(1))
+//                .withStartupCheckStrategy(new OneShotStartupCheckStrategy())
         // output live stream
                 .withLogConsumer { OutputFrame frame -> out.write(frame.bytes ?: EMPTY) }
-
         try {
-            cont.start()
-            project.logger.info('Command executed in exclusive container ({}) in {}',
-                    container.containerName, DurationFormatter.format(System.currentTimeMillis() - watch))
-            return 0
-        } catch (ExecutionException ex) {
+            doStart('exclusive container', cont)
+            // In case of forever-running task, gradle would interrupt task thread when ctrl+c would be called
+            // in console. After this point we will not see any logs anymore, but testcontainers should still
+            // shut down started containers.
+            while (cont.running && !Thread.currentThread().interrupted) {
+                sleep(300)
+            }
+        } catch (GradleException ex) {
+            project.logger.lifecycle("Exclusive container failed to start: {}", ex.getMessage())
             // normally it would not be visible, but it would be possible to see it with --info flag
-            project.logger.info('Exclusive container startup failed', ex)
-            // real error code is not known!
-            return 1
+            project.logger.info('Container error stacktrace', ex)
         } finally {
-            cont.stop()
+            // if container already finished (limited time task), then no log here (no actual stop performed)
+            // and for infinite task user will not see this log (stopping just in case)
+            doStop('exclusive container', cont)
         }
+        return cont.getDockerClient().inspectContainerCmd(cont.containerId).exec().getState().exitCodeLong
     }
 
-    @SuppressWarnings(['UnusedMethodParameter', 'UnnecessaryGetter'])
+    @SuppressWarnings('UnnecessaryGetter')
     String formatContainerInfo(DockerConfig config, String workDir, Map<String, Object> env) {
         StringBuilder res = new StringBuilder()
         String labelPattern = '\t%-15s '
@@ -253,6 +250,9 @@ class ContainerManager {
             // only names because there might be secrets in values
                     .append(env.keySet().join(', ')).append(NL)
         }
+        if (config.ports != null && !config.ports.empty) {
+            res.append(String.format(labelPattern, 'Ports')).append(config.ports.join(', ')).append(NL)
+        }
         return res.toString()
     }
 
@@ -261,7 +261,6 @@ class ContainerManager {
         if (container != null) {
             return
         }
-        long watch = System.currentTimeMillis()
         container = createContainer(config.docker, config.workDir, config.env)
         // infinite process to keep container running
         if (windows) {
@@ -275,14 +274,58 @@ class ContainerManager {
                         project.logger.lifecycle('[docker{}] {}', container.containerName, frame.utf8String)
                     }
                 }
-        container.start()
+        doStart('container', container, config.docker, config.workDir, config.env)
         containerConfig = config
-        project.logger.lifecycle('[docker] container \'{}\' ({}) started in {}\n{}',
-                image, container.containerName, DurationFormatter.format(System.currentTimeMillis() - watch),
-                formatContainerInfo(config.docker, config.workDir, config.env))
     }
 
-    @SuppressWarnings(['UnusedPrivateMethodParameter', 'UnnecessaryGetter'])
+    @SuppressWarnings('CatchException')
+    private void doStart(String message, PythonContainer container,
+                         DockerConfig config = null,
+                         String workDir = null,
+                         Map<String, Object> env = null) {
+        long watch = System.currentTimeMillis()
+        try {
+            container.start()
+        } catch (Exception ex) {
+            // by default gradle shows only top error message and user need to activate --stacktrace mode to see
+            // inner errors, but the most important information would be in these inner messages
+            // To simplify usage throwing onw more exception with the root cause
+            throw new GradleException(collectErrors(ex))
+        }
+        String info = config != null ? formatContainerInfo(config, workDir, env) : ''
+        project.logger.lifecycle('[docker] {} \'{}\' ({}) started in {}{}',
+                message, image, container.containerName, DurationFormatter.format(System.currentTimeMillis() - watch),
+                NL + info)
+    }
+
+    private String collectErrors(Exception ex) {
+        String res = ex.message
+        String prefix = ''
+        Throwable current = ex
+        while (current.cause) {
+            prefix += '\t'
+            current = current.cause
+            res += "\n$prefix ${current.message}"
+        }
+        return res
+    }
+
+    @SuppressWarnings('CatchException')
+    private void doStop(String message, PythonContainer container) {
+        if (container.running) {
+            long watch = System.currentTimeMillis()
+            String name = container.containerName
+            try {
+                container.stop()
+                project.logger.lifecycle('[docker] {} \'{}\' ({}) stopped in {}',
+                        message, image, name, DurationFormatter.format(System.currentTimeMillis() - watch))
+            } catch (Exception ex) {
+                project.logger.warn("Container '$name' stop failed", ex)
+            }
+        }
+    }
+
+    @SuppressWarnings('UnnecessaryGetter')
     private PythonContainer createContainer(DockerConfig config, String workDir, Map<String, Object> env) {
         PythonContainer container = new PythonContainer(image)
                 .withFileSystemBind(projectRootPath, projectDockerPath, BindMode.READ_WRITE)
@@ -294,16 +337,28 @@ class ContainerManager {
             }
         }
 
-//        Testcontainers.exposeHostPorts()
-//                .withAccessToHost(true)
-
-        // image pull policy
-        //https://www.testcontainers.org/features/advanced_options/
+        parseMappings(config.ports).each { k, v ->
+            container.withFixedExposedPort(k, v)
+        }
         return container
     }
 
     private String getDockerWorkDir(String workDir) {
         workDir ? toDockerPath(project.file(workDir).absolutePath) : projectDockerPath
+    }
+
+    private Map<Integer, Integer> parseMappings(Set<String> mappings) {
+        Map<Integer, Integer> res = [:]
+        if (mappings != null) {
+            mappings.each {
+                int src, target
+                String[] split = it.split(':')
+                src = Integer.valueOf(split[0])
+                target = split.size() > 1 ? Integer.valueOf(split[1]) : src
+                res[src] = target
+            }
+        }
+        return res
     }
 
     /**
@@ -335,6 +390,10 @@ class ContainerManager {
             // environment changed (check that all variables already present in current container)
             if (conf.env && (env == null || conf.env.find { k, v -> env[k] != v })) {
                 return 'environment variables'
+            }
+            if (conf.docker.ports &&
+                    (!docker.ports || !docker.ports.containsAll(conf.docker.ports))) {
+                return 'ports'
             }
             return null
         }

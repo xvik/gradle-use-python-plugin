@@ -19,4 +19,5 @@ class DockerConfig {
     boolean windows
     String image
     boolean exclusive
+    Set<String> ports
 }

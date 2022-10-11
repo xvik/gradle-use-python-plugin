@@ -396,5 +396,25 @@ class PythonExtension {
          * @see <a href="https://hub.docker.com/_/python">python image</a>
          */
         String image = windows ? 'python:3.10.7-windowsservercore-1809' : 'python:3.10.7-alpine3.15'
+
+        /**
+         * Required container port mappings - port to open from container to be accessible on host.
+         * Note that normally ports are not required because python code executed inside container. This could
+         * make sense for long-lived process like dev.server.
+         * <p>
+         * Single number (2011) for mapping on the same port and colo-separated numbers (2011:3011) for mapping
+         * on custom port.
+         */
+        Set<String> ports = []
+
+        /**
+         * Specify ports to expose from container. Value could be either integer or string. By default, port would
+         * be mapped on the same port on host (no random), but if different port is required use 'port:port' string.
+         *
+         * @param ports ports to be mapped from container
+         */
+        void ports(Object... ports) {
+            ports.each { this.ports.add(String.valueOf(it)) }
+        }
     }
 }

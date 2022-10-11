@@ -98,4 +98,90 @@ class DockerAutoRestartKitTest extends AbstractKitTest {
         !result.output.contains('Restarting container due to changed')
         result.output.contains('samplee')
     }
+
+    def "Check auto container restart due to added ports"() {
+        setup:
+        build """
+            plugins {
+                id 'ru.vyarus.use-python'
+            }
+
+            python {               
+                docker.use = true                
+            }
+            
+            task sample(type: PythonTask) {
+                docker.ports 9000 
+                command = '-c print(\\'samplee\\')'
+            }
+
+        """
+
+        when: "run task"
+        debug()
+        BuildResult result = run('sample')
+
+        then: "task successful"
+        result.task(':sample').outcome == TaskOutcome.SUCCESS
+        result.output.contains('Restarting container due to changed ports')
+        result.output.contains('samplee')
+    }
+
+    def "Check auto container restart due to changed ports"() {
+        setup:
+        build """
+            plugins {
+                id 'ru.vyarus.use-python'
+            }
+
+            python {                                                           
+                docker.use = true
+                docker.ports 5000
+            }
+            
+            task sample(type: PythonTask) {
+                docker.ports 5001
+                command = '-c print(\\'samplee\\')'
+            }
+
+        """
+
+        when: "run task"
+        debug()
+        BuildResult result = run('sample')
+
+        then: "task successful"
+        result.task(':sample').outcome == TaskOutcome.SUCCESS
+        result.output.contains('Restarting container due to changed ports')
+        result.output.contains('samplee')
+    }
+
+    def "Check no auto container restart due to same ports"() {
+        setup:
+        build """
+            plugins {
+                id 'ru.vyarus.use-python'
+            }
+
+            python {               
+                docker.ports 5000, 5001                           
+                docker.use = true
+            }
+            
+            task sample(type: PythonTask) {
+                docker.ports 5001
+                command = '-c print(\\'samplee\\')'
+            }
+
+        """
+
+        when: "run task"
+        debug()
+        BuildResult result = run('sample')
+
+        then: "task successful"
+        result.task(':sample').outcome == TaskOutcome.SUCCESS
+        !result.output.contains('Restarting container due to changed')
+        result.output.contains('samplee')
+    }
 }

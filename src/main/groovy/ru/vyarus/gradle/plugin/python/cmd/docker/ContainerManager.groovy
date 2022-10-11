@@ -226,7 +226,7 @@ class ContainerManager {
                 sleep(300)
             }
         } catch (GradleException ex) {
-            project.logger.lifecycle("Exclusive container failed to start: {}", ex.getMessage())
+            project.logger.lifecycle('Exclusive container failed to start: {}', ex.message)
             // normally it would not be visible, but it would be possible to see it with --info flag
             project.logger.info('Container error stacktrace', ex)
         } finally {
@@ -234,7 +234,7 @@ class ContainerManager {
             // and for infinite task user will not see this log (stopping just in case)
             doStop('exclusive container', cont)
         }
-        return cont.getDockerClient().inspectContainerCmd(cont.containerId).exec().getState().exitCodeLong
+        return cont.dockerClient.inspectContainerCmd(cont.containerId).exec().state.exitCodeLong
     }
 
     @SuppressWarnings('UnnecessaryGetter')

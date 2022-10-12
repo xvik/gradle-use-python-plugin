@@ -85,7 +85,8 @@ class ContainerManager {
     void convertCommand(String[] command) {
         for (int i = 0; i < command.length; i++) {
             String cmd = command[i]
-            if (cmd.startsWith(projectRootPath)) {
+            // it might be quoted parameter so can't use startsWith
+            if (cmd.contains(projectRootPath)) {
                 command[i] = toDockerPath(cmd)
             }
         }

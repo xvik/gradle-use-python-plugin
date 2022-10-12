@@ -3,6 +3,7 @@ package ru.vyarus.gradle.plugin.python.task
 import groovy.transform.CompileStatic
 import groovy.transform.Memoized
 import org.gradle.api.Action
+import org.gradle.api.GradleException
 import org.gradle.api.internal.ConventionTask
 import org.gradle.api.logging.LogLevel
 import org.gradle.api.provider.Property
@@ -13,7 +14,10 @@ import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.Optional
 import org.gradle.util.ClosureBackedAction
 import ru.vyarus.gradle.plugin.python.cmd.Python
+import ru.vyarus.gradle.plugin.python.cmd.docker.ContainerManager
 import ru.vyarus.gradle.plugin.python.cmd.docker.DockerConfig
+import ru.vyarus.gradle.plugin.python.cmd.docker.DockerFactory
+import ru.vyarus.gradle.plugin.python.util.OutputLogger
 
 /**
  * Base task for all python tasks.
@@ -160,6 +164,47 @@ class BasePythonTask extends ConventionTask {
     @Internal
     protected Python getPython() {
         buildPython()
+    }
+
+    /**
+     * Execute command inside docker container. Output would be printed to console.
+     * <p>
+     * IMPORTANT: exception would not be thrown if command execution fails!
+     *
+     * @param cmd command array to execute (paths to project file would be re-written to docker paths)
+     * @return command exit code
+     * @throws GradleException when docker is not configured for task
+     */
+    protected int dockerExec(String... cmd) {
+        logger.lifecycle('[docker] executing command: {}', cmd.join(' '))
+        // start command printing all output messages
+        return new OutputLogger(logger, LogLevel.LIFECYCLE, '\t')
+                .withStream { return dockerExec(it, cmd) }
+    }
+
+    /**
+     * Execute command inside docker container. Command output would be only written into provided stream, but
+     * after process finishes.
+     * <p>
+     * IMPORTANT: exception would not be thrown if command execution fails!
+     *
+     * @param out output stream (use {@link ByteArrayOutputStream} to consume output)
+     * @param cmd command array to execute (paths to project file would be re-written to docker paths)
+     * @return command exit code
+     * @throws GradleException when docker is not configured for task
+     */
+    protected int dockerExec(OutputStream out, String... cmd) {
+        if (!getDocker().use) {
+            throw new GradleException('Docker command can\'t be executed: docker not enabled')
+        }
+        // it would be pre-started container (used in checkPython)
+        ContainerManager manager = DockerFactory.getContainer(getDocker().toConfig(), project)
+        // restart container if task parameters differ
+        manager.restartIfRequired(getDocker().toConfig(), getWorkDir(), getEnvironment())
+        // rewrite paths from host to docker fs
+        manager.convertCommand(cmd)
+        // start command printing all output messages
+        return manager.exec(cmd, out)
     }
 
     @Memoized

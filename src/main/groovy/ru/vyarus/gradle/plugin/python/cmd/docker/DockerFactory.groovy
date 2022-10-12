@@ -25,8 +25,18 @@ class DockerFactory {
 
     private static final Map<String, ContainerManager> CONTAINERS = [:]
 
-    // same docker instance used for all tasks and subprojects
-    // might be used directly to start/stop long-lived containers (span multiple tasks)
+    /**
+     * Gets existing or creates new docker container manager. It is assumed that all tasks requiring the same container
+     * (by image name) would share the same instance. This allows synchronization of running commands inside
+     * the same container (so in multi-module projects or with parallel execution one container would always
+     * execute only one python command).
+     * <p>
+     * Note that exclusive tasks always spawn new container.
+     *
+     * @param config docker configuration (only image name is required)
+     * @param project project instance
+     * @return container manager instance (most likely, already started)
+     */
     static synchronized ContainerManager getContainer(DockerConfig config, Project project) {
         if (config == null) {
             return null
@@ -38,8 +48,9 @@ class DockerFactory {
         return CONTAINERS.get(key)
     }
 
-    // not required as testcontainers would close them automatically, but added for tests in order to not
-    // re-use the same containers between tests (technically, it is ok to re-use containers, but just in case)
+    /**
+     * Shuts down started containers. Called at the end of the build.
+     */
     static synchronized void shutdownAll() {
         CONTAINERS.values().each { it.stop() }
         CONTAINERS.clear()

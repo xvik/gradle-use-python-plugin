@@ -161,18 +161,13 @@ class BasePythonTask extends ConventionTask {
         return docker
     }
 
-    @Internal
-    protected Python getPython() {
-        buildPython()
-    }
-
     /**
      * Takes into account docker configuration (container os).
      *
      * @return true if target os is windows, false otherwise
      */
     @Internal
-    protected boolean isWindows() {
+    boolean isWindows() {
         return python.windows
     }
 
@@ -182,8 +177,13 @@ class BasePythonTask extends ConventionTask {
      * @return true if docker environment enabled, false otherwise
      */
     @Internal
-    protected boolean isDockerUsed() {
+    boolean isDockerUsed() {
         return docker.use.get()
+    }
+
+    @Internal
+    protected Python getPython() {
+        buildPython()
     }
 
     /**

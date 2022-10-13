@@ -112,6 +112,17 @@ final class PythonBinary {
     }
 
     /**
+     * Updates separators in path according to target environment. Important for docker when windows host could
+     * execute linux container.
+     *
+     * @param path path
+     * @return path with corrected separators or path as is if docker not used
+     */
+    String targetOsCanonicalPath(String path) {
+        return docker ? docker.canonicalPath(path) : path
+    }
+
+    /**
      * @param sysExecutableProvider sys.executable value provider
      * @param sysPrefixProvider sys.prefix value provider
      * @return directory under python home containing python binary (always absolute path)
@@ -128,7 +139,7 @@ final class PythonBinary {
             // just guess by home dir (yes, I know, this MIGHT be incorrect in some cases, but should be ok
             // for virtualenvs used in majority of cases)
             path = sysPrefixProvider.call()
-            res = CliUtils.pythonBinPath(path)
+            res = CliUtils.pythonBinPath(path, windows)
         } else {
             // cut off binary
             res = path[0..idx - 1]
@@ -139,11 +150,6 @@ final class PythonBinary {
             res = docker.toDockerPath(res)
         }
         return res
-    }
-
-    // may return null for docker if path is not located inside project dir!
-    String getLocalPath(String path) {
-        docker ? docker.toLocalPath(path) : path
     }
 
     boolean isWindows() {

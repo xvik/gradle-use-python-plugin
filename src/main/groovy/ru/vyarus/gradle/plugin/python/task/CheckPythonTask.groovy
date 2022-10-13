@@ -75,10 +75,10 @@ class CheckPythonTask extends BasePipTask {
             switchEnvironment(env, ext)
         }
 
-        if (!python.binaryDir.startsWith(python.homeDir)) {
+        if (!python.canonicalBinaryDir.startsWith(python.canonicalHomeDir)) {
             logger.error("WARNING: Python binary path '{}' does not match home path reported by python (sys.prefix): " +
                     "'{}'. Everything could still work as expected if code doesn't rely on python location.",
-                    python.binaryDir, python.homeDir
+                    python.canonicalBinaryDir, python.canonicalHomeDir
             )
         }
     }
@@ -94,7 +94,7 @@ class CheckPythonTask extends BasePipTask {
         try {
             python.version
         } catch (ExecException ex) {
-            throw new GradleException("Python not found: $python.usedBinary. " + (virtual ?
+            throw new GradleException("Python not found: $python.canonicalUsedBinary. " + (virtual ?
                     'This must be a bug of virtualenv support, please report it ' +
                             '(https://github.com/xvik/gradle-use-python-plugin/issues). You can disable ' +
                             'virtualenv usage with \'python.scope = USER\'.'
@@ -111,7 +111,8 @@ class CheckPythonTask extends BasePipTask {
             throw new GradleException("Python ($python.homeDir) verion $version does not match minimal " +
                     "required version: $minVersion")
         }
-        logger.lifecycle('Using python {} from {} ({})', python.version, python.homeDir, python.usedBinary)
+        logger.lifecycle('Using python {} from {} ({})',
+                python.version, python.canonicalHomeDir, python.canonicalUsedBinary)
     }
 
     private void checkPip(PythonExtension ext) {

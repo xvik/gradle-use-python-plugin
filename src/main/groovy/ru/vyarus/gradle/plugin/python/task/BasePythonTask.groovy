@@ -196,7 +196,6 @@ class BasePythonTask extends ConventionTask {
      * @throws GradleException when docker is not configured for task
      */
     protected int dockerExec(String... cmd) {
-        logger.lifecycle('[docker] executing command: {}', cmd.join(' '))
         // start command printing all output messages
         return new OutputLogger(logger, LogLevel.LIFECYCLE, '\t')
                 .withStream { return dockerExec(it, cmd) }
@@ -223,6 +222,7 @@ class BasePythonTask extends ConventionTask {
         manager.restartIfRequired(getDocker().toConfig(), getWorkDir(), getEnvironment())
         // rewrite paths from host to docker fs
         manager.convertCommand(cmd)
+        logger.lifecycle('[docker] {}', cmd.join(' '))
         // start command printing all output messages
         return manager.exec(cmd, out)
     }

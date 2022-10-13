@@ -175,7 +175,7 @@ class DockerRunKitTest extends AbstractKitTest {
 
         then: "created"
         result.task(':checkPython').outcome == TaskOutcome.SUCCESS
-        result.output.contains('-m virtualenv .gradle/python'.replace('/', File.separator))
+        result.output.contains('-m virtualenv .gradle/python')
         file('.gradle/python').exists()
 
         when: "cleanup env"
@@ -191,7 +191,7 @@ class DockerRunKitTest extends AbstractKitTest {
 
         then: "created"
         result.task(':checkPython').outcome == TaskOutcome.SUCCESS
-        result.output.contains('-m virtualenv .gradle/python'.replace('/', File.separator))
+        result.output.contains('-m virtualenv .gradle/python')
         file('.gradle/python').exists()
     }
 }

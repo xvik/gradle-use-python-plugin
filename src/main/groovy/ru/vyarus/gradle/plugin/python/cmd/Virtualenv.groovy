@@ -200,7 +200,7 @@ class Virtualenv {
      */
     @Memoized
     String getPythonPath() {
-        String res = CliUtils.pythonBinPath(location.absolutePath)
+        String res = CliUtils.pythonBinPath(location.absolutePath, python.windows)
         return Paths.get(path).absolute ? res
                 // use shorter relative path
                 : project.relativePath(res)

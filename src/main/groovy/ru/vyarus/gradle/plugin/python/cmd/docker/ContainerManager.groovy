@@ -1,6 +1,7 @@
 package ru.vyarus.gradle.plugin.python.cmd.docker
 
 import groovy.transform.CompileStatic
+import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.testcontainers.containers.BindMode
@@ -49,6 +50,8 @@ class ContainerManager {
     private static final String DOCKER_WINDOWS_PROJECT_PATH = 'c:/projects/'
     private static final byte[] EMPTY = new byte[0]
     private static final String NL = '\n'
+    public static final char WIN_SEPARATOR = '\\'
+    public static final char LINUX_SEPARATOR = '/'
 
     private final String image
     private final boolean windowsImage
@@ -79,28 +82,48 @@ class ContainerManager {
      * Replaces local paths into docker paths (according to project mapping). Only for paths leading inside
      * project. This way the same command would work with local python and dockerized python (no need to correct
      * anything).
+     * <p>
+     * Also replace path separators to match target container OS. For example, if linux container executed on
+     * windows, paths would be formatted for windows which would cause problems inside container.
      *
      * @param command command to convert paths in
      */
     void convertCommand(String[] command) {
         for (int i = 0; i < command.length; i++) {
-            String cmd = command[i]
-            // it might be quoted parameter so can't use startsWith
-            if (cmd.contains(projectRootPath)) {
-                command[i] = toDockerPath(cmd)
-            }
+            command[i] = toDockerPath(command[i])
         }
     }
 
     /**
      * Converts path to docker path, according to mapping (only for absolute paths, leading inside project).
+     * <p>
+     * Also replace path separators to match target container OS. For example, if linux container executed on
+     * windows, paths would be formatted for windows which would cause problems inside container.
      *
      * @param path path to convert
      * @return converted path (or not changed, if conversion not require)
      * @see #toLocalPath(java.lang.String) reverse conversion
      */
     String toDockerPath(String path) {
-        path.replace(projectRootPath, projectDockerPath)
+        return canonicalPath(path.replace(projectRootPath, projectDockerPath))
+    }
+
+    /**
+     * Replace path separators to match target container OS. For example, if linux container executed on
+     * windows, paths would be formatted for windows which would cause problems inside container.
+     *
+     * @param path path
+     * @return path with updated separators according to target os
+     */
+    String canonicalPath(String path) {
+        String res = path
+        char from = Os.isFamily(Os.FAMILY_WINDOWS) ? WIN_SEPARATOR : LINUX_SEPARATOR
+        char to = windows ? WIN_SEPARATOR : LINUX_SEPARATOR
+        if (from != to) {
+            // there probably would be edge cases with false replacements.. practice will show
+            res = res.replace(from, to)
+        }
+        return res
     }
 
     /**

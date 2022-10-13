@@ -313,7 +313,7 @@ class Python {
     }
 
     /**
-     * Takes into account docker configuration (container os).
+     * This is important for docker because windows host could call linux container and so host os must be ignored.
      *
      * @return true if target os is windows, false otherwise
      */
@@ -330,6 +330,21 @@ class Python {
     @Memoized
     String getHomeDir() {
         return resolveInfo()[1]
+    }
+
+    /**
+     * Same as {@link #getHomeDir()} but with separators according to target docker os (no difference if docker not
+     * used). Difference might appear for example when windows host used for linux container.
+     * <p>
+     * Suitable for uniform output or unified python paths comparisons.
+     * <p>
+     * Note: change could not be applied to the original method because host-specific separators are important for
+     * some logic paths.
+     *
+     * @return homeDir path with separators aligned with docker os (if docker used)
+     */
+    String getCanonicalHomeDir() {
+        return binary.targetOsCanonicalPath(homeDir)
     }
 
     /**
@@ -362,10 +377,19 @@ class Python {
         return binary.getBinaryDir({ resolveInfo()[2]?.trim() }, { homeDir })
     }
 
-    // important for docker when virtualenv located inside project
-    @Memoized
-    String getLocalBinaryDir() {
-        binary.getLocalPath(binaryDir)
+    /**
+     * Same as {@link #getBinaryDir()} but with separators according to target docker os (no difference if docker not
+     * used). Difference might appear for example when windows host used for linux container.
+     * <p>
+     * Suitable for uniform output or unified python paths comparisons.
+     * <p>
+     * Note: change could not be applied to the original method because host-specific separators are important for
+     * some logic paths.
+     *
+     * @return binaryDir path with separators aligned with docker os (if docker used)
+     */
+    String getCanonicalBinaryDir() {
+        return binary.targetOsCanonicalPath(binaryDir)
     }
 
     /**
@@ -418,6 +442,21 @@ class Python {
      */
     String getUsedBinary() {
         this.binary.executable
+    }
+
+    /**
+     * Same as {@link #getUsedBinary()} but with separators according to target docker os (no difference if docker not
+     * used). Difference might appear for example when windows host used for linux container.
+     * <p>
+     * Suitable for uniform output or unified python paths comparisons.
+     * <p>
+     * Note: change could not be applied to the original method because host-specific separators are important for
+     * some logic paths.
+     *
+     * @return binary path with separators aligned with docker os (if docker used)
+     */
+    String getCanonicalUsedBinary() {
+        binary.targetOsCanonicalPath(usedBinary)
     }
 
     @CompileStatic(TypeCheckingMode.SKIP)

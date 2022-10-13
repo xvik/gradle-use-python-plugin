@@ -1,5 +1,6 @@
 package ru.vyarus.gradle.plugin.python.cmd
 
+import org.apache.tools.ant.taskdefs.condition.Os
 import ru.vyarus.gradle.plugin.python.util.CliUtils
 
 /**
@@ -13,7 +14,7 @@ class PipExecUnderVirtualenvTest extends AbstractCliMockSupport {
     @Override
     void setup() {
         String root = dir.absolutePath
-        String binPath = CliUtils.pythonBinPath(root)
+        String binPath = CliUtils.pythonBinPath(root, Os.isFamily(Os.FAMILY_WINDOWS))
         File bin = new File(binPath, 'activate')
         bin.mkdirs()
         bin.createNewFile() // force virtualenv detection

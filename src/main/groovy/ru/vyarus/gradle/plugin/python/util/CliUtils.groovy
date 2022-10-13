@@ -246,6 +246,8 @@ final class CliUtils {
             return path
         }
         // important to resolve file relative to project home, because work dir may be gradle daemon root.
+        // note: with docker started for windows this will work only with canonical path
+        // (even linux path with win separator would be correctly detected on windows)
         Path relative = Paths.get(file)
         if (!relative.absolute && home == null) {
             throw new IllegalArgumentException('Home dir not specified for relative path validation: ' + file)
@@ -268,13 +270,16 @@ final class CliUtils {
 
     /**
      * @param pythonHome python home path (always absolute)
+     * @param windows true to prepare path for windows host
      * @return python binaries path relative to provided python home
      */
-    static String pythonBinPath(String pythonHome) {
+    static String pythonBinPath(String pythonHome, boolean windows) {
+        // note: with docker started for windows this will work only because python home path was canonicalize
+        // (even linux path with win separator would be correctly detected on windows)
         if (!Paths.get(pythonHome).absolute) {
             throw new IllegalArgumentException('Non absolute home path provided: ' + pythonHome)
         }
-        canonicalPath(null, Os.isFamily(Os.FAMILY_WINDOWS) ? "$pythonHome/Scripts" : "$pythonHome/bin")
+        canonicalPath(null, windows ? "$pythonHome/Scripts" : "$pythonHome/bin")
     }
 
     /**

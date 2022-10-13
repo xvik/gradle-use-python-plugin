@@ -31,7 +31,8 @@ import ru.vyarus.gradle.plugin.python.util.PythonExecutionFailed
  * @since 15.11.2017
  */
 @CompileStatic
-@SuppressWarnings(['ConfusingMethodName', 'StaticMethodsBeforeInstanceMethods', 'DuplicateNumberLiteral'])
+@SuppressWarnings(['ConfusingMethodName', 'StaticMethodsBeforeInstanceMethods',
+        'DuplicateNumberLiteral', 'MethodCount'])
 class Python {
 
     private final Project project
@@ -309,6 +310,15 @@ class Python {
      */
     void callModule(Logger logger, String module, Object args) {
         exec(logger, CliUtils.mergeArgs("-m $module", args))
+    }
+
+    /**
+     * Takes into account docker configuration (container os).
+     *
+     * @return true if target os is windows, false otherwise
+     */
+    boolean isWindows() {
+        return binary.windows
     }
 
     /**

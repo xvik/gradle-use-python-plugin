@@ -167,6 +167,26 @@ class BasePythonTask extends ConventionTask {
     }
 
     /**
+     * Takes into account docker configuration (container os).
+     *
+     * @return true if target os is windows, false otherwise
+     */
+    @Internal
+    protected boolean isWindows() {
+        return python.windows
+    }
+
+    /**
+     * Shortcut for custom tasks (simplify usage and avoid silly errors with properties usage).
+     *
+     * @return true if docker environment enabled, false otherwise
+     */
+    @Internal
+    protected boolean isDockerUsed() {
+        return docker.use.get()
+    }
+
+    /**
      * Execute command inside docker container. Output would be printed to console.
      * <p>
      * IMPORTANT: exception would not be thrown if command execution fails!

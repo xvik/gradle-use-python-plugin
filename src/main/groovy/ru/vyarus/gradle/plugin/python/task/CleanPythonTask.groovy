@@ -26,10 +26,10 @@ class CleanPythonTask extends BasePythonTask {
     @TaskAction
     void run() {
         String path = project.file(getEnvPath()).absolutePath
-        if (docker.use.get()) {
+        if (dockerUsed) {
             // with docker, environment would be created with a root user and so it would not be possible
             // to simply remove folder: so removing within docker
-            String[] cmd = docker.windows.get() ? ['rd', '/s', '/q', "\"$path\""] : ['rm', '-rf', path]
+            String[] cmd = windows ? ['rd', '/s', '/q', "\"$path\""] : ['rm', '-rf', path]
             if (dockerExec(cmd) != 0) {
                 throw new GradleException('Python environment cleanup failed')
             }

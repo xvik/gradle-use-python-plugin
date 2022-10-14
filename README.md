@@ -73,7 +73,7 @@ Plugin compiled for java 8, compatible with java 11
 
 Gradle | Version
 --------|-------
-5-6     | 2.3.0
+5-7     | 2.3.0
 4.x     | [1.2.0](https://github.com/xvik/gradle-use-python-plugin/tree/1.2.0)
 
 #### Snapshots

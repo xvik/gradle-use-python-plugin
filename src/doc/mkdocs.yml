@@ -1,0 +1,112 @@
+site_name: Gradle-use-python-plugin
+
+# Meta tags (placed in header)
+site_description: Use python modules in gradle build
+site_author: Vyacheslav Rusakov
+site_url: https://xvik.github.io/gradle-use-python-plugin
+
+# Repository (add link to repository on each page)
+repo_name: gradle-use-python-plugin
+repo_url: https://xvik.github.io/gradle-use-python-plugin
+edit_uri: edit/master/src/doc/docs/
+
+#Copyright (shown at the footer)
+copyright: 'Copyright &copy; 2017-2022 Vyacheslav Rusakov'
+
+# Meterial theme
+theme:
+  name: 'material'
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/toggle-switch-off-outline
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/toggle-switch
+        name: Switch to light mode
+  features:
+    #- navigation.tabs
+    #- navigation.tabs.sticky
+    #- navigation.instant
+    - navigation.tracking
+    - navigation.top
+
+plugins:
+  - search
+  - markdownextradata
+
+extra:
+#  palette:
+#    primary: 'indigo'
+#    accent: 'indigo'
+
+  version:
+    provider: mike
+
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/xvik
+    - icon: fontawesome/brands/hashnode
+      link: https://blog.vyarus.ru
+#    - icon: fontawesome/brands/twitter
+#      link: https://twitter.com/vyarus
+#
+# Google Analytics
+#  analytics:
+#    provider: google
+#    property: UA-XXXXXXXX-X
+
+markdown_extensions:
+  # Python Markdown
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - meta
+  - md_in_html
+  - toc:
+      permalink: true
+
+  # Python Markdown Extensions
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+dev_addr: 127.0.0.1:3001
+
+nav:
+  - Home: index.md
+  - Getting started: getting-started.md
+  - User guide:
+      - Python install: guide/python.md
+      - Pip modules: guide/pip.md
+      - Usage: guide/usage.md
+      - Multi-module: guide/multimodule.md
+      - Configuration: guide/configuration.md
+      - CI: guide/ci.md
+      - Plugin development: guide/plugindev.md
+  - About:
+      - Release notes: about/history.md
+      - Compatibility: about/compatibility.md
+      - License: about/license.md

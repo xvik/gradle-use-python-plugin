@@ -7,7 +7,7 @@ site_url: https://xvik.github.io/gradle-use-python-plugin
 
 # Repository (add link to repository on each page)
 repo_name: gradle-use-python-plugin
-repo_url: https://xvik.github.io/gradle-use-python-plugin
+repo_url: https://github.com/xvik/gradle-use-python-plugin
 edit_uri: edit/master/src/doc/docs/
 
 #Copyright (shown at the footer)

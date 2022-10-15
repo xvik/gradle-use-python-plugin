@@ -4,7 +4,7 @@
   - Add validateSystemBinary configuration to be able to disable validation (in case it would not work properly)
 * Add cleanPython task for removing project-specific virtualenv
 * Add python process output to exception message to be sure it will be visible on error (especially on CI)
-* Add requirements files support. 
+* Add requirements file support (requirements.txt). 
   - By default, requirements support is enabled in strict mode:
     plugin reads file contents and expects only exact version matches (allows extracting module declarations
     so external tools could easily parse and update dependencies).

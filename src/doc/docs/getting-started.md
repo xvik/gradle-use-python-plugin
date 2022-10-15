@@ -128,6 +128,14 @@ called: `python -c "import sys; print(sys.prefix)"` on win and `python -c exec("
 
 See [command parsing specifics and env variables usage](guide/usage.md#command-parsing)
 
+String command is used for simplicity, but it could be array/collection of args:
+
+```groovy
+task script(type: PythonTask) { 
+    command = ['path/to/script.py', '1', '2'] 
+}
+```
+
 ### Module
 
 ```groovy
@@ -148,11 +156,3 @@ task script(type: PythonTask) {
 ```
 
 called: `python path/to/script.py 1 2` (arguments are optional, just for demo)
-
-String command is used for simplicity, but it could be array/collection of args:
-
-```groovy
-task script(type: PythonTask) { 
-    command = ['path/to/script.py', '1', '2'] 
-}
-```

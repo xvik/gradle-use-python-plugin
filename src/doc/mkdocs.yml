@@ -1,4 +1,4 @@
-site_name: Gradle-use-python-plugin
+site_name: Gradle use-python plugin
 
 # Meta tags (placed in header)
 site_description: Use python modules in gradle build

@@ -1,4 +1,4 @@
-# Welcome to gradle-use-python-plugin
+# Welcome to gradle use-python plugin
 
 !!! summary ""
     Use [python](https://www.python.org/) in gradle build. The only plugin intention is to simplify python usage from gradle (without managing python itself).

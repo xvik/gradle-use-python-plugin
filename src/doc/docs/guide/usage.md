@@ -23,6 +23,14 @@ called: `python -c "import sys; print(sys.prefix)"` on win and `python -c exec("
 !!! note 
     It is important to wrap script with space in quotes (otherwise parser will incorrectly parse arguments).
 
+String command is used for simplicity, but it could be array/collection of args:
+
+```groovy
+task script(type: PythonTask) { 
+    command = ['path/to/script.py', '1', '2'] 
+}
+```
+
 ## Pip module command
 
 ```groovy
@@ -43,14 +51,6 @@ task script(type: PythonTask) {
 ```
 
 called: `python path/to/script.py 1 2` (arguments are optional, just for demo)
-
-String command is used for simplicity, but it could be array/collection of args:
-
-```groovy
-task script(type: PythonTask) { 
-    command = ['path/to/script.py', '1', '2'] 
-}
-```
 
 ## Command parsing
 

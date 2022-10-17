@@ -385,10 +385,12 @@ class PythonExtension {
         boolean use
 
         /**
-         * Type of used image. By default, linux image used. Required for proper work on windows images.
+         * Type of used image. By default, linux images used. Required for proper work on windows images.
          * <p>
-         * IMPORTANT: plugin supports windows images in theory, but this wasn't tested. Testcontainers windows support
-         * is limited and not sure it is possible to use windows image at all now.
+         * WARNING: plugin supports windows images in theory, but this wasn't tested because testcontainers does not
+         * support currently windows containers (WCOW). So right now this option is completely useless.
+         *
+         * @see <a href="https://www.testcontainers.org/supported_docker_environment/windows/">windows support</a>
          */
         boolean windows
 
@@ -396,9 +398,9 @@ class PythonExtension {
          * Docker image to use. This is complete image path (potentially including repository and tag) and not just
          * image name. It is highly suggested always specifying exact tag!
          * <p>
-         * Plugin use linux image by default. On windows, docker desktop is installed now with WSL2 support and
-         * so could start linux images without problems. Moreover, testcontainers currently provides only linux
-         * versions of helper containers (additional containers used for proper shutdown).
+         * Plugin use linux image by default. On windows linux containers must be used (WSL2 or Hyper-V) because
+         * testcontainers currently does not support windows containers (plugin implements windows support for the
+         * future).
          *
          * @see <a href="https://hub.docker.com/_/python">python image</a>
          */

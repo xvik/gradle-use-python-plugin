@@ -263,9 +263,9 @@ class BasePythonTask extends ConventionTask {
          * Docker image to use. This is complete image path (potentially including repository and tag) and not just
          * image name. It is highly suggested always specifying exact tag!
          * <p>
-         * Normally, docker image must align with host. Windows image would not work on linux (without additional
-         * virtualization). But, on windows, it is possible to launch linux container. Anyway, in order to minimize
-         * problems, host-specific images would be used by default.
+         * Plugin use linux image by default. On windows linux containers must be used (WSL2 or Hyper-V) because
+         * testcontainers currently does not support windows containers (plugin implements windows support for the
+         * future).
          *
          * @see <a href="https://hub.docker.com/_/python">python image</a>
          */
@@ -273,9 +273,12 @@ class BasePythonTask extends ConventionTask {
         abstract Property<String> getImage()
 
         /**
-         * Type of used image. Normally, image os must be aligned with host, but variations are possible,
-         * There is no automatic system detection in docker so you'll need to specify correct type to let plugin
-         * correctly format commands.
+         * Type of used image. By default, linux images used. Required for proper work on windows images.
+         * <p>
+         * WARNING: plugin supports windows images in theory, but this wasn't tested because testcontainers does not
+         * support currently windows containers (WCOW). So right now this option is completely useless.
+         *
+         * @see <a href="https://www.testcontainers.org/supported_docker_environment/windows/">windows support</a>
          */
         @Internal
         abstract Property<Boolean> getWindows()

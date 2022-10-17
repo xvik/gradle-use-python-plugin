@@ -7,6 +7,7 @@
 
 ## Features
 
+* Works with directly installed python or docker container (with python)
 * Creates local (project-specific) virtualenv (creating project-specific python copy)
 * Installs required pip modules (virtualenv by default, but could be global installation)
 * Could be used as basement for [building plugins](guide/plugindev.md) for specific python modules (like

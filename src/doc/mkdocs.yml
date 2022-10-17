@@ -100,6 +100,7 @@ nav:
   - Getting started: getting-started.md
   - User guide:
       - Python install: guide/python.md
+      - Docker: guide/docker.md
       - Pip modules: guide/pip.md
       - Usage: guide/usage.md
       - Multi-module: guide/multimodule.md

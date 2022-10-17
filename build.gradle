@@ -41,7 +41,7 @@ github {
 
 mkdocs {
     extras = [
-            'version': '2.3.0'
+            'version': '3.0.0'
     ]
     publish {
         docPath = mkdocs.extras['version']

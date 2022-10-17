@@ -50,6 +50,16 @@ pip3 --version
 
 [Install python](guide/python.md) if required.
 
+### Docker
+
+If you have docker installed, you can use python from [docker container](guide/docker.md):
+
+```groovy
+python.docker.use = true
+```
+
+In this case global python installation is not required.
+
 ## Pip modules
 
 If additional pip modules required configure them:

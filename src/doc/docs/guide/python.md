@@ -1,5 +1,8 @@
 # Python & Pip
 
+!!! tip
+    [Docker might be used](docker.md) instead of direct python installation
+
 To make sure python and pip are installed:
 
 ```bash

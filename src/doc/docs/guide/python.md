@@ -110,3 +110,21 @@ If you want automatic python installation, try looking on JetBrain's
 [python-envs plugin](https://github.com/JetBrains/gradle-python-envs). But be careful because
 it has some caveats (for example, on windows python could be installed automatically just once
 and requires manual un-installation). 
+
+## Global python validation
+
+For global python (when no `pythonPath` configured) plugin would manually search
+for python binary in `$PATH` and would throw error if not found containing 
+entire `$PATH`. This is required for cases when PATH visible for gradle process
+is different to your shell path.
+
+For example, on M1 it could be rosetta path instead of native (see [this issue](https://github.com/xvik/gradle-use-python-plugin/issues/35)).
+
+Validation could be disabled with:
+
+```groovy
+python.validateSystemBinary = false
+```
+
+!!! note
+    This option is ignored if [docker support](docker.md) enabled

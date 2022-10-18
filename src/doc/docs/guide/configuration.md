@@ -149,6 +149,8 @@ python {
    pythonPath
    // python binary name (python or python3 by default)
    pythonBinary
+   // search python in system PATH and fail build if not found (incorrect PATH reveal)
+   validateSystemBinary = true 
    // additional environment variables, visible for all python commands
    environment = [:]
    
@@ -182,7 +184,28 @@ python {
    // used virtualenv path (if virtualenv used, see 'scope')
    envPath = '.gradle/python'
    // copy virtualenv instead of symlink (when created)
-   envCopy = false   
+   envCopy = false
+
+   requirements {
+       // use requirements.txt file
+       use = true
+       // file to use as requirements (path to file)
+       file = 'requirements.txt'
+       // requirements restriction (exact versions, syntax subset support)
+       // false delegates requirements loading to pip
+       strict = true
+   }
+    
+   docker {
+      // enables docker support 
+      use = false
+      // image to use 
+      image = 'python:3.10.7-alpine3.15'
+      // windows containers indicator (not supported now, done for the future) 
+      windows = false
+      // docker ports to expose into host (direct 5000 or mapped '5000:6000')
+      ports = [] 
+   } 
 }
 ```
 
@@ -193,19 +216,25 @@ even if plugin is activated inside module (see [multi-module setup](multimodule.
 
 PythonTask configuration:
 
-| Property | Description |
-|---------|--------------|
-| pythonPath | Path to python binary. By default used path declared in global configuration |
-| pythonBinary | Python binary name. By default, python3 on linux and python otherwise. |
-| workDir | Working directory (important if called script/module do file operations). By default, it's a project root |
-| createWorkDir | Automatically create working directory if does not exist. Enabled by default |
-| module | Module name to call command on (if command not set module called directly). Useful for derived tasks. |
-| command | Python command to execute (string, array, iterable) |
-| logLevel | Logging level for python output. By default is `LIFECYCLE` (visible in console). To hide output use `LogLevel.INFO` |
-| pythonArgs | Extra python arguments applied just after python binary. Useful for declaring common python options (-I, -S, etc.) |
+| Property | Description                                                                                                                            |
+|---------|----------------------------------------------------------------------------------------------------------------------------------------|
+| pythonPath | Path to python binary. By default used path declared in global configuration                                                           |
+| pythonBinary | Python binary name. By default, python3 on linux and python otherwise.                                                                 |
+| validateSystemBinary | Search python binary in PATH and fail build to reveal PATH problems                                                                    |
+| workDir | Working directory (important if called script/module do file operations). By default, it's a project root                              |
+| createWorkDir | Automatically create working directory if does not exist. Enabled by default                                                           |
+| module | Module name to call command on (if command not set module called directly). Useful for derived tasks.                                  |
+| command | Python command to execute (string, array, iterable)                                                                                    |
+| logLevel | Logging level for python output. By default is `LIFECYCLE` (visible in console). To hide output use `LogLevel.INFO`                    |
+| pythonArgs | Extra python arguments applied just after python binary. Useful for declaring common python options (-I, -S, etc.)                     |
 | extraArgs | Extra arguments applied at the end of declared command (usually module arguments). Useful for derived tasks to declare default options |
-| outputPrefix | Prefix, applied for each line of python output. By default is '\t' to identify output for called gradle command |
-| environment | Process specific environment variables |
+| outputPrefix | Prefix, applied for each line of python output. By default is '\t' to identify output for called gradle command                        |
+| environment | Process specific environment variables                                                                                                 |
+| docker.use | Enable docker support                                                                                                                  |
+| docker.image | Python image to use                                                                                                                    |
+| docker.windows | Windows image use. Not usefule now as testcontainers can't run on windows containers (imlpemented for the future) |
+| docker.ports | Exposed ports from docker container |
+| docker.exclusive | Enable exclusive container mode (immediate logs for long-running tasks)                                                                |
 
 
 Also, task provide extra methods:
@@ -214,6 +243,7 @@ Also, task provide extra methods:
 * `extraArgs(String... args)` to declare extra arguments (shortcut to append values to extraArgs property).
 * `environment(String var, Object value)` to set custom environment variable (shortcut to append values to environment property)
 * `environment(Map<String, Object> vars)` to set multiple custom environment variables at once (shortcut to append values to environment property)
+* `docker.ports(Object... ports)` to set container ports to expose (direct 5000 or mapped '5000:6000')
 
 ### PipInstallTask
 
@@ -232,6 +262,7 @@ Configuration:
 |----------|-------------|
 | pythonPath | Path to python binary. By default used path declared in global configuration |
 | pythonBinary | Python binary name. By default, python3 on linux and python otherwise. |
+| validateSystemBinary | Search python binary in PATH and fail build to reveal PATH problems                                                                    |
 | pythonArgs | Extra python arguments applied just after python binary. Useful for declaring common python options (-I, -S, etc.) |
 | environment | Process specific environment variables |
 | modules | Modules to install. In most cases configured indirectly with `pip(..)` task methods. By default, modules from global configuration. |
@@ -242,6 +273,8 @@ Configuration:
 | extraIndexUrls | Additional pip repositories (--extra-index-url) |
 | trustedHosts / trusted hosts (--trusted-host) |
 | options | additional pip install options |
+| requirements | Requirements file to use |
+| strictRequirements | Strict or native requirements file processing mode |
 
 And, as shown above, custom methods:
 

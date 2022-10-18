@@ -101,7 +101,7 @@ nav:
   - User guide:
       - Python install: guide/python.md
       - Docker: guide/docker.md
-      - Pip modules: guide/pip.md
+      - Pip modules: guide/modules.md
       - Usage: guide/usage.md
       - Multi-module: guide/multimodule.md
       - Configuration: guide/configuration.md

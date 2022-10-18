@@ -179,6 +179,95 @@ Or you can use property directly:
 pipInstall.options = ['--a', 'value', '--b', 'value']
 ```
 
+## Requirements.txt
+
+Plugin supports python requirements.txt file: if file found in project root, it would
+be loaded automatically.
+
+To specify different file location:
+
+```groovy
+python.requirements.file = 'path/to/file' // relative to project root
+```
+
+To switch off requirements support:
+
+```groovy
+python.requirements.use = false
+```
+
+!!! note
+    In multi-module projects file is searched relatively to current module. Root module is not
+    searched to avoid situation when root file used in module by mistake.
+
+    If required, search in root could be configured manually: 
+    ```groovy
+    python.requirements.file = project.rootProject.rootDir.absolutePath
+    ```
+
+### Strict mode
+
+By default, restricted file syntax assumed: 
+
+* Support exactly the same module types as in gradle declaration:
+  - Only strict module version (e.g. `foo==1.0`)
+  - With [features](#pip-module-extra-features) support
+  - [VCS modules](#vcs-pip-modules) with extended syntax (including version)
+    * This syntax might not be parsed correctly by python tools,
+      but it is required by plugin in order to know installed version (and properly perform up-to-date check).
+* All commented or empty lines are skipped
+
+!!! note "Motivation"
+    Allow externalizing pip modules configuration file so
+    python tools could see and parse it, but still restrict version ranges (for reproducible builds).
+    As en example, depndabot could auto update module versions. 
+
+Example file:
+
+```
+# simple module (exact version)
+extract-msg == 0.34.3
+
+# features
+requests[socks,security] == 2.28.1
+
+# vcs syntax (with version part!)
+git+https://github.com/ictxiangxin/boson/@ea7d9113f71a7eb79083208d4f3bbb74feeb149f#egg=boson-1.4
+```
+
+In this mode requirements file read by plugin itself and registered in gradle modules
+(the same as if modules were declared directly in gradle file).
+
+!!! important
+    Module declarations in gradle script override requirements declaration. So if, for example,
+    requirements contains `foo==1.1` and in gradle script `python.pip 'foo:1.0'` then version 1.0 would be used.
+
+### Native behaviour
+
+You can also use requirement file in a [native way](https://pip.pypa.io/en/stable/reference/requirements-file-format/#requirements-file-format):
+
+```groovy
+python.requirements.strict = false
+```
+
+In this case instead of manual file parsing plugin will delegate processing to pip:
+
+```
+pip -r requirements.txt
+```
+
+!!! note
+    Plugin up-to-date check will rely on requirements file last edit time (because plugin not aware of modules inside it).
+    `pipUpdates` task will not show updates for modules in requirements file (but you could 
+    configure it to show all modules `pipUpdates.all = true`)
+
+If modules also declared in gradle file directly, they would be installed **after** requirements processing.
+
+As an example, this mode might be helpful if you need to rely on python modules, built in gradle's project submodules
+(in this case python task dependencies must be properly set).
+
+See [requirements file syntax](https://pip.pypa.io/en/stable/reference/requirements-file-format/#requirements-file-format) for all available options
+
 ## Scope
 
 Pip dependencies could be installed per project, for current user (~/) or globally.
@@ -243,5 +332,9 @@ pipUpdates.all = true
   pip install -U pip
   ```
 
+## Cleanup environment
 
+Use `cleanPython` task to remove current project-specific python environment.
+
+This would be required for python version change and for switching to docker (or back). 
  

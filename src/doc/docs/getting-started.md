@@ -81,7 +81,7 @@ python {
     Version ranges are not allowed for reproducible builds! (but, eventually, there would be problems
     in any case because of transitive dependencies)   
 
-[Module features](guide/pip.md#pip-module-extra-features) and [VCS modules](guide/pip.md#vcs-pip-modules) supported.
+[Module features](guide/modules.md#pip-module-extra-features) and [VCS modules](guide/modules.md#vcs-pip-modules) supported.
 
 ## Behaviour
 

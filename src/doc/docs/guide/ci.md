@@ -18,7 +18,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: Java ${{ matrix.java }}, python ${{ matrix.python }}
+    name: Java {{ '${{ matrix.java }}' }}, python {{ '${{ matrix.python }}' }}
     strategy:
       matrix:
         java: [8, 11]
@@ -26,10 +26,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Set up JDK ${{ matrix.java }}
+      - name: Set up JDK {{ '${{ matrix.java }}' }}
         uses: actions/setup-java@v1
         with:
-          java-version: ${{ matrix.java }}
+          java-version: {{ '${{ matrix.java }}' }}
 
       - name: Set up Python
         uses: actions/setup-python@v4

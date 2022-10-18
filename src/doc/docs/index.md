@@ -5,14 +5,15 @@
 
 [Release notes](about/history.md) - [Compatibility](about/compatibility.md) - [License](about/license.md)
 
+**[Who's using](https://github.com/xvik/gradle-use-python-plugin/discussions/18)**
+
 ## Features
 
 * Works with [directly installed python](guide/python.md) or [docker container](guide/docker.md) (with python)
 * Creates local (project-specific) [virtualenv](guide/configuration.md#virtualenv) (creating project-specific python copy)
 * Installs required [pip modules](guide/modules.md) (virtualenv by default, but could be global installation)
-  - Support requirements.txt file (limited by default)
+  - Support [requirements.txt](guide/modules.md#requirementstxt) file (limited by default)
 * Could be used as basement for [building plugins](guide/plugindev.md) for specific python modules (like
   [mkdocs plugin](https://github.com/xvik/gradle-mkdocs-plugin))  
 
-**[Who's using](https://github.com/xvik/gradle-use-python-plugin/discussions/18)**
  

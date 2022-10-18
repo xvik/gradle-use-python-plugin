@@ -176,3 +176,34 @@ Pip(Python python, boolean userScope, boolean useCache) {
 
 See `CliUtils.hidePipCredentials` for an implementation example (using regexps).
 Most likely, implementation would be the same in your case. 
+
+## Call docker in task
+
+In case of docker there might be a need to execute docker command directly.
+For this, `BasePythonTask` contains `dockerExec` method.
+
+For example, `CleanPython` task have to use it because on linux docker would create
+environment as root user, and it would not be possible to remove it outside of docker:
+
+```groovy
+@TaskAction
+void run() {
+    String path = project.file(getEnvPath()).absolutePath
+    if (dockerUsed) {
+        // with docker, environment would be created with a root user and so it would not be possible
+        // to simply remove folder: so removing within docker
+        String[] cmd = windows ? ['rd', '/s', '/q', "\"$path\""] : ['rm', '-rf', path]
+        if (dockerExec(cmd) != 0) {
+            throw new GradleException('Python environment cleanup failed')
+        }
+    } else {
+        project.delete(path)
+    }
+}
+```
+
+`isDockerUsed()`, `isWindows()` and `dockerExec(cmd)` are all provided by `BasePythonTask`
+
+!!! note
+    There is no way now to run on windows containers (due to testcontainers restriction),
+    but plugin implements this support for the future.

@@ -1,6 +1,6 @@
 # Docker
 
-Instead of direct python usage, plugin could use python docker container
+Instead of direct python usage, plugin could use python inside docker container
 (docker must be installed).
 
 To enable docker support:
@@ -38,7 +38,7 @@ custom repository simply declare it: `registry.mycompany.com/mirror/python:3.10.
 
 ## Behaviour
 
-* Docker container is started before first python call (in `checkPython` task) and stopped after build completion.
+* Docker container started before first python call (in `checkPython` task) and stopped after build completion.
 * Entire project directory is mapped inside container (so python process would be able to access any project file)
 * Working directory would be set to project root
 
@@ -98,13 +98,13 @@ task sample(type: PythonTask) {
 
 This changes `workDir`, docker exposed ports and environment variables.
 
-Plugin will detect these changed and **will restart container** automatically to properly apply configuration (you'll see it in log).
+Plugin will detect these changes and **will restart container** automatically to properly apply configuration (you'll see it in log).
 
 !!! tip
     To avoid redundant container restarts prefer global docker configuration. But `workDir` could be set
     only on task level
 
-Task properties affecting container restart (because they could be specified only during startup):
+Task properties affecting container restart (because they could be specified only before container startup):
 
 name | Description                                                                                                           
 -----|-----------------------------------------------------------------------------------------------------------------------
@@ -134,12 +134,12 @@ task sample(type: PythonTask) {
 ```
 
 In this case new docker container would be started **using python command as container command** (command keeping container alive).
-This mode required for long-lived or just long tasks because this way logs immediately streamed into
+This mode required for infinite or just long tasks because this way logs immediately streamed into
 gradle console. This is ideal for various dev-servers (like mkdocs dev server in example above).
 
 Exclusive task does not stop currently running (shared) container (because other (potential) python tasks may need it).
 
-!!! important
+!!! warning
     When running infinite task (e.g. dev server) the only way to stop it is using force (usually stop from IDE).
     After such emergency stop containers may live for about ~10s (keep it in mind), but, eventually, they should be
     removed.
@@ -166,7 +166,7 @@ Here docker port 5000 mapped to host 5001 and 5010 to 5011
 
 ### Different image
 
-Custom task can use a different container image (then declared in global extension) if required (no limits):
+Custom task can use a different container image (than declared in global extension) if required (no limits):
 
 ```groovy
 task sample(type: PythonTask) {
@@ -181,7 +181,7 @@ In this case, new container would be started just before python command (and wil
 ## Concurrency
 
 Any number of docker images could be used during the build. Different images would work concurrently.
-Different tags for the same image would be treated as different containers.
+Different tags for the same image would be started as different containers.
 
 Execution is synchronized by docker image: in multi-module project or with parallel build only
 one python command would be executed in container at a time (but commands could run in different containers concurrently).

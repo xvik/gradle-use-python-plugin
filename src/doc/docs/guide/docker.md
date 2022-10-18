@@ -189,4 +189,19 @@ one python command would be executed in container at a time (but commands could 
 This synchronization applied to minimize potential edge cases (simpler to investigate problems, avoid side effects).
 Later this could change (based on feedback).
 
+## Troubleshooting
 
+Testcontainers remembers not found docker environment error (e.g. docker was simply not started) inside local static 
+variable. But, as docker was executed inside gradle daemon, this state remains, and you can see error:
+
+```
+Previous attempts to find a Docker environment failed. Will not retry. Please see logs and check configuration
+```
+
+It will continue showing this even if docker already started (it doesn't check at all).
+
+To resolve this simply stop gradle daemons:
+
+```
+gradlew --stop
+```

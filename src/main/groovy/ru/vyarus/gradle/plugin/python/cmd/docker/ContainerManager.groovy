@@ -314,7 +314,7 @@ class ContainerManager {
             // by default gradle shows only top error message and user need to activate --stacktrace mode to see
             // inner errors, but the most important information would be in these inner messages
             // To simplify usage throwing onw more exception with the root cause
-            throw new GradleException(collectErrors(ex))
+            throw new GradleException(collectErrors(ex), ex)
         }
         String info = config != null ? formatContainerInfo(config, workDir, env) : ''
         project.logger.lifecycle('[docker] {} \'{}\' ({}) started in {}{}',

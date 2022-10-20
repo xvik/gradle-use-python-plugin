@@ -46,7 +46,7 @@ import java.time.Duration
 @CompileStatic
 class ContainerManager {
 
-    private static final String DOCKER_PROJECT_PATH = '/usr/source/'
+    private static final String DOCKER_PROJECT_PATH = '/usr/src/'
     private static final String DOCKER_WINDOWS_PROJECT_PATH = 'c:/projects/'
     private static final byte[] EMPTY = new byte[0]
     private static final String NL = '\n'

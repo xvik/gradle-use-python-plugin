@@ -113,6 +113,14 @@ class Pip {
 }
 ```
 
+!!! important
+    `Python` object use delayed initialization (to avoid putting all parameters inside
+    constructor). By default, initialization will be performed automatically just before python command execution,
+    but this also mean that system binary validation or other errors could happen at that point.
+    It is often required to separate initialization and execution errors and so there is
+    `.validate()` method triggering initialization (and, as a result, potential initialization errors).
+
+
 ## Apply default modules
 
 In your plugin you could apply default modules like this:

@@ -310,6 +310,13 @@ final class CliUtils {
         return output.toString()
     }
 
+    /**
+     * @return true if host is linux (not mac!), false otherwise
+     */
+    static boolean isLinuxHost() {
+        return Os.isFamily(Os.FAMILY_UNIX) && !Os.isFamily(Os.FAMILY_MAC)
+    }
+
     private static boolean isPositionMatch(String[] ver, String[] req, int pos) {
         boolean valid = (ver[pos] as Integer) >= (req[pos] as Integer)
         if (valid && ver[pos] == req[pos] && req.length > pos + 1) {

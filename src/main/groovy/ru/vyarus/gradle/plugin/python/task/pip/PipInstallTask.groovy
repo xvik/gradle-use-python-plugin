@@ -3,6 +3,7 @@ package ru.vyarus.gradle.plugin.python.task.pip
 import groovy.transform.CompileStatic
 import groovy.transform.Memoized
 import org.gradle.api.tasks.*
+import ru.vyarus.gradle.plugin.python.PythonExtension
 import ru.vyarus.gradle.plugin.python.util.RequirementsReader
 
 import java.util.concurrent.ConcurrentHashMap
@@ -80,6 +81,9 @@ class PipInstallTask extends BasePipTask {
         // could be at first run (upToDateWhen requires at least one task execution)
         if (modulesToInstall.empty && !directReqsInstallRequired) {
             logger.lifecycle('All required modules are already installed with correct versions')
+        } else {
+            // chown created files so user could remove them on host (unroot)
+            dockerChown(project.extensions.getByType(PythonExtension).envPath)
         }
 
         if (isShowInstalledVersions()) {

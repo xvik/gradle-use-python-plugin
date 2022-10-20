@@ -36,6 +36,7 @@ class CheckPythonTask extends BasePipTask {
     private static final String PROP_VENV_INSTALLED = 'ru.vyarus.python.virtualenv.installed'
     private static final Object SYNC = new Object()
     private boolean virtual = false
+    private boolean envCreated = false
 
     @TaskAction
     @SuppressWarnings('UnnecessaryGetter')
@@ -194,6 +195,7 @@ class CheckPythonTask extends BasePipTask {
 
         // symlink by default (copy if requested by user config)
         env.create(ext.envCopy)
+        envCreated = true
         return true
     }
 
@@ -212,6 +214,12 @@ class CheckPythonTask extends BasePipTask {
         if (!python.isVirtualenv()) {
             throw new GradleException("Configured environment is not a virtualenv: ${env.location.absolutePath}. " +
                     'Most likely, issue appear due to incorrect `python.envPath` configuration.')
+        }
+
+        if (envCreated) {
+            // own files, created within docker (unroot)
+            // executed not after creation because python will create new files on first run
+            dockerChown(env.path)
         }
     }
 }

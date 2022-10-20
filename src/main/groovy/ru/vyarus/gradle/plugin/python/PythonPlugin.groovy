@@ -4,11 +4,11 @@ import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.tasks.Delete
 import org.gradle.api.tasks.TaskProvider
 import ru.vyarus.gradle.plugin.python.cmd.docker.DockerFactory
 import ru.vyarus.gradle.plugin.python.task.BasePythonTask
 import ru.vyarus.gradle.plugin.python.task.CheckPythonTask
-import ru.vyarus.gradle.plugin.python.task.CleanPythonTask
 import ru.vyarus.gradle.plugin.python.task.PythonTask
 import ru.vyarus.gradle.plugin.python.task.pip.BasePipTask
 import ru.vyarus.gradle.plugin.python.task.pip.PipInstallTask
@@ -70,11 +70,11 @@ class PythonPlugin implements Plugin<Project> {
             }
         }
 
-        project.tasks.register('cleanPython', CleanPythonTask) {
+        project.tasks.register('cleanPython', Delete) {
             it.with {
                 group = 'python'
                 description = 'Removes existing python environment (virtualenv)'
-                conventionMapping.envPath = { extension.envPath }
+                delete extension.envPath
                 onlyIf { project.file(extension.envPath).exists() }
             }
         }

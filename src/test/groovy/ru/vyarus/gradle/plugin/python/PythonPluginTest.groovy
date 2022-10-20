@@ -3,7 +3,6 @@ package ru.vyarus.gradle.plugin.python
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.tasks.Delete
-import ru.vyarus.gradle.plugin.python.task.CleanPythonTask
 import ru.vyarus.gradle.plugin.python.task.pip.module.VcsPipModule
 
 /**
@@ -77,8 +76,8 @@ class PythonPluginTest extends AbstractTest {
         pipList.modules == ['sample:1', 'foo:2']
 
         then: "clean task configured"
-        CleanPythonTask clean = project.tasks.getByName('cleanPython')
-        clean.envPath == '.gradle/python'.replace('/', File.separator)
+        Delete clean = project.tasks.getByName('cleanPython')
+        clean.delete == ['.gradle/python'.replace('/', File.separator)] as Set
     }
 
 

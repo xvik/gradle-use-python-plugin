@@ -17,7 +17,12 @@ import ru.vyarus.gradle.plugin.python.cmd.Python
 import ru.vyarus.gradle.plugin.python.cmd.docker.ContainerManager
 import ru.vyarus.gradle.plugin.python.cmd.docker.DockerConfig
 import ru.vyarus.gradle.plugin.python.cmd.docker.DockerFactory
+import ru.vyarus.gradle.plugin.python.util.CliUtils
 import ru.vyarus.gradle.plugin.python.util.OutputLogger
+
+import java.nio.file.Files
+import java.nio.file.LinkOption
+import java.nio.file.Path
 
 /**
  * Base task for all python tasks.
@@ -181,24 +186,66 @@ class BasePythonTask extends ConventionTask {
         return docker.use.get()
     }
 
-    @Internal
-    protected Python getPython() {
-        buildPython()
+    /**
+     * Docker works with root user and so will create all new files inside project as a root user. This is not a
+     * problem for windows and mac (because they use network mapping and will not allow using host root).
+     * For linux problem exists. In order to solve this, task should chown files for current user so they would
+     * be accessible by current user.
+     * <p>
+     * Method would perform only on linux, if target container is linux. So it is safe to call this method - it will do
+     * nothing when not require. It will also do nothing if docker support not enabled.
+     * <p>
+     * For linux, it will run chown for provided dir inside container with uid and gid taken from root project dir
+     * (not current user, but the same as project directory!).
+     * <p>
+     * Method opened in order to use it in {@code doFirst } or {@code doLast } callbacks for custom python tasks.
+     * <p>
+     * IMPORTANT: path must be local (inside project) because it is tested for existence before command execution
+     *
+     * @param dir string path or File object for local directory to change file permissions on within docker
+     */
+    void dockerChown(Object dir) {
+        dockerChown(project.file(dir).toPath())
     }
 
     /**
      * Execute command inside docker container. Output would be printed to console.
      * <p>
+     * Method opened in order to use it in {@code doFirst } or {@code doLast } callbacks for custom python tasks.
+     * <p>
      * IMPORTANT: exception would not be thrown if command execution fails!
      *
-     * @param cmd command array to execute (paths to project file would be re-written to docker paths)
+     * @param cmd command string or array to execute (paths to project file would be re-written to docker paths)
      * @return command exit code
      * @throws GradleException when docker is not configured for task
      */
-    protected int dockerExec(String... cmd) {
+    int dockerExec(Object cmd) {
         // start command printing all output messages
         return new OutputLogger(logger, LogLevel.LIFECYCLE, '\t')
-                .withStream { return dockerExec(it, cmd) }
+                .withStream { return dockerExec(cmd, it) }
+    }
+
+    @Internal
+    protected Python getPython() {
+        // changes to path or binary would trigger python object re-creation
+        buildPython(getPythonPath(), getPythonBinary())
+    }
+
+    /**
+     * Docker chown command execution implementation.
+     *
+     * @param dir local directory to change file permissions on within docker
+     */
+    protected void dockerChown(Path dir) {
+        // only for docker environment if linux container used and on linux host
+        if (!dockerUsed || windows || !CliUtils.linuxHost || !Files.exists(dir)) {
+            return
+        }
+
+        Path projectDir = project.rootProject.rootDir.toPath()
+        int uid = (int) Files.getAttribute(projectDir, 'unix:uid', LinkOption.NOFOLLOW_LINKS)
+        int gid = (int) Files.getAttribute(projectDir, 'unix:gid', LinkOption.NOFOLLOW_LINKS)
+        dockerExec(['chown' , '-Rh', "$uid:$gid", dir.toAbsolutePath()])
     }
 
     /**
@@ -207,29 +254,30 @@ class BasePythonTask extends ConventionTask {
      * <p>
      * IMPORTANT: exception would not be thrown if command execution fails!
      *
+     * @param cmd command string or array to execute (paths to project file would be re-written to docker paths)
      * @param out output stream (use {@link ByteArrayOutputStream} to consume output)
-     * @param cmd command array to execute (paths to project file would be re-written to docker paths)
      * @return command exit code
      * @throws GradleException when docker is not configured for task
      */
-    protected int dockerExec(OutputStream out, String... cmd) {
+    protected int dockerExec(Object cmd, OutputStream out) {
         if (!getDocker().use) {
             throw new GradleException('Docker command can\'t be executed: docker not enabled')
         }
+        String[] args = CliUtils.parseArgs(cmd)
         // it would be pre-started container (used in checkPython)
         ContainerManager manager = DockerFactory.getContainer(getDocker().toConfig(), project)
         // restart container if task parameters differ
         manager.restartIfRequired(getDocker().toConfig(), getWorkDir(), getEnvironment())
         // rewrite paths from host to docker fs
-        manager.convertCommand(cmd)
-        logger.lifecycle('[docker] {}', cmd.join(' '))
+        manager.convertCommand(args)
+        logger.lifecycle('[docker] {}', args.join(' '))
         // start command printing all output messages
-        return manager.exec(cmd, out)
+        return manager.exec(args, out)
     }
 
     @Memoized
-    private Python buildPython() {
-        new Python(project, getPythonPath(), getPythonBinary())
+    private Python buildPython(String pythonPath, String pythonBinary) {
+        new Python(project, pythonPath, pythonBinary)
                 .logLevel(getLogLevel())
                 .workDir(getWorkDir())
                 .pythonArgs(getPythonArgs())
@@ -248,6 +296,10 @@ class BasePythonTask extends ConventionTask {
      * re-started.
      * <p>
      * For a long-lived tasks use {@link DockerEnv#getExclusive()} mode.
+     * <p>
+     * Note that all files created inside docker in mapped project directory will be owned with root (problem actual
+     * only for linux users!). To overcome this for custom tasks use
+     * {@link BasePythonTask#dockerChown(java.lang.Object)} method inside {@code doFirst } or {@code doLast } blocks.
      *
      * @see ru.vyarus.gradle.plugin.python.cmd.docker.DockerFactory
      */

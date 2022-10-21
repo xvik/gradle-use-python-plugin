@@ -50,8 +50,9 @@ class ContainerManager {
     private static final String DOCKER_WINDOWS_PROJECT_PATH = 'c:/projects/'
     private static final byte[] EMPTY = new byte[0]
     private static final String NL = '\n'
-    public static final char WIN_SEPARATOR = '\\'
-    public static final char LINUX_SEPARATOR = '/'
+    private static final char WIN_SEPARATOR = '\\'
+    private static final char LINUX_SEPARATOR = '/'
+    private static final int STARTUP_TIMEOUT = 3
 
     private final String image
     private final boolean windowsImage
@@ -237,7 +238,7 @@ class ContainerManager {
                       Map<String, Object> env) {
         PythonContainer cont = createContainer(config, workDir, env)
                 .withCommand(command)
-                .withStartupTimeout(Duration.ofSeconds(3))
+                .withStartupTimeout(Duration.ofSeconds(STARTUP_TIMEOUT))
 //                .withStartupCheckStrategy(new OneShotStartupCheckStrategy())
         // output live stream
                 .withLogConsumer { OutputFrame frame -> out.write(frame.bytes ?: EMPTY) }
@@ -292,7 +293,7 @@ class ContainerManager {
         } else {
             container.withCommand('tail', '-f', '/dev/null')
         }
-        container.withStartupTimeout(Duration.ofSeconds(3))
+        container.withStartupTimeout(Duration.ofSeconds(STARTUP_TIMEOUT))
                 .withLogConsumer { OutputFrame frame ->
                     if (frame.bytes != null) {
                         project.logger.lifecycle('[docker{}] {}', container.containerName, frame.utf8String)

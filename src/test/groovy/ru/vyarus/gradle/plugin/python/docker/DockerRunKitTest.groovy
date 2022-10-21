@@ -3,6 +3,7 @@ package ru.vyarus.gradle.plugin.python.docker
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.TaskOutcome
 import ru.vyarus.gradle.plugin.python.AbstractKitTest
+import ru.vyarus.gradle.plugin.python.util.CliUtils
 import spock.lang.IgnoreIf
 
 /**
@@ -194,4 +195,80 @@ class DockerRunKitTest extends AbstractKitTest {
         result.output.contains('-m virtualenv .gradle/python')
         file('.gradle/python').exists()
     }
+
+    def "Check manual own call"() {
+        setup:
+        build """
+            plugins {
+                id 'base'
+                id 'ru.vyarus.use-python'
+            }
+
+            python {               
+                docker.use = true
+            }
+            
+            task sample(type: PythonTask) {
+                command = '-c "with open(\\'build/temp.txt\\', \\'w+\\') as f: pass"'
+                doLast {
+                    dockerChown 'build/temp.txt'
+                }
+            }
+
+        """
+        file('build').mkdir()
+
+        when: "run task"
+        debug()
+        BuildResult result = run('sample')
+
+        then: "task successful"
+        result.task(':sample').outcome == TaskOutcome.SUCCESS
+        result.output.contains('[docker] container')
+        if (CliUtils.linuxHost) {
+            result.output.contains('chown')
+        } else {
+            !result.output.contains('chown')
+        }
+        file('build/temp.txt').exists()
+
+        when: "do clean"
+        result = run('clean')
+
+        then: "clean ok"
+        result.task(':clean').outcome == TaskOutcome.SUCCESS
+        !file('build').exists()
+    }
+
+    def "Check docker command execution"() {
+        setup:
+        build """
+            plugins {
+                id 'ru.vyarus.use-python'
+            }
+
+            python {               
+                docker.use = true
+            }
+            
+            task sample(type: PythonTask) {
+                doFirst {
+                    dockerExec 'ls -l /usr/src/'
+                }
+                command = '-c print(\\'samplee\\')'
+            }
+
+        """
+
+        when: "run task"
+        debug()
+        BuildResult result = run('sample')
+
+        then: "task successful"
+        result.task(':sample').outcome == TaskOutcome.SUCCESS
+        result.output.contains('[docker] container')
+        result.output.contains('samplee')
+        result.output.contains('ls -l')
+    }
+
 }

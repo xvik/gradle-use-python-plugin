@@ -216,10 +216,13 @@ class BasePythonTask extends ConventionTask {
      * IMPORTANT: exception would not be thrown if command execution fails!
      *
      * @param cmd command string or array to execute (paths to project file would be re-written to docker paths)
-     * @return command exit code
+     * @return command exit code or -1 if docker not used
      * @throws GradleException when docker is not configured for task
      */
     int dockerExec(Object cmd) {
+        if (!dockerUsed) {
+            return -1
+        }
         // start command printing all output messages
         return new OutputLogger(logger, LogLevel.LIFECYCLE, '\t')
                 .withStream { return dockerExec(cmd, it) }
@@ -260,7 +263,7 @@ class BasePythonTask extends ConventionTask {
      * @throws GradleException when docker is not configured for task
      */
     protected int dockerExec(Object cmd, OutputStream out) {
-        if (!getDocker().use) {
+        if (!dockerUsed) {
             throw new GradleException('Docker command can\'t be executed: docker not enabled')
         }
         String[] args = CliUtils.parseArgs(cmd)

@@ -244,6 +244,8 @@ Also, task provide extra methods:
 * `environment(String var, Object value)` to set custom environment variable (shortcut to append values to environment property)
 * `environment(Map<String, Object> vars)` to set multiple custom environment variables at once (shortcut to append values to environment property)
 * `docker.ports(Object... ports)` to set container ports to expose (direct 5000 or mapped '5000:6000')
+* `dockerChown(Object path)` to [fix root user](docker.md#user-permissions) on paths created inside container for linux
+* `dockerExec(Object command)` to [run native command](docker.md#docker-commands) inside container
 
 ### PipInstallTask
 

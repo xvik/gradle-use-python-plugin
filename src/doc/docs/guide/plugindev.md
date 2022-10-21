@@ -185,13 +185,25 @@ Pip(Python python, boolean userScope, boolean useCache) {
 See `CliUtils.hidePipCredentials` for an implementation example (using regexps).
 Most likely, implementation would be the same in your case. 
 
-## Call docker in task
+## Docker
+
+You don't need any additional actions to support docker: python execution will be
+performed either in docker or on local python, based on task configuration.
+
+!!! note
+    All absolute paths in commands would be replaced automatically to match docker container locations
+
+!!! warning
+    There is no way now to run on windows containers (due to testcontainers restriction),
+    but plugin implements this support *for the future*. 
+
+### Call docker in task
 
 In case of docker there might be a need to execute docker command directly.
 For this, `BasePythonTask` contains `dockerExec` method.
 
-For example, `CleanPython` task have to use it because on linux docker would create
-environment as root user, and it would not be possible to remove it outside of docker:
+For example, during development there was a `CleanPython` task which used it to run deletion inside docker container
+(later it was replaced by chown calls, but still a good example):
 
 ```groovy
 @TaskAction
@@ -212,6 +224,18 @@ void run() {
 
 `isDockerUsed()`, `isWindows()` and `dockerExec(cmd)` are all provided by `BasePythonTask`
 
+### Chown
+
+Docker container works with root user and creates all files in mapped project as root.
+It is ok for windows and mac because then use network volume mappings, but *on linux*,
+such files [remain as root](docker.md#user-permissions). As a result, you will not be able to remove them without `sudo`.
+
+In order to workaround this problem, `checkPython` and `pipInstall` calls `chown` on
+created environment (and after new modules installation) in order to change their permissions
+(into the same uid and gid as root project dir).
+
+If your python tasks create files then you should also call `dockerChown(path)` manually with local path (inside project).
+This method will work only on linux host with linux container and if docker enabled.
+
 !!! note
-    There is no way now to run on windows containers (due to testcontainers restriction),
-    but plugin implements this support for the future.
+    Be aware, if you use `doLast` for it that it will be called only after **successful** task execution

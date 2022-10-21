@@ -47,8 +47,8 @@ It all mentioned in logs:
 ```
 > Task :checkPython
 [docker] container 'python:3.10.7-alpine3.15' (/focused_wing) started in 1.92s
-	Mount           /home/user/projects/project:/usr/source/project
-	Work dir        /usr/source/project
+	Mount           /home/user/projects/project:/usr/src/project
+	Work dir        /usr/src/project
 ```
 
 !!! note
@@ -121,6 +121,9 @@ workDir | container restarts if work dir changes
     This should simplify usage as no changes required to use task with direct python and inside docker.
     Also, all path separators changed according to target os (important when running container from windows host).
 
+!!! note
+    Environment variable values are not logged (only keys logged) because they might contain secrets.
+
 ### Exclusive mode
 
 There is one configuration option available **only for tasks** - exclusive mode:
@@ -177,6 +180,89 @@ task sample(type: PythonTask) {
 ```
 
 In this case, new container would be started just before python command (and will stay up until gradle finished build).
+
+## User permissions
+
+Docker works as root user and so all files created inside mounted project would be owned by root.
+On windows and mac volume mounted using network with permissions mapping (no root-owned files on host).
+But on linux container root permissions would become host root permissions. As a result, 
+you'll need a root rights to simply remove these files (cleanup).
+
+In order to fix this situation, plugin will execute `chown` on created files (with uid and gid 
+of user owning project directory (not current user)). This will work for `checkPython` and `pipInstall` tasks.
+
+!!! note 
+    As long as uid and gid used instead of user/group name, container does not need to have user with the same uid:gid
+
+If your custom python task create other files, then you should fix permissions manually with help of
+`dockerChown` method available on all python tasks. You can use `doFirst` or `doLast` callbacks.
+For example, suppose python command creates a file:
+
+```groovy
+task sample(type: PythonTask) {
+    command = '-c "with open(\'build/temp.txt\', \'w+\') as f: pass"'
+    doLast {
+        dockerChown 'build/temp.txt'
+    }
+}
+```
+
+Without "chown" used, next `gradlew clean` execution would fail.
+
+!!! note
+    `doLast` is executed only after successful task execution. If you need it to be called in any case you'll have
+    to use gradle graph:
+
+    ```groovy
+    gradle.taskGraph.afterTask {task, state ->
+        // execute chown even if task fails
+        if (task instanceof PythonTask) {
+            (task as PythonTask).dockerChown('some/path')
+        }
+    }
+    ```
+
+!!! important 
+    `dockerChown` will work only for linux container when host is also linux and when docker used,
+    so it is safe to call it without conditions. Also, specified directory (or file) path **must exist
+    on local fs** (plugin will rewrite path into correct docker path, but first it checks for local existence). 
+
+## Docker commands
+
+There is also a way to execute any command inside started docker container with `dockerExec` method available on all 
+python tasks:
+
+```groovy
+task sample(type: PythonTask) {
+    doFirst {
+        dockerExec 'ls -l /usr/src/'
+    }
+    command = '-c print(\'samplee\')'
+}
+```
+
+!!! tip
+    As with python commands, docker command could be specified as simple string (will be split by spaces)
+    or as array: `['ls', '-l', '/usr/src/']` (suitable in complex cases when command can't be correctly parsed automatically) 
+
+Docker command output would be printed in console:
+
+```
+[docker] ls -l /usr/src/
+	 total 4
+	 drwx------    3 1000     1000          4096 Oct 21 08:02 project
+```
+
+`dockerExec` returns command exit code which might be used for conditions:
+
+```groovy
+if (dockerExec(...) == 0) {
+    // do something on success
+}
+```
+
+!!! note
+    When docker not enabled, `dockerExec` returns -1 and do nothing
 
 ## Concurrency
 

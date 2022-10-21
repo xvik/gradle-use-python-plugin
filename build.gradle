@@ -41,7 +41,8 @@ github {
 
 mkdocs {
     extras = [
-            'version': '3.0.0'
+            'version': '3.0.0',
+            'image': 'python:3.10.8-alpine3.15'
     ]
     publish {
         docPath = mkdocs.extras['version']

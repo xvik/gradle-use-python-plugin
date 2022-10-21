@@ -23,18 +23,18 @@ python.docker.use = true
 
 ## Image
 
-By default, [official python docker image](https://hub.docker.com/_/python) used: `python:3.10.7-alpine3.15`.
+By default, [official python docker image](https://hub.docker.com/_/python) used: `{{ gradle.image }}`.
 But you can change it to any other image containing python:
 
 ```groovy
-python.docker.image = 'python:3.10.7-alpine3.15'
+python.docker.image = '{{ gradle.image }}'
 ```
 
 !!! tip
     It is highly recommended to always specify exact tags for reproducible builds!
 
 Simple image declaration above would lead to docker hub, but if you need to use 
-custom repository simply declare it: `registry.mycompany.com/mirror/python:3.10.7-alpine3.15`
+custom repository simply declare it: `registry.mycompany.com/mirror/{{ gradle.image }}`
 
 ## Behaviour
 
@@ -46,7 +46,7 @@ It all mentioned in logs:
 
 ```
 > Task :checkPython
-[docker] container 'python:3.10.7-alpine3.15' (/focused_wing) started in 1.92s
+[docker] container '{{ gradle.image }}' (/focused_wing) started in 1.92s
 	Mount           /home/user/projects/project:/usr/src/project
 	Work dir        /usr/src/project
 ```
@@ -77,7 +77,7 @@ On next execution, created environment would be simply used (same as with direct
 name | Description                                                                                                           | Default
 ------|-----------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------
 use | Enable docker support                                                                                                 | false
-image | Image name (could be full path with repository)                                                                       | python:3.10.7-alpine3.15
+image | Image name (could be full path with repository)                                                                       | {{ gradle.image }}
 windows | Windows container OS. Windows containers support implemented in plugin, but currently not supported by testcontainers | false
 ports | Ports to expose from container (for long-lived commands) | 
 

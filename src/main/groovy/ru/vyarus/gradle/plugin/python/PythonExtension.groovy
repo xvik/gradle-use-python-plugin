@@ -404,7 +404,7 @@ class PythonExtension {
          *
          * @see <a href="https://hub.docker.com/_/python">python image</a>
          */
-        String image = 'python:3.10.7-alpine3.15'
+        String image = 'python:3.10.8-alpine3.15'
 
         /**
          * Required container port mappings - port to open from container to be accessible on host.

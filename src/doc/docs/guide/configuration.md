@@ -200,7 +200,7 @@ python {
       // enables docker support 
       use = false
       // image to use 
-      image = 'python:3.10.7-alpine3.15'
+      image = '{{ gradle.image }}'
       // windows containers indicator (not supported now, done for the future) 
       windows = false
       // docker ports to expose into host (direct 5000 or mapped '5000:6000')

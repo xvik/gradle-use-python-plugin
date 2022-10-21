@@ -277,6 +277,8 @@ Later this could change (based on feedback).
 
 ## Troubleshooting
 
+### Testcontainers check docker just once
+
 Testcontainers remembers not found docker environment error (e.g. docker was simply not started) inside local static 
 variable. But, as docker was executed inside gradle daemon, this state remains, and you can see error:
 
@@ -290,4 +292,18 @@ To resolve this simply stop gradle daemons:
 
 ```
 gradlew --stop
+```
+
+### Pip root user warning
+
+As root user used inside container, you'll see the following warning:
+
+```
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
+```
+
+It's just a warning, but if you want to remove it:
+
+```groovy
+python.environment 'PIP_ROOT_USER_ACTION', 'ignore' 
 ```

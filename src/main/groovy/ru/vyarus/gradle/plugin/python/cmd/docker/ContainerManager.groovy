@@ -237,7 +237,7 @@ class ContainerManager {
                       Map<String, Object> env) {
         PythonContainer cont = createContainer(config, workDir, env)
                 .withCommand(command)
-                .withStartupTimeout(Duration.ofSeconds(1))
+                .withStartupTimeout(Duration.ofSeconds(3))
 //                .withStartupCheckStrategy(new OneShotStartupCheckStrategy())
         // output live stream
                 .withLogConsumer { OutputFrame frame -> out.write(frame.bytes ?: EMPTY) }
@@ -292,7 +292,7 @@ class ContainerManager {
         } else {
             container.withCommand('tail', '-f', '/dev/null')
         }
-        container.withStartupTimeout(Duration.ofSeconds(1))
+        container.withStartupTimeout(Duration.ofSeconds(3))
                 .withLogConsumer { OutputFrame frame ->
                     if (frame.bytes != null) {
                         project.logger.lifecycle('[docker{}] {}', container.containerName, frame.utf8String)

@@ -12,21 +12,21 @@
         <meta name="author" content="Vyacheslav Rusakov">
       
       
-        <link rel="canonical" href="https://xvik.github.io/gradle-use-python-plugin/2.3.0/guide/pip/">
+        <link rel="canonical" href="https://xvik.github.io/gradle-use-python-plugin/3.0.0/getting-started/">
       
-      <link rel="icon" href="../../assets/images/favicon.png">
+      <link rel="icon" href="../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.3.0, mkdocs-material-8.3.6">
     
     
       
-        <title>Pip modules - Gradle use-python plugin</title>
+        <title>Getting started - Gradle use-python plugin</title>
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.4a0965b7.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.4a0965b7.min.css">
       
         
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.cbb835fc.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/palette.cbb835fc.min.css">
         
       
       
@@ -42,7 +42,7 @@
       
     
     
-    <script>__md_scope=new URL("../..",location),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("..",location),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -70,7 +70,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#pip-modules" class="md-skip">
+        <a href="#getting-started" class="md-skip">
           Skip to content
         </a>
       
@@ -90,7 +90,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../.." title="Gradle use-python plugin" class="md-header__button md-logo" aria-label="Gradle use-python plugin" data-md-component="logo">
+    <a href=".." title="Gradle use-python plugin" class="md-header__button md-logo" aria-label="Gradle use-python plugin" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
@@ -109,7 +109,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Pip modules
+              Getting started
             
           </span>
         </div>
@@ -210,7 +210,7 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../.." title="Gradle use-python plugin" class="md-nav__button md-logo" aria-label="Gradle use-python plugin" data-md-component="logo">
+    <a href=".." title="Gradle use-python plugin" class="md-nav__button md-logo" aria-label="Gradle use-python plugin" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
@@ -241,7 +241,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../.." class="md-nav__link">
+      <a href=".." class="md-nav__link">
         Home
       </a>
     </li>
@@ -254,11 +254,113 @@
 
   
   
+    
   
-    <li class="md-nav__item">
-      <a href="../../getting-started/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Getting started
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         Getting started
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    installation
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#python-pip" class="md-nav__link">
+    Python &amp; Pip
+  </a>
+  
+    <nav class="md-nav" aria-label="Python &amp; Pip">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#docker" class="md-nav__link">
+    Docker
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pip-modules" class="md-nav__link">
+    Pip modules
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#behaviour" class="md-nav__link">
+    Behaviour
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usage" class="md-nav__link">
+    Usage
+  </a>
+  
+    <nav class="md-nav" aria-label="Usage">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#module" class="md-nav__link">
+    Module
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#script" class="md-nav__link">
+    Script
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -269,14 +371,12 @@
 
   
   
-    
-  
   
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" checked>
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" >
       
       
       
@@ -299,7 +399,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../python/" class="md-nav__link">
+      <a href="../guide/python/" class="md-nav__link">
         Python install
       </a>
     </li>
@@ -311,87 +411,11 @@
               
   
   
-    
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          Pip modules
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
-        Pip modules
+    <li class="md-nav__item">
+      <a href="../guide/docker/" class="md-nav__link">
+        Docker
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#pip-module-extra-features" class="md-nav__link">
-    Pip module extra features
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#vcs-pip-modules" class="md-nav__link">
-    VCS pip modules
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#extra-pip-repositories" class="md-nav__link">
-    Extra pip repositories
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#extra-pip-install-options" class="md-nav__link">
-    Extra pip install options
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#scope" class="md-nav__link">
-    Scope
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#check-modules-updates" class="md-nav__link">
-    Check modules updates
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -403,7 +427,21 @@
   
   
     <li class="md-nav__item">
-      <a href="../usage/" class="md-nav__link">
+      <a href="../guide/modules/" class="md-nav__link">
+        Pip modules
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guide/usage/" class="md-nav__link">
         Usage
       </a>
     </li>
@@ -417,7 +455,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../multimodule/" class="md-nav__link">
+      <a href="../guide/multimodule/" class="md-nav__link">
         Multi-module
       </a>
     </li>
@@ -431,7 +469,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../configuration/" class="md-nav__link">
+      <a href="../guide/configuration/" class="md-nav__link">
         Configuration
       </a>
     </li>
@@ -445,7 +483,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../ci/" class="md-nav__link">
+      <a href="../guide/ci/" class="md-nav__link">
         CI
       </a>
     </li>
@@ -459,7 +497,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../plugindev/" class="md-nav__link">
+      <a href="../guide/plugindev/" class="md-nav__link">
         Plugin development
       </a>
     </li>
@@ -507,7 +545,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../about/history/" class="md-nav__link">
+      <a href="../about/history/" class="md-nav__link">
         Release notes
       </a>
     </li>
@@ -521,7 +559,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../about/compatibility/" class="md-nav__link">
+      <a href="../about/compatibility/" class="md-nav__link">
         Compatibility
       </a>
     </li>
@@ -535,7 +573,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../about/license/" class="md-nav__link">
+      <a href="../about/license/" class="md-nav__link">
         License
       </a>
     </li>
@@ -576,44 +614,70 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#pip-module-extra-features" class="md-nav__link">
-    Pip module extra features
+  <a href="#installation" class="md-nav__link">
+    installation
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#vcs-pip-modules" class="md-nav__link">
-    VCS pip modules
+  <a href="#python-pip" class="md-nav__link">
+    Python &amp; Pip
+  </a>
+  
+    <nav class="md-nav" aria-label="Python &amp; Pip">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#docker" class="md-nav__link">
+    Docker
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pip-modules" class="md-nav__link">
+    Pip modules
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#extra-pip-repositories" class="md-nav__link">
-    Extra pip repositories
+  <a href="#behaviour" class="md-nav__link">
+    Behaviour
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#extra-pip-install-options" class="md-nav__link">
-    Extra pip install options
+  <a href="#usage" class="md-nav__link">
+    Usage
+  </a>
+  
+    <nav class="md-nav" aria-label="Usage">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#module" class="md-nav__link">
+    Module
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#scope" class="md-nav__link">
-    Scope
+        
+          <li class="md-nav__item">
+  <a href="#script" class="md-nav__link">
+    Script
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#check-modules-updates" class="md-nav__link">
-    Check modules updates
-  </a>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -629,14 +693,55 @@
             <article class="md-content__inner md-typeset">
               
                 
-  <a href="https://github.com/xvik/gradle-use-python-plugin/edit/master/src/doc/docs/guide/pip.md" title="Edit this page" class="md-content__button md-icon">
+  <a href="https://github.com/xvik/gradle-use-python-plugin/edit/master/src/doc/docs/getting-started.md" title="Edit this page" class="md-content__button md-icon">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
   </a>
 
 
 
-<h1 id="pip-modules">Pip modules<a class="headerlink" href="#pip-modules" title="Permanent link">&para;</a></h1>
-<p>If additional pip modules required:</p>
+<h1 id="getting-started">Getting started<a class="headerlink" href="#getting-started" title="Permanent link">&para;</a></h1>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Plugin <strong>does not install python and pip</strong> itself and use globally installed python (by default).
+It's easier to prepare python manually because python have good compatibility (from user perspective) and does not need to
+be updated often.</p>
+</div>
+<h2 id="installation">installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h2>
+<p><a href="https://maven-badges.herokuapp.com/maven-central/ru.vyarus/gradle-use-python-plugin"><img alt="Maven Central" src="https://img.shields.io/maven-central/v/ru.vyarus/gradle-use-python-plugin.svg" /></a>
+<a href="https://plugins.gradle.org/plugin/ru.vyarus.use-python"><img alt="Gradle Plugin Portal" src="https://img.shields.io/maven-metadata/v/https/plugins.gradle.org/m2/ru/vyarus/use-python/ru.vyarus.use-python.gradle.plugin/maven-metadata.xml.svg?colorB=007ec6&amp;label=plugins%20portal" /></a></p>
+<div class="highlight"><pre><span></span><code><span class="n">buildscript</span><span class="w"> </span><span class="o">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">repositories</span><span class="w"> </span><span class="o">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">mavenCentral</span><span class="o">()</span><span class="w"></span>
+<span class="w">    </span><span class="o">}</span><span class="w"></span>
+<span class="w">    </span><span class="n">dependencies</span><span class="w"> </span><span class="o">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">classpath</span><span class="w"> </span><span class="s1">&#39;ru.vyarus:gradle-use-python-plugin:3.0.0&#39;</span><span class="w"></span>
+<span class="w">    </span><span class="o">}</span><span class="w"></span>
+<span class="o">}</span><span class="w"></span>
+<span class="n">apply</span><span class="w"> </span><span class="nl">plugin:</span><span class="w"> </span><span class="s1">&#39;ru.vyarus.use-python&#39;</span><span class="w"></span>
+</code></pre></div>
+<p>OR</p>
+<div class="highlight"><pre><span></span><code><span class="n">plugins</span><span class="w"> </span><span class="o">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">id</span><span class="w"> </span><span class="s1">&#39;ru.vyarus.use-python&#39;</span><span class="w"> </span><span class="n">version</span><span class="w"> </span><span class="s1">&#39;3.0.0&#39;</span><span class="w"></span>
+<span class="o">}</span><span class="w"></span>
+</code></pre></div>
+<p><a href="../about/compatibility/">Compatibility matrix</a></p>
+<h2 id="python-pip">Python &amp; Pip<a class="headerlink" href="#python-pip" title="Permanent link">&para;</a></h2>
+<p>Make sure python and pip are installed:</p>
+<div class="highlight"><pre><span></span><code>python --version  
+pip --version
+</code></pre></div>
+<p>On *nix <code>python</code> usually reference python2. For python3:</p>
+<div class="highlight"><pre><span></span><code>python3 --version  
+pip3 --version
+</code></pre></div>
+<p><a href="../guide/python/">Install python</a> if required.</p>
+<h3 id="docker">Docker<a class="headerlink" href="#docker" title="Permanent link">&para;</a></h3>
+<p>If you have docker installed, you can use python from <a href="../guide/docker/">docker container</a>:</p>
+<div class="highlight"><pre><span></span><code><span class="n">python</span><span class="o">.</span><span class="na">docker</span><span class="o">.</span><span class="na">use</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="w"></span>
+</code></pre></div>
+<p>In this case global python installation is not required.</p>
+<h2 id="pip-modules">Pip modules<a class="headerlink" href="#pip-modules" title="Permanent link">&para;</a></h2>
+<p>If additional pip modules required configure them:</p>
 <div class="highlight"><pre><span></span><code><span class="n">python</span><span class="o">.</span><span class="na">pip</span><span class="w"> </span><span class="s1">&#39;module1:1.0&#39;</span><span class="o">,</span><span class="w"> </span><span class="s1">&#39;module2:1.0&#39;</span><span class="w"></span>
 </code></pre></div>
 <p>or</p>
@@ -645,166 +750,16 @@
 <span class="w">    </span><span class="n">pip</span><span class="w"> </span><span class="s1">&#39;module2:1.0&#39;</span><span class="w"></span>
 <span class="o">}</span><span class="w"></span>
 </code></pre></div>
-<p>Module format is: <code>name:version</code> (will mean <code>name==version</code> in pip notion). Non-strict version definition is not allowed (for obvious reasons).
-Dependencies are installed in declaration order. If duplicate declaration specified then only the latest declaration
-will be used:</p>
-<div class="highlight"><pre><span></span><code><span class="n">python</span><span class="o">.</span><span class="na">pip</span><span class="w"> </span><span class="s1">&#39;module1:2.0&#39;</span><span class="o">,</span><span class="w"> </span><span class="s1">&#39;module2:1.0&#39;</span><span class="o">,</span><span class="w"> </span><span class="s1">&#39;module1:1.0&#39;</span><span class="w"> </span>
-</code></pre></div>
-<p>Will install version 1.0 of module1 because it was the latest declaration. "Module overrides"
-works for all declaration types (see below): the latest declared module version always wins.</p>
-<p>Dependencies are installed with <code>pipInstall</code> task which is called before any declared <code>PythonTask</code>.</p>
-<p>By default, dependencies are installed inside project specific virtualenv (project specific copy of python environment, 
-configured with <code>python.envPath</code>).</p>
-<p>Behaviour matrix for possible <code>scope</code> and <code>installVirtualenv</code> configurations:</p>
-<table>
-<thead>
-<tr>
-<th>scope</th>
-<th>installVirtualenv</th>
-<th>Behaviour</th>
-<th>default</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>GLOBAL</td>
-<td>ignored</td>
-<td>packages installed in global scope (<code>pip install name</code>)</td>
-<td></td>
-</tr>
-<tr>
-<td>USER</td>
-<td>ignored</td>
-<td>packages installed in user scope (<code>pip install name --user</code>)</td>
-<td></td>
-</tr>
-<tr>
-<td>VIRTUALENV_OR_USER</td>
-<td>true</td>
-<td>if virtualenv not installed, install it in user scope; create project specific virtualenv and use it</td>
-<td>default</td>
-</tr>
-<tr>
-<td>VIRTUALENV_OR_USER</td>
-<td>false</td>
-<td>when virtualenv is not installed install packages in user scope (same as USER); when virtualenv installed create project specific virtualenv and use it</td>
-<td></td>
-</tr>
-<tr>
-<td>VIRTUALENV</td>
-<td>true</td>
-<td>if virtualenv not installed, install it in user scope; create project specific virtualenv and use it</td>
-<td></td>
-</tr>
-<tr>
-<td>VIRTUALENV</td>
-<td>false</td>
-<td>throw error when virtualenv not installed</td>
-<td></td>
-</tr>
-</tbody>
-</table>
-<p>Note that <code>VIRTUALENV + true</code> and <code>VIRTUALENV_OR_USER + true</code> behaviours are the same. Different scope
-name here describes behavior for unexpected <code>installVirtualenv=false</code> change (to fail or fallback to user scope).</p>
-<p><code>USER</code> and <code>GLOBAL</code> scopes will ignore local (virtual)environment, even if project-specific environment was created before,
-with these options global python will be used instead.  </p>
-<h2 id="pip-module-extra-features">Pip module extra features<a class="headerlink" href="#pip-module-extra-features" title="Permanent link">&para;</a></h2>
-<p>You can declare modules with <a href="https://setuptools.readthedocs.io/en/latest/setuptools.html#declaring-extras-optional-features-with-their-own-dependencies">extra features</a>
-in module name to install special version of module (with enabled features):</p>
-<div class="highlight"><pre><span></span><code><span class="n">python</span><span class="o">.</span><span class="na">pip</span><span class="w"> </span><span class="s1">&#39;requests[socks,security]:2.18.4&#39;</span><span class="w"></span>
-</code></pre></div>
 <div class="admonition important">
 <p class="admonition-title">Important</p>
-<p>It is impossible to track if this "variation" of module is installed, so
-plugin performs up-to-date check for such modules by name only (for example,
-if 'requests==2.18.4' is already installed). For most cases, this is suitable behaviour because, by default,
-modules are installed in virtualenv and so you will always have correct module installed.
-For other cases, you can disable up-to-date checks (delegate all dependencies logic to pip): <code>python.alwaysInstallModules = true</code></p>
+<p>Version ranges are not allowed for reproducible builds! (but, eventually, there would be problems
+in any case because of transitive dependencies)   </p>
 </div>
-<h2 id="vcs-pip-modules">VCS pip modules<a class="headerlink" href="#vcs-pip-modules" title="Permanent link">&para;</a></h2>
-<p>You can declare <a href="https://pip.pypa.io/en/stable/reference/pip_install/#vcs-support">vcs modules</a>: modules installed directly from
-version control (e.g. git, svn). Format:</p>
-<div class="highlight"><pre><span></span><code>vcs+protocol://repo_url/@vcsVersion#egg=pkg-pkgVersion
-</code></pre></div>
-<ul>
-<li><code>@vcsVersion</code> part is required: prefer using commit version or tag for reproducible builds</li>
-<li><code>-pkgVersion</code> is installed module version. Required to be able to compare declared plugin with installed version.</li>
-</ul>
-<p>For example:</p>
-<div class="highlight"><pre><span></span><code><span class="n">python</span><span class="o">.</span><span class="na">pip</span><span class="w"> </span><span class="s1">&#39;git+https://github.com/ictxiangxin/boson/@b52727f7170acbedc5a1b4e1df03972bd9bb85e3#egg=boson-0.9&#39;</span><span class="w"></span>
-</code></pre></div>
-<p>Declares module <code>boson</code> version <code>0.9</code>, installed from git commit <code>b52727f7170acbedc5a1b4e1df03972bd9bb85e3</code> (it may be tag name or branch, but prefer not using branch names).</p>
-<p><code>pipInstall</code> will be considered up-to-date if <code>boson==0.9</code> is already installed. Note that declared module version
-is completely free: you can set any version (0.10, 1.2, etc.), it is not checked and used only for up-to-date validation.</p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>Module version part assumed to follow the last dash, so if you specify version like
-<code>somethinf-12.0-alpha.1</code> it would be parsed incorrectly (as package <code>somethinf-12.0</code> version <code>alpha.1</code>)!
-Don't use dashes in version!</p>
-</div>
-<p>Vcs module installation is: source checkout and module build (using setup.py). You may need to specify subdirectory
-as <code>&amp;subdirectory=pkg_dir</code> (<a href="https://pip.pypa.io/en/stable/reference/pip_install/#vcs-support">see docs</a>)</p>
-<p>To avoid installation problems, package version is not used for actual installation (in spite of the fact that its official
-convention, it doesn't work in some cases). For example, module above will be installed as (without <code>-0.9</code>):</p>
-<div class="highlight"><pre><span></span><code>pip install git+https://github.com/ictxiangxin/boson/@b52727f7170acbedc5a1b4e1df03972bd9bb85e3#egg<span class="o">=</span>boson
-</code></pre></div>
-<p>All pip supported vcs could be used: git, svn, hg, bzr</p>
-<p>If up-to-date logic, implemented by <code>pipInstall</code> task, does not suit your needs, you can always
-disable it with <code>python.alwaysInstallModules = true</code> (pip always called). But this will be slower.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Since pip 20, compiled vcs module is cached (before it was build on each execution), but
-it is possible to disable cache (for all modules) with <code>python.usePipCache=false</code> configuration
-(applies <a href="https://pip.pypa.io/en/stable/reference/pip_install/#caching">--no-cache-dir</a> pip flag)</p>
-</div>
-<h2 id="extra-pip-repositories">Extra pip repositories<a class="headerlink" href="#extra-pip-repositories" title="Permanent link">&para;</a></h2>
-<p>To add additional pip repositories (probably self-hosted):</p>
-<div class="highlight"><pre><span></span><code><span class="n">python</span><span class="w"> </span><span class="o">{</span><span class="w"></span>
-<span class="w">    </span><span class="n">extraIndexUrls</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[</span><span class="s2">&quot;http://extra-url.com&quot;</span><span class="o">,</span><span class="w"> </span><span class="s2">&quot;http://extra-url.com&quot;</span><span class="o">]</span><span class="w"></span>
-<span class="o">}</span><span class="w"></span>
-</code></pre></div>
-<p>or with shortcut method (shortcut may be used multiple times):</p>
-<div class="highlight"><pre><span></span><code><span class="n">python</span><span class="w"> </span><span class="o">{</span><span class="w"></span>
-<span class="w">    </span><span class="n">extraIndexUrls</span><span class="w"> </span><span class="s2">&quot;http://extra-url.com&quot;</span><span class="o">,</span><span class="w"> </span><span class="s2">&quot;http://extra-url2.com&quot;</span><span class="w"> </span>
-<span class="o">}</span><span class="w"></span>
-</code></pre></div>
-<p>Extra urls will be applied as <a href="https://pip.pypa.io/en/stable/reference/pip_install/#install-extra-index-url">--extra-index-url</a>
-flag for pip commands supporting it: install, download, list and wheel. By default, it only affects <code>pipInstall</code> and <code>pipList</code> tasks.
-Applied for all <code>BasePipTask</code>, so if you have custom pip tasks, it would be affected too.</p>
-<p>In case of ssl problems (stale or self-signed certificated), mark domains as trusted:</p>
-<div class="highlight"><pre><span></span><code><span class="n">python</span><span class="w"> </span><span class="o">{</span><span class="w"></span>
-<span class="w">    </span><span class="n">trustedHosts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[</span><span class="s2">&quot;extra-url.com&quot;</span><span class="o">]</span><span class="w"></span>
-<span class="o">}</span><span class="w"></span>
-</code></pre></div>
-<p>or</p>
-<div class="highlight"><pre><span></span><code><span class="n">python</span><span class="w"> </span><span class="o">{</span><span class="w"></span>
-<span class="w">    </span><span class="n">trustedHosts</span><span class="w"> </span><span class="s2">&quot;extra-url.com&quot;</span><span class="w"></span>
-<span class="o">}</span><span class="w"></span>
-</code></pre></div>
-<p>Applied as <a href="https://pip.pypa.io/en/stable/reference/pip/#trusted-host">--trusted-host</a>
-option only for <code>pipInstall</code> (because <code>pip install</code> is the only command supporting this option).</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>If, for some reason, you don't want to specify it for all pip tasks, you can configure exact task,
-for example: <code>pipInstall.extraIndexUrls = ["http://extra-url.com", "http://extra-url2.com"]</code></p>
-</div>
-<h2 id="extra-pip-install-options">Extra pip install options<a class="headerlink" href="#extra-pip-install-options" title="Permanent link">&para;</a></h2>
-<p>It is impossible to support directly all possible <code>pip install</code> <a href="https://pip.pypa.io/en/stable/reference/pip_install/#options">options</a>
-usages directly with api (safe way), so there is a direct configuration for an additional options. For example:</p>
-<div class="highlight"><pre><span></span><code><span class="n">pipInstall</span><span class="o">.</span><span class="na">options</span><span class="o">(</span><span class="s1">&#39;--upgrade-strategy&#39;</span><span class="o">,</span><span class="w"> </span><span class="s1">&#39;only-if-needed&#39;</span><span class="o">)</span><span class="w"></span>
-</code></pre></div>
-<p>Shortcut method above may be called multiple times:</p>
-<div class="highlight"><pre><span></span><code><span class="n">pipInstall</span><span class="o">.</span><span class="na">options</span><span class="o">(</span><span class="s1">&#39;--a&#39;</span><span class="o">,</span><span class="w"> </span><span class="s1">&#39;value&#39;</span><span class="o">)</span><span class="w"></span>
-<span class="n">pipInstall</span><span class="o">.</span><span class="na">options</span><span class="o">(</span><span class="s1">&#39;--b&#39;</span><span class="o">,</span><span class="w"> </span><span class="s1">&#39;value&#39;</span><span class="o">)</span><span class="w"></span>
-</code></pre></div>
-<p>Or you can use property directly:</p>
-<div class="highlight"><pre><span></span><code><span class="n">pipInstall</span><span class="o">.</span><span class="na">options</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[</span><span class="s1">&#39;--a&#39;</span><span class="o">,</span><span class="w"> </span><span class="s1">&#39;value&#39;</span><span class="o">,</span><span class="w"> </span><span class="s1">&#39;--b&#39;</span><span class="o">,</span><span class="w"> </span><span class="s1">&#39;value&#39;</span><span class="o">]</span><span class="w"></span>
-</code></pre></div>
-<h2 id="scope">Scope<a class="headerlink" href="#scope" title="Permanent link">&para;</a></h2>
-<p>Pip dependencies could be installed per project, for current user (~/) or globally.</p>
+<p><a href="../guide/modules/#pip-module-extra-features">Module features</a> and <a href="../guide/modules/#vcs-pip-modules">VCS modules</a> supported.</p>
+<h2 id="behaviour">Behaviour<a class="headerlink" href="#behaviour" title="Permanent link">&para;</a></h2>
 <p>Default behaviour:</p>
 <ul>
-<li>if <a href="https://virtualenv.pypa.io/en/stable/"><code>virtualenv</code></a> module installed (or <a href="../configuration/#virtualenv">automatically installed</a>):
+<li>if <a href="https://virtualenv.pypa.io/en/stable/"><code>virtualenv</code></a> module installed (or <a href="../guide/configuration/#virtualenv">automatically installed</a>):
   manage pip dependencies per project (env <code>.gradle/python</code> created)</li>
 <li>if no virtualenv - use user scope (<a href="https://pip.pypa.io/en/stable/user_guide/#user-installs"><code>--user</code></a> pip flag):
   pip modules are installed only for current user (this avoid permission problems on linux)</li>
@@ -820,34 +775,50 @@ usages directly with api (safe way), so there is a direct configuration for an a
 </ul>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Values may be declared without quotes because it's an enum which values are
-declared as project ext properties (<code>ext.USER==ru.vyarus.gradle.plugin.python.PythonExtension.Scope.USER</code>).</p>
+<p>For multi-module projects, by default, plugin will create virtualenv inside the root project directory
+in order to share the same environment for all modules (but this <a href="../guide/multimodule/">could be changed</a>).</p>
 </div>
-<p>Complete behaviour matrix <a href="#">see above</a>.</p>
-<h2 id="check-modules-updates">Check modules updates<a class="headerlink" href="#check-modules-updates" title="Permanent link">&para;</a></h2>
-<p>To quick check if new versions are available for the registered pip modules
-use <code>pipUpdates</code> task:</p>
-<div class="highlight"><pre><span></span><code>:pipUpdates
-The following modules could be updated:
-
-    package            version latest type 
-    ------------------ ------- ------ -----
-    click              6.6     6.7    wheel
+<h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h2>
+<p>Call python command:</p>
+<div class="highlight"><pre><span></span><code><span class="n">task</span><span class="w"> </span><span class="nf">cmd</span><span class="o">(</span><span class="nl">type:</span><span class="w"> </span><span class="n">PythonTask</span><span class="o">)</span><span class="w"> </span><span class="o">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;-c print(&#39;sample&#39;)&quot;</span><span class="w"></span>
+<span class="o">}</span><span class="w"></span>
 </code></pre></div>
-<p>Note that it will not show versions for transitive modules, only
-for modules specified directly in <code>python.pip</code>.</p>
-<p>To see all available updates (without filtering):</p>
-<div class="highlight"><pre><span></span><code><span class="n">pipUpdates</span><span class="o">.</span><span class="na">all</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="w"></span>
-</code></pre></div>
+<p>called: <code>python -c print('sample')</code> on win and <code>python -c exec("print('sample')")</code> on *nix (exec applied automatically for compatibility)</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
+<p>Each <code>PythonTask</code> would depend on <code>checkPython</code> and <code>pipInstall</code> tasks which would
+prepare python environment before actual execution.</p>
 </div>
-<p>If you see an error like</p>
-<div class="highlight"><pre><span></span><code>TypeError: &#39;&gt;&#39; not supported between instances of &#39;Version&#39; and &#39;SetuptoolsVersion&#39;
+<p>Call multi-line command:</p>
+<div class="highlight"><pre><span></span><code><span class="n">task</span><span class="w"> </span><span class="nf">cmd</span><span class="o">(</span><span class="nl">type:</span><span class="w"> </span><span class="n">PythonTask</span><span class="o">)</span><span class="w"> </span><span class="o">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;-c \&quot;import sys; print(sys.prefix)\&quot;&quot;</span><span class="w"></span>
+<span class="o">}</span><span class="w"></span>
 </code></pre></div>
-<p>then <a href="https://pip.pypa.io/en/stable/installing/#upgrading-pip">update pip</a>:</p>
-<div class="highlight"><pre><span></span><code>pip install -U pip
+<p>called: <code>python -c "import sys; print(sys.prefix)"</code> on win and <code>python -c exec("import sys; print(sys.prefix)")</code> on *nix</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>It is important to wrap script with space in quotes (otherwise parser will incorrectly parse arguments).</p>
+</div>
+<p>See <a href="../guide/usage/#command-parsing">command parsing specifics and env variables usage</a></p>
+<p>String command is used for simplicity, but it could be array/collection of args:</p>
+<div class="highlight"><pre><span></span><code><span class="n">task</span><span class="w"> </span><span class="nf">script</span><span class="o">(</span><span class="nl">type:</span><span class="w"> </span><span class="n">PythonTask</span><span class="o">)</span><span class="w"> </span><span class="o">{</span><span class="w"> </span>
+<span class="w">    </span><span class="n">command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[</span><span class="s1">&#39;path/to/script.py&#39;</span><span class="o">,</span><span class="w"> </span><span class="s1">&#39;1&#39;</span><span class="o">,</span><span class="w"> </span><span class="s1">&#39;2&#39;</span><span class="o">]</span><span class="w"> </span>
+<span class="o">}</span><span class="w"></span>
 </code></pre></div>
+<h3 id="module">Module<a class="headerlink" href="#module" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="n">task</span><span class="w"> </span><span class="nf">mod</span><span class="o">(</span><span class="nl">type:</span><span class="w"> </span><span class="n">PythonTask</span><span class="o">)</span><span class="w"> </span><span class="o">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">module</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;sample&#39;</span><span class="w"> </span>
+<span class="w">    </span><span class="n">command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;mod args&quot;</span><span class="w"></span>
+<span class="o">}</span><span class="w"></span>
+</code></pre></div>
+<p>called: <code>python -m sample mod args</code></p>
+<h3 id="script">Script<a class="headerlink" href="#script" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="n">task</span><span class="w"> </span><span class="nf">script</span><span class="o">(</span><span class="nl">type:</span><span class="w"> </span><span class="n">PythonTask</span><span class="o">)</span><span class="w"> </span><span class="o">{</span><span class="w"> </span>
+<span class="w">    </span><span class="n">command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;path/to/script.py 1 2&quot;</span><span class="w"></span>
+<span class="o">}</span><span class="w"></span>
+</code></pre></div>
+<p>called: <code>python path/to/script.py 1 2</code> (arguments are optional, just for demo)</p>
 
               
             </article>
@@ -868,7 +839,7 @@ for modules specified directly in <code>python.pip</code>.</p>
     <nav class="md-footer__inner md-grid" aria-label="Footer" >
       
         
-        <a href="../python/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Python install" rel="prev">
+        <a href=".." class="md-footer__link md-footer__link--prev" aria-label="Previous: Home" rel="prev">
           <div class="md-footer__button md-icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
           </div>
@@ -877,20 +848,20 @@ for modules specified directly in <code>python.pip</code>.</p>
               <span class="md-footer__direction">
                 Previous
               </span>
-              Python install
+              Home
             </div>
           </div>
         </a>
       
       
         
-        <a href="../usage/" class="md-footer__link md-footer__link--next" aria-label="Next: Usage" rel="next">
+        <a href="../guide/python/" class="md-footer__link md-footer__link--next" aria-label="Next: Python install" rel="next">
           <div class="md-footer__title">
             <div class="md-ellipsis">
               <span class="md-footer__direction">
                 Next
               </span>
-              Usage
+              Python install
             </div>
           </div>
           <div class="md-footer__button md-icon">
@@ -946,10 +917,10 @@ for modules specified directly in <code>python.pip</code>.</p>
     <div class="md-dialog" data-md-component="dialog">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
-    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tracking", "navigation.top"], "search": "../../assets/javascripts/workers/search.85cb4492.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "version": {"provider": "mike"}}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.tracking", "navigation.top"], "search": "../assets/javascripts/workers/search.85cb4492.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.a877e258.min.js"></script>
+      <script src="../assets/javascripts/bundle.a877e258.min.js"></script>
       
     
   </body>

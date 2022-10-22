@@ -12,7 +12,7 @@
         <meta name="author" content="Vyacheslav Rusakov">
       
       
-        <link rel="canonical" href="https://xvik.github.io/gradle-use-python-plugin/2.3.0/getting-started/">
+        <link rel="canonical" href="https://xvik.github.io/gradle-use-python-plugin/3.0.0/getting-started/">
       
       <link rel="icon" href="../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.3.0, mkdocs-material-8.3.6">
@@ -301,6 +301,19 @@
     Python &amp; Pip
   </a>
   
+    <nav class="md-nav" aria-label="Python &amp; Pip">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#docker" class="md-nav__link">
+    Docker
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -400,7 +413,21 @@
   
   
     <li class="md-nav__item">
-      <a href="../guide/pip/" class="md-nav__link">
+      <a href="../guide/docker/" class="md-nav__link">
+        Docker
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guide/modules/" class="md-nav__link">
         Pip modules
       </a>
     </li>
@@ -598,6 +625,19 @@
     Python &amp; Pip
   </a>
   
+    <nav class="md-nav" aria-label="Python &amp; Pip">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#docker" class="md-nav__link">
+    Docker
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -674,14 +714,14 @@ be updated often.</p>
 <span class="w">        </span><span class="n">mavenCentral</span><span class="o">()</span><span class="w"></span>
 <span class="w">    </span><span class="o">}</span><span class="w"></span>
 <span class="w">    </span><span class="n">dependencies</span><span class="w"> </span><span class="o">{</span><span class="w"></span>
-<span class="w">        </span><span class="n">classpath</span><span class="w"> </span><span class="s1">&#39;ru.vyarus:gradle-use-python-plugin:2.3.0&#39;</span><span class="w"></span>
+<span class="w">        </span><span class="n">classpath</span><span class="w"> </span><span class="s1">&#39;ru.vyarus:gradle-use-python-plugin:3.0.0&#39;</span><span class="w"></span>
 <span class="w">    </span><span class="o">}</span><span class="w"></span>
 <span class="o">}</span><span class="w"></span>
 <span class="n">apply</span><span class="w"> </span><span class="nl">plugin:</span><span class="w"> </span><span class="s1">&#39;ru.vyarus.use-python&#39;</span><span class="w"></span>
 </code></pre></div>
 <p>OR</p>
 <div class="highlight"><pre><span></span><code><span class="n">plugins</span><span class="w"> </span><span class="o">{</span><span class="w"></span>
-<span class="w">    </span><span class="n">id</span><span class="w"> </span><span class="s1">&#39;ru.vyarus.use-python&#39;</span><span class="w"> </span><span class="n">version</span><span class="w"> </span><span class="s1">&#39;2.3.0&#39;</span><span class="w"></span>
+<span class="w">    </span><span class="n">id</span><span class="w"> </span><span class="s1">&#39;ru.vyarus.use-python&#39;</span><span class="w"> </span><span class="n">version</span><span class="w"> </span><span class="s1">&#39;3.0.0&#39;</span><span class="w"></span>
 <span class="o">}</span><span class="w"></span>
 </code></pre></div>
 <p><a href="../about/compatibility/">Compatibility matrix</a></p>
@@ -695,6 +735,11 @@ pip --version
 pip3 --version
 </code></pre></div>
 <p><a href="../guide/python/">Install python</a> if required.</p>
+<h3 id="docker">Docker<a class="headerlink" href="#docker" title="Permanent link">&para;</a></h3>
+<p>If you have docker installed, you can use python from <a href="../guide/docker/">docker container</a>:</p>
+<div class="highlight"><pre><span></span><code><span class="n">python</span><span class="o">.</span><span class="na">docker</span><span class="o">.</span><span class="na">use</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="w"></span>
+</code></pre></div>
+<p>In this case global python installation is not required.</p>
 <h2 id="pip-modules">Pip modules<a class="headerlink" href="#pip-modules" title="Permanent link">&para;</a></h2>
 <p>If additional pip modules required configure them:</p>
 <div class="highlight"><pre><span></span><code><span class="n">python</span><span class="o">.</span><span class="na">pip</span><span class="w"> </span><span class="s1">&#39;module1:1.0&#39;</span><span class="o">,</span><span class="w"> </span><span class="s1">&#39;module2:1.0&#39;</span><span class="w"></span>
@@ -710,7 +755,7 @@ pip3 --version
 <p>Version ranges are not allowed for reproducible builds! (but, eventually, there would be problems
 in any case because of transitive dependencies)   </p>
 </div>
-<p><a href="../guide/pip/#pip-module-extra-features">Module features</a> and <a href="../guide/pip/#vcs-pip-modules">VCS modules</a> supported.</p>
+<p><a href="../guide/modules/#pip-module-extra-features">Module features</a> and <a href="../guide/modules/#vcs-pip-modules">VCS modules</a> supported.</p>
 <h2 id="behaviour">Behaviour<a class="headerlink" href="#behaviour" title="Permanent link">&para;</a></h2>
 <p>Default behaviour:</p>
 <ul>

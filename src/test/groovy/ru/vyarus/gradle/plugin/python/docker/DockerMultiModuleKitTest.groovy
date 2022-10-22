@@ -10,7 +10,7 @@ import spock.lang.IgnoreIf
  * @since 07.10.2022
  */
 // testcontainers doesn't work on windows server https://github.com/testcontainers/testcontainers-java/issues/2960
-@IgnoreIf({ env.containsKey('APPVEYOR') })
+@IgnoreIf({ System.getProperty("os.name").toLowerCase().contains("windows") })
 class DockerMultiModuleKitTest extends AbstractKitTest {
 
     def "Check modules use different python"() {

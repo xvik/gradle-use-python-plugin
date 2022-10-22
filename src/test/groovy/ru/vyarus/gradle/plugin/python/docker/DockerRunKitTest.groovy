@@ -11,7 +11,7 @@ import spock.lang.IgnoreIf
  * @since 21.09.2022
  */
 // testcontainers doesn't work on windows server https://github.com/testcontainers/testcontainers-java/issues/2960
-@IgnoreIf({ env.containsKey('APPVEYOR') })
+@IgnoreIf({ System.getProperty("os.name").toLowerCase().contains("windows") })
 class DockerRunKitTest extends AbstractKitTest {
 
     def "Check simple execution"() {

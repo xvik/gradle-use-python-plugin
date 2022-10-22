@@ -10,7 +10,7 @@
 ## Features
 
 * Works with [directly installed python](guide/python.md) or [docker container](guide/docker.md) (with python)
-* Creates local (project-specific) [virtualenv](guide/configuration.md#virtualenv) (creating project-specific python copy)
+* Creates local (project-specific) [virtualenv](guide/configuration.md#virtualenv) (project-specific python copy)
 * Installs required [pip modules](guide/modules.md) (virtualenv by default, but could be global installation)
   - Support [requirements.txt](guide/modules.md#requirementstxt) file (limited by default)
 * Could be used as basement for [building plugins](guide/plugindev.md) for specific python modules (like

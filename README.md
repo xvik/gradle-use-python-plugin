@@ -12,14 +12,18 @@ Plugin **does not install python and pip** itself and use globally installed pyt
 It's easier to prepare python manually because python have good compatibility (from user perspective) and does not need to 
 be updated often.
 
+Also, plugin could run python inside docker container to avoid local python installation.
+
 The only plugin intention is to simplify python usage from gradle. By default, plugin creates python virtualenv
 inside the project and installs all modules there so each project has its own python (copy) and could not be 
 affected by other projects or system changes.
 
 Features:
 
-* Install required python modules using pip (per project (virtualenv), os user (--user) or globally) 
-* Provides task to call python commands, modules or scripts (`PythonTask`)
+* Works with directly installed python or docker container (with python)
+* Creates local (project-specific) virtualenv (project-specific python copy)
+* Installs required pip modules (virtualenv by default, but could be global installation) 
+* Support requirements.txt file (limited by default)
 * Could be used as basement for building plugins for specific python modules (like 
 [mkdocs plugin](https://github.com/xvik/gradle-mkdocs-plugin))
 
@@ -30,6 +34,7 @@ Features:
 * Configuration: `python`
 * Tasks:
     - `checkPython` - validate python installation (and create virtualenv if required)
+    - `cleanPython` - clean created python environment
     - `pipInstall` - install declared pip modules
     - `pipUpdates` - show the latest available versions for the registered modules
     - `pipList` - show all installed modules (the same as pipInstall shows after installation)
@@ -47,7 +52,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'ru.vyarus:gradle-use-python-plugin:2.3.0'
+        classpath 'ru.vyarus:gradle-use-python-plugin:3.0.0'
     }
 }
 apply plugin: 'ru.vyarus.use-python'
@@ -57,7 +62,7 @@ OR
 
 ```groovy
 plugins {
-    id 'ru.vyarus.use-python' version '2.3.0'
+    id 'ru.vyarus.use-python' version '3.0.0'
 }
 ```  
 
@@ -67,7 +72,8 @@ Plugin compiled for java 8, compatible with java 11. Supports python 2 and 3 on 
 
 Gradle | Version
 --------|-------
-5-7     | 2.3.0
+5.3-7     | 3.0.0
+5-5.2     | 2.3.0
 4.x     | [1.2.0](https://github.com/xvik/gradle-use-python-plugin/tree/1.2.0)
 
 #### Snapshots
@@ -137,6 +143,8 @@ On *nix `python` usually reference python2. For python3:
 python3 --version  
 pip3 --version
 ```
+
+OR enable docker support to run python inside docker container
 
 ### Usage
 

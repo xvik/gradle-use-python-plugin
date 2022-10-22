@@ -1,15 +1,17 @@
+### [3.0.0](http://xvik.github.io/gradle-use-python-plugin/3.0.0) (2022-10-22)
 * (breaking) Drop gradle 5.0-5.2 support (minimum required gradle is 5.3)
 * Add docker support (python could be started in docker container without local python)
-* Add global python binary validation to reveal PATH problems (might not be the same as user shell PATH)
-  - Add validateSystemBinary configuration to be able to disable validation (in case it would not work properly)
-* Add cleanPython task for removing project-specific virtualenv
-* Add python process output to exception message to be sure it will be visible on error (especially on CI)
+  - Add dockerChown and dockerExec methods for python tasks for customizations in doFirst or doLast closures
 * Add requirements file support (requirements.txt).
   - By default, requirements support is enabled in strict mode:
     plugin reads file contents and expects only exact version matches (allows extracting module declarations
     so external tools could easily parse and update dependencies).
   - In non-strict mode, requirements file processing delegated to pip (no restrictions on declarations)
   - New configuration section: python.requirements
+* Add global python binary validation to reveal PATH problems (might not be the same as user shell PATH)
+  - Add validateSystemBinary configuration to be able to disable validation (in case it would not work properly)
+* Add cleanPython task for removing project-specific virtualenv
+* Add python process output to exception message to be sure it will be visible on error (especially on CI)
 * Fix potential memory leak due to gradle Project objects caching (#22)
 * Fix concurrent virtualenv installation in multi-module project with parallel execution enabled (#19)
 * Fix concurrent pipInstall into the same environment with parallel execution

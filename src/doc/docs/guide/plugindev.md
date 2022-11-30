@@ -55,7 +55,7 @@ Usage:
 ```groovy
 pyton.pip 'sommemodule:1'
 
-task modCmd(type: SomeModuleTask) {
+tasks.register('modCmd', SomeModuleTask) {
     command = 'module args'
 }
 ```

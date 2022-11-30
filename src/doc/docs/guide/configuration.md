@@ -253,7 +253,7 @@ Default pip installation task is registered as `pipInstall` and used to install 
 Custom task(s) may be used, if required:
 
 ```groovy
-task myPipInst(type: PipInstallTask) {
+tasks.register('myPipInst', PipInstallTask) {
     pip 'mod:1', 'other:2'
 }
 ```

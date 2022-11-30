@@ -112,7 +112,7 @@ python.scope = VIRTUALENV
 Call python command:
 
 ```groovy
-task cmd(type: PythonTask) {
+tasks.register('cmd', PythonTask) {
     command = "-c print('sample')"
 }
 ```
@@ -126,7 +126,7 @@ called: `python -c print('sample')` on win and `python -c exec("print('sample')"
 Call multi-line command:
 
 ```groovy
-task cmd(type: PythonTask) {
+tasks.register('cmd', PythonTask) {
     command = "-c \"import sys; print(sys.prefix)\""
 }
 ```
@@ -141,7 +141,7 @@ See [command parsing specifics and env variables usage](guide/usage.md#command-p
 String command is used for simplicity, but it could be array/collection of args:
 
 ```groovy
-task script(type: PythonTask) { 
+tasks.register('script', PythonTask) { 
     command = ['path/to/script.py', '1', '2'] 
 }
 ```
@@ -149,7 +149,7 @@ task script(type: PythonTask) {
 ### Module
 
 ```groovy
-task mod(type: PythonTask) {
+tasks.register('mod', PythonTask) {
     module = 'sample' 
     command = "mod args"
 }
@@ -160,7 +160,7 @@ called: `python -m sample mod args`
 ### Script
 
 ```groovy
-task script(type: PythonTask) { 
+tasks.register('script', PythonTask) { 
     command = "path/to/script.py 1 2"
 }
 ```

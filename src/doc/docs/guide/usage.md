@@ -3,7 +3,7 @@
 Call python command:
 
 ```groovy
-task cmd(type: PythonTask) {
+tasks.register('cmd', PythonTask) {
     command = "-c print('sample')"
 }
 ```
@@ -13,8 +13,8 @@ called: `python -c print('sample')` on win and `python -c exec("print('sample')"
 Call multi-line command:
 
 ```groovy
-task cmd(type: PythonTask) {
-    command = "-c \"import sys; print(sys.prefix)\""
+tasks.register('cmd', PythonTask) {
+    command = '-c "import sys; print(sys.prefix)"'
 }
 ```
 
@@ -26,7 +26,7 @@ called: `python -c "import sys; print(sys.prefix)"` on win and `python -c exec("
 String command is used for simplicity, but it could be array/collection of args:
 
 ```groovy
-task script(type: PythonTask) { 
+tasks.register('script', PythonTask) { 
     command = ['path/to/script.py', '1', '2'] 
 }
 ```
@@ -34,9 +34,9 @@ task script(type: PythonTask) {
 ## Pip module command
 
 ```groovy
-task mod(type: PythonTask) {
+tasks.register('mod', PythonTask) {
     module = 'sample' 
-    command = "mod args"
+    command = 'mod args'
 }
 ```
 
@@ -45,8 +45,8 @@ called: `python -m sample mod args`
 ## Script
 
 ```groovy
-task script(type: PythonTask) { 
-    command = "path/to/script.py 1 2"
+tasks.register('script', PythonTask) { 
+    command = 'path/to/script.py 1 2'
 }
 ```
 
@@ -70,7 +70,7 @@ By default, executed python can access system environment variables (same as `Sy
 To declare custom (process specific) variables:
 
 ```groovy
-task sample(type: PythonTask) {
+tasks.register('sample', PythonTask) {
        command = "-c \"import os;print('variables: '+os.getenv('some', 'null')+' '+os.getenv('foo', 'null'))\""
        environment 'some', 1
        environment 'other', 2

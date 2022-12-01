@@ -27,7 +27,7 @@ class PythonUsedInSubmoduleKitTest extends AbstractKitTest {
                     pip 'extract-msg:0.28.0'
                 }
                 
-                task sample(type: PythonTask) {
+                tasks.register('sample', PythonTask) {
                     command = '-c print(\\'samplee\\')'
                 }
             }
@@ -67,7 +67,7 @@ class PythonUsedInSubmoduleKitTest extends AbstractKitTest {
                     pip 'extract-msg:0.28.0'
                 }
                                                                                 
-                task sample(type: PythonTask) {
+                tasks.register('sample', PythonTask) {
                     command = '-c print(\\'samplee\\')'
                 }
             }                        
@@ -102,7 +102,7 @@ class PythonUsedInSubmoduleKitTest extends AbstractKitTest {
             }                        
             
             subprojects {                                                                           
-                task sample(type: PythonTask) {
+                tasks.register('sample', PythonTask) {
                     command = '-c print(\\'samplee\\')'
                 }
             }
@@ -111,7 +111,7 @@ class PythonUsedInSubmoduleKitTest extends AbstractKitTest {
                 pip 'extract-msg:0.28.0'
             }
             
-            task rsample(type: PythonTask) {
+            tasks.register('rsample', PythonTask) {
                 command = '-c print(\\'rsamplee\\')'
             }
 
@@ -158,7 +158,7 @@ class PythonUsedInSubmoduleKitTest extends AbstractKitTest {
                     pip 'extract-msg:0.28.0'
                 }
                                                                                            
-                task sample(type: PythonTask) {
+                tasks.register('sample', PythonTask) {
                     command = '-c print(\\'samplee\\')'
                 }
             }                        
@@ -196,7 +196,7 @@ class PythonUsedInSubmoduleKitTest extends AbstractKitTest {
                     pip 'extract-msg:0.28.0'
                 }
                                                                                      
-                task sample(type: PythonTask) {
+                tasks.register('sample', PythonTask) {
                     command = '-c print(\\'samplee\\')'
                     workDir = 'src'
                 }

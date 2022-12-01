@@ -24,7 +24,7 @@ class DockerExclusiveExecutionKitTest extends AbstractKitTest {
                 docker { use = true }
             }
             
-            task sample(type: PythonTask) {
+            tasks.register('sample', PythonTask) {
                 docker.exclusive = true
                 command = '-c print(\\'samplee\\')'
             }
@@ -52,7 +52,7 @@ class DockerExclusiveExecutionKitTest extends AbstractKitTest {
                 docker { use = true }
             }
             
-            task sample(type: PythonTask) {
+            tasks.register('sample', PythonTask) {
                 docker {
                    exclusive = true
                 }  
@@ -82,7 +82,7 @@ class DockerExclusiveExecutionKitTest extends AbstractKitTest {
                 docker.use = true
             }
             
-            task sample(type: PythonTask) {
+            tasks.register('sample', PythonTask) {
                 docker.exclusive = true
                 command = '-c printTt(\\'samplee\\')'
             }

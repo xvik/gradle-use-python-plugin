@@ -30,7 +30,7 @@ class DockerMultiModuleKitTest extends AbstractKitTest {
                     docker.use = true                    
                 }
                 
-                task sample(type: PythonTask) {
+                tasks.register('sample', PythonTask) {
                     command = "-c print('sampl\${project.name}')"
                 }                
             }                                    
@@ -59,7 +59,7 @@ class DockerMultiModuleKitTest extends AbstractKitTest {
                     docker.use = true                   
                 }
                 
-                task sample(type: PythonTask) {
+                tasks.register('sample', PythonTask) {
                     command = "-c print('sampl\${project.name}')"
                 }                                    
             }

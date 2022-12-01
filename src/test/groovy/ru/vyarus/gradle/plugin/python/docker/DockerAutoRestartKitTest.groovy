@@ -24,7 +24,7 @@ class DockerAutoRestartKitTest extends AbstractKitTest {
                 docker.use = true
             }
             
-            task sample(type: PythonTask) {
+            tasks.register('sample', PythonTask) {
                 workDir = 'build'
                 command = '-c print(\\'samplee\\')'
             }
@@ -53,7 +53,7 @@ class DockerAutoRestartKitTest extends AbstractKitTest {
                 docker.use = true
             }
             
-            task sample(type: PythonTask) {
+            tasks.register('sample', PythonTask) {
                 environment 'ONE', 'two'
                 command = '-c print(\\'samplee\\')'
             }
@@ -82,7 +82,7 @@ class DockerAutoRestartKitTest extends AbstractKitTest {
                 docker.use = true
             }
             
-            task sample(type: PythonTask) {
+            tasks.register('sample', PythonTask) {
                 environment 'ONE', 'one'
                 command = '-c print(\\'samplee\\')'
             }
@@ -110,7 +110,7 @@ class DockerAutoRestartKitTest extends AbstractKitTest {
                 docker.use = true                
             }
             
-            task sample(type: PythonTask) {
+            tasks.register('sample', PythonTask) {
                 docker.ports 9000 
                 command = '-c print(\\'samplee\\')'
             }
@@ -139,7 +139,7 @@ class DockerAutoRestartKitTest extends AbstractKitTest {
                 docker.ports 5000
             }
             
-            task sample(type: PythonTask) {
+            tasks.register('sample', PythonTask) {
                 docker.ports 5001
                 command = '-c print(\\'samplee\\')'
             }
@@ -168,7 +168,7 @@ class DockerAutoRestartKitTest extends AbstractKitTest {
                 docker.use = true
             }
             
-            task sample(type: PythonTask) {
+            tasks.register('sample', PythonTask) {
                 docker.ports 5001
                 command = '-c print(\\'samplee\\')'
             }

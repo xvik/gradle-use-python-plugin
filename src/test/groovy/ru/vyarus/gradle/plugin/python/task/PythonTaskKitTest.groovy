@@ -17,7 +17,7 @@ class PythonTaskKitTest extends AbstractKitTest {
                 id 'ru.vyarus.use-python'
             }
 
-            task sample(type: PythonTask) {
+            tasks.register('sample', PythonTask) {
                 workDir = 'build/pyth'
                 command = '-c "open(\\'fl\\', \\'a\\').close()"'
             }
@@ -38,7 +38,7 @@ class PythonTaskKitTest extends AbstractKitTest {
                 id 'ru.vyarus.use-python'
             }
 
-            task sample(type: PythonTask) {
+            tasks.register('sample', PythonTask) {
                 workDir = 'build/pyth'
                 createWorkDir = false
                 command = '-c "open(\\'fl\\', \\'a\\').close()"'
@@ -59,7 +59,7 @@ class PythonTaskKitTest extends AbstractKitTest {
                 id 'ru.vyarus.use-python'
             }
 
-            task sample(type: PythonTask) {
+            tasks.register('sample', PythonTask) {
                 module = 'pip'
                 command = ['list', '--user']
             }
@@ -81,7 +81,7 @@ class PythonTaskKitTest extends AbstractKitTest {
                 id 'ru.vyarus.use-python'
             }
 
-            task sample(type: PythonTask) {
+            tasks.register('sample', PythonTask) {
                 module = 'pip'
                 command = 'list --user'
             }
@@ -102,7 +102,7 @@ class PythonTaskKitTest extends AbstractKitTest {
                 id 'ru.vyarus.use-python'
             }
 
-            task sample(type: PythonTask) {
+            tasks.register('sample', PythonTask) {
                 module = 'pip'
                 command = 'list'
                 logLevel = LogLevel.DEBUG
@@ -124,7 +124,7 @@ class PythonTaskKitTest extends AbstractKitTest {
                 id 'ru.vyarus.use-python'
             }
 
-            task sample(type: PythonTask) {
+            tasks.register('sample', PythonTask) {
                 module = 'pip'
                 command = 'list'
                 outputPrefix = '---->'
@@ -146,7 +146,7 @@ class PythonTaskKitTest extends AbstractKitTest {
                 id 'ru.vyarus.use-python'
             }
 
-            task sample(type: PythonTask) {
+            tasks.register('sample', PythonTask) {
                 module = 'pip'
                 command = 'list'
                 pythonArgs '-s'
@@ -169,7 +169,7 @@ class PythonTaskKitTest extends AbstractKitTest {
                 id 'ru.vyarus.use-python'
             }
 
-            task script(type: PythonTask) {
+            tasks.register('script', PythonTask) {
                 command = 'sample.py'
             }
         """

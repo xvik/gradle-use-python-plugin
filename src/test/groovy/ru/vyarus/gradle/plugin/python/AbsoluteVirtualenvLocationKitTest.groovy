@@ -27,7 +27,7 @@ class AbsoluteVirtualenvLocationKitTest extends AbstractKitTest {
                 pip 'extract-msg:0.28.0'
             }
                                                                                 
-            task sample(type: PythonTask) {
+            tasks.register('sample', PythonTask) {
                 command = '-c print(\\'samplee\\')'
             }                        
 

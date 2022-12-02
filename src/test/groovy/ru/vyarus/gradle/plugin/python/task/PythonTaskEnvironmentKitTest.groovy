@@ -17,7 +17,7 @@ class PythonTaskEnvironmentKitTest extends AbstractKitTest {
                 id 'ru.vyarus.use-python'
             }
 
-            task sample(type: PythonTask) {
+            tasks.register('sample', PythonTask) {
                 command = "-c \\"import os;print('variables: '+os.getenv('some', 'null')+' '+os.getenv('foo', 'null'))\\""
                 environment 'some', 1
                 environment(['foo': 'bar'])
@@ -43,7 +43,7 @@ class PythonTaskEnvironmentKitTest extends AbstractKitTest {
             
             assert System.getenv('some') == 'foo'
             
-            task sample(type: PythonTask) {
+            tasks.register('sample', PythonTask) {
                 command = "-c \\"import os;print('variables: '+os.getenv('some', 'null'))\\""
             }
         """
@@ -69,7 +69,7 @@ class PythonTaskEnvironmentKitTest extends AbstractKitTest {
             
             assert System.getenv('some') == 'foo'
             
-            task sample(type: PythonTask) {
+            tasks.register('sample', PythonTask) {
                 command = "-c \\"import os;print('variables: '+os.getenv('some', 'null'))\\""
                 environment 'bar', 1
             }
@@ -96,7 +96,7 @@ class PythonTaskEnvironmentKitTest extends AbstractKitTest {
             
             python.environment 'some', 1
 
-            task sample(type: PythonTask) {
+            tasks.register('sample', PythonTask) {
                 command = "-c \\"import os;print('variables: '+os.getenv('some', 'null')+' '+os.getenv('foo', 'null'))\\""
                 environment 'foo', 'bar'
             }

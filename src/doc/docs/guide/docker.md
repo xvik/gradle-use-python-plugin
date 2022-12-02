@@ -88,7 +88,7 @@ ports | Ports to expose from container (for long-lived commands) |
 Docker configuration could be changed globally or per-task. For example:
 
 ```groovy
-task sample(type: PythonTask) {
+tasks.register('sample', PythonTask) {
         workDir 'src/main'
         docker.ports 5000
         environment 'foo', 'bar'
@@ -129,7 +129,7 @@ workDir | container restarts if work dir changes
 There is one configuration option available **only for tasks** - exclusive mode:
 
 ```groovy
-task sample(type: PythonTask) {
+tasks.register('sample', PythonTask) {
         docker.exclusive = true
         module = 'mkdocs'
         command = 'serve'
@@ -172,7 +172,7 @@ Here docker port 5000 mapped to host 5001 and 5010 to 5011
 Custom task can use a different container image (than declared in global extension) if required (no limits):
 
 ```groovy
-task sample(type: PythonTask) {
+tasks.register('sample', PythonTask) {
         docker.image = 'python:3.10.7-bullseye'
         module = 'mkdocs'
         command = 'serve'
@@ -199,7 +199,7 @@ If your custom python task create other files, then you should fix permissions m
 For example, suppose python command creates a file:
 
 ```groovy
-task sample(type: PythonTask) {
+tasks.register('sample', PythonTask) {
     command = '-c "with open(\'build/temp.txt\', \'w+\') as f: pass"'
     doLast {
         dockerChown 'build/temp.txt'
@@ -233,7 +233,7 @@ There is also a way to execute any command inside started docker container with 
 python tasks:
 
 ```groovy
-task sample(type: PythonTask) {
+tasks.register('sample', PythonTask) {
     doFirst {
         dockerExec 'ls -l /usr/src/'
     }

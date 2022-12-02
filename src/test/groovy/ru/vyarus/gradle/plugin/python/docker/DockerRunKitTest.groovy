@@ -25,7 +25,7 @@ class DockerRunKitTest extends AbstractKitTest {
                 docker.use = true
             }
             
-            task sample(type: PythonTask) {
+            tasks.register('sample', PythonTask) {
                 command = '-c print(\\'samplee\\')'
             }
 
@@ -55,7 +55,7 @@ class DockerRunKitTest extends AbstractKitTest {
                 docker.use = true
             }
             
-            task sample(type: PythonTask) {
+            tasks.register('sample', PythonTask) {
                 command = '-c print(\\'samplee\\')'
             }
 
@@ -86,7 +86,7 @@ class DockerRunKitTest extends AbstractKitTest {
                 docker.use = true
             }
             
-            task sample(type: PythonTask) {
+            tasks.register('sample', PythonTask) {
                 command = '-c print(\\'samplee\\')'
             }
 
@@ -115,7 +115,7 @@ class DockerRunKitTest extends AbstractKitTest {
                 docker.use = true
             }
             
-            task sample(type: PythonTask) {
+            tasks.register('sample', PythonTask) {
                 command = '-c printTt(\\'samplee\\')'
             }
 
@@ -142,7 +142,7 @@ class DockerRunKitTest extends AbstractKitTest {
                 docker.ports 5000, '5001:5020'
             }
             
-            task sample(type: PythonTask) {
+            tasks.register('sample', PythonTask) {
                 command = '-c print(\\'samplee\\')'
             }
 
@@ -208,7 +208,7 @@ class DockerRunKitTest extends AbstractKitTest {
                 docker.use = true
             }
             
-            task sample(type: PythonTask) {
+            tasks.register('sample', PythonTask) {
                 command = '-c "with open(\\'build/temp.txt\\', \\'w+\\') as f: pass"'
                 doLast {
                     dockerChown 'build/temp.txt'
@@ -251,7 +251,7 @@ class DockerRunKitTest extends AbstractKitTest {
                 docker.use = true
             }
             
-            task sample(type: PythonTask) {
+            tasks.register('sample', PythonTask) {
                 doFirst {
                     dockerExec 'ls -l /usr/src/'
                 }

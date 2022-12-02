@@ -105,7 +105,7 @@ class PipInstallTaskKitTest extends AbstractKitTest {
             
             python.scope = USER
             
-            task customPip(type: PipInstallTask) {                
+            tasks.register('customPip', PipInstallTask) {                
                 pip 'extract-msg:0.28.0'
                 alwaysInstallModules = true
             }

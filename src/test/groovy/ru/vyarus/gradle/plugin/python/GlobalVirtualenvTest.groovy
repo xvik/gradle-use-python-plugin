@@ -28,7 +28,7 @@ class GlobalVirtualenvTest extends AbstractKitTest {
                 pip 'extract-msg:0.34.3'
             }
             
-            task sample(type: PythonTask) {
+            tasks.register('sample', PythonTask) {
                 command = '-c print(\\'samplee\\')'
             }
 

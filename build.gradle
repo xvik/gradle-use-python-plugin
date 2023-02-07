@@ -27,7 +27,7 @@ dependencies {
     testImplementation('org.spockframework:spock-core:2.0-groovy-2.5') {
         exclude group: 'org.codehaus.groovy'
     }
-    testImplementation 'net.bytebuddy:byte-buddy:1.12.22'
+    testImplementation 'net.bytebuddy:byte-buddy:1.12.23'
     testImplementation 'org.objenesis:objenesis:3.3'
 }
 

@@ -35,8 +35,9 @@ class PipInstallTask extends BasePipTask {
 
     /**
      * True to always call 'pip install' for configured modules, otherwise pip install called only
-     * if module is not installed or different version installed.
-     * By default use {@link ru.vyarus.gradle.plugin.python.PythonExtension#showInstalledVersions} value.
+     * if module is not installed or different version installed. For requirements file this option might be useful
+     * if requirements file links other files, which changes plugin would not be able to track.
+     * By default use {@link ru.vyarus.gradle.plugin.python.PythonExtension#alwaysInstallModules} value.
      */
     @Input
     boolean alwaysInstallModules
@@ -53,8 +54,10 @@ class PipInstallTask extends BasePipTask {
         // useful only when dependencies declared (directly or with requirements file)
         onlyIf { modulesInstallationRequired }
         // task will always run for the first time (even if deps are ok), but all consequent runs will be up-to-date
-        // note: for requirements file up-to-date check will correctly count file modification date
-        outputs.upToDateWhen { modulesToInstall.empty }
+        // note: for requirements file up-to-date check will correctly count file modification date.
+        // "alwaysInstallModules" might be used in case when requirements file links other files and so dependent
+        // file change would not trigger task execution (because referenced file not changed)
+        outputs.upToDateWhen { modulesToInstall.empty && !isAlwaysInstallModules() }
     }
 
     @TaskAction

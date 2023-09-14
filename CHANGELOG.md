@@ -1,3 +1,6 @@
+* Fix `alwaysInstallModules = true` not triggers pipInstall for non-strict requirements file (#94)
+  (required for case when requirements file links other files, which changes are not tracked) 
+
 ### 3.0.0 (2022-10-22)
 * (breaking) Drop gradle 5.0-5.2 support (minimum required gradle is 5.3)
 * Add docker support (python could be started in docker container without local python)

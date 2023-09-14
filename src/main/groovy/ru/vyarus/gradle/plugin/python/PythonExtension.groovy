@@ -77,6 +77,9 @@ class PythonExtension {
      * By default, plugin will not call "pip install" for modules already installed (with exactly
      * the same version). Enable option if you need to always call "pip install module" (for example,
      * to make sure correct dependencies installed).
+     * <p>
+     * For requirements file this option might be useful if requirements file links other files, which changes plugin
+     * would not be able to track.
      */
     boolean alwaysInstallModules
 

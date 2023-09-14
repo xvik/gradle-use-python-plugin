@@ -70,7 +70,71 @@ requests[socks,security] == 2.28.1
         result.output =~ /extract-msg\s+0.34.3/
         result.output =~ /boson\s+1.4/
         result.output =~ /requests\s+2.28.1/
+        
+        when: "run again"
+        result = run('pipInstall')
+
+        then: "no need to update"
+        result.task(':pipInstall').outcome == TaskOutcome.UP_TO_DATE
+
+        when: "run again with changed file"
+        file('requirements.txt') << """
+# comment
+extract-msg == 0.34.3
+
+# features syntax
+requests[socks,security] == 2.28.1
+"""
+        result = run('pipInstall')
+
+        then: "task executed again"
+        result.task(':pipInstall').outcome == TaskOutcome.SUCCESS
     }
+
+    def "Check non-strict requirements always install"() {
+        // requirements fiel MAY link other files and, if such dependent file would be changed, plugin would
+        // not execute pip install (because original requirements file was not changed)
+        // In this case only always install could help
+        setup:
+        build """
+            plugins {
+                id 'ru.vyarus.use-python'
+            }
+            
+            python.requirements.strict = false
+            python.alwaysInstallModules = true
+
+        """
+        file('requirements.txt') << """
+# comment
+extract-msg == 0.34.3
+
+# vcs syntax (without version part!)
+git+https://github.com/ictxiangxin/boson/@ea7d9113f71a7eb79083208d4f3bbb74feeb149f#egg=boson
+
+# features syntax
+requests[socks,security] == 2.28.1
+"""
+
+        when: "run task"
+        BuildResult result = run('pipInstall')
+
+        then: "task successful"
+        result.task(':pipInstall').outcome == TaskOutcome.SUCCESS
+        result.output.contains('-m virtualenv .gradle/python'.replace('/', File.separator))
+        result.output.contains('-m pip install -r requirements.txt')
+        result.output =~ /extract-msg\s+0.34.3/
+        result.output =~ /boson\s+1.4/
+        result.output =~ /requests\s+2.28.1/
+
+        when: "run again"
+        result = run('pipInstall')
+
+        then: "no need to update"
+        result.task(':pipInstall').outcome == TaskOutcome.SUCCESS
+
+    }
+
 
     def "Check strict requirements ignore"() {
         setup:

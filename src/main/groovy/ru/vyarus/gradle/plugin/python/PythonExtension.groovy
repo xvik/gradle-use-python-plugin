@@ -345,7 +345,9 @@ class PythonExtension {
          * mode plugin reads requirements file and use them the same way as if they would be declared directly in
          * gradle file. This is more secure and allows external tools to read and update requirements.
          * <p>
-         * By disabling strict mode, requirements dile processing is delegated to pip. Which means that there would
+         * Strict mode supports file reference: -r some-other.txt. Sub files would be also parsed.
+         * <p>
+         * By disabling strict mode, requirements file processing delegated to pip. Which means that there would
          * be no restrictions on pip file format.
          *
          * @see <a href="https://pip.pypa.io/en/stable/reference/requirements-file-format/#requirements-file-format">

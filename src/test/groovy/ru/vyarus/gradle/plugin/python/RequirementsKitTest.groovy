@@ -91,6 +91,55 @@ requests[socks,security] == 2.28.1
         result.task(':pipInstall').outcome == TaskOutcome.SUCCESS
     }
 
+    def "Check strict requirements with file references"() {
+        setup:
+        build """
+            plugins {
+                id 'ru.vyarus.use-python'
+            }
+
+        """
+        file('requirements.txt') << """
+# comment
+-r req-prod.txt
+
+extract-msg == 0.34.3
+"""
+        file('req-prod.txt') << """
+# vcs syntax (note, it's not valid syntax for pip due to version in egg part!) 
+git+https://github.com/ictxiangxin/boson/@ea7d9113f71a7eb79083208d4f3bbb74feeb149f#egg=boson-1.4
+
+# features syntax
+requests[socks,security] == 2.28.1
+"""
+
+        when: "run task"
+        BuildResult result = run('pipInstall')
+
+        then: "task successful"
+        result.task(':pipInstall').outcome == TaskOutcome.SUCCESS
+        result.output.contains('-m virtualenv .gradle/python'.replace('/', File.separator))
+        result.output =~ /extract-msg\s+0.34.3/
+        result.output =~ /boson\s+1.4/
+        result.output =~ /requests\s+2.28.1/
+
+        when: "run again"
+        result = run('pipInstall')
+
+        then: "task ignored"
+        result.task(':pipInstall').outcome == TaskOutcome.UP_TO_DATE
+
+        when: "run with changed sub file"
+        file('req-prod.txt') << """
+# features syntax
+requests[socks,security] == 2.29.0
+"""
+        result = run('pipInstall')
+
+        then: "task successful"
+        result.task(':pipInstall').outcome == TaskOutcome.SUCCESS
+    }
+
     def "Check non-strict requirements always install"() {
         // requirements fiel MAY link other files and, if such dependent file would be changed, plugin would
         // not execute pip install (because original requirements file was not changed)

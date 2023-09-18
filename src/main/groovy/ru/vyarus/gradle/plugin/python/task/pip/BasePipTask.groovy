@@ -173,7 +173,7 @@ class BasePipTask extends BasePythonTask {
             File file = getRequirements()
             List<String> res = RequirementsReader.read(file)
             if (!res.isEmpty()) {
-                logger.info('{} modules to install configured in {}',
+                logger.warn('{} modules to install read from requirements file: {} (strict mode)',
                         res.size(), RequirementsReader.relativePath(project, file))
             }
             return res

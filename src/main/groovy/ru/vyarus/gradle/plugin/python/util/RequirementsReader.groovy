@@ -38,6 +38,9 @@ class RequirementsReader {
      * Reads module declarations from requirements file. Does not perform any validations: it is assumed to
      * be used for plugin input which would complain if some declaration is incorrect.
      * <p>
+     * Recognize requirements file references (like "-r some-file.txt") and reads referenced files. Constraint
+     * files (-c) are not supported!
+     * <p>
      * Returns all non empty and non-comment lines. Only replace '==' into ':' to convert from python declaration
      * syntax into plugin syntax.
      * <p>
@@ -57,9 +60,15 @@ class RequirementsReader {
         List<String> res = []
         file.readLines('utf-8').each {
             String line = it.trim()
-            if (line && !line.startsWith('#')) {
-                // translate python syntax into "plugin syntax" (required only for simple packages)
-                res.add(line.replace('==', ':'))
+            if (line) {
+                if (line.startsWith('-r')) {
+                    String sub = line.split(' ')[1].trim()
+                    // not existing file would be simply ignored
+                    res.addAll(read(new File(file.parent, sub)))
+                } else if (!line.startsWith('#')) {
+                    // translate python syntax into "plugin syntax" (required only for simple packages)
+                    res.add(line.replace('==', ':'))
+                }
             }
         }
         return res

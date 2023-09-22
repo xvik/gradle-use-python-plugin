@@ -148,4 +148,19 @@ class PythonCliTest extends AbstractTest {
         python.binary.envVars == ['foo': 1, 'bar' : 3, 'baz': 4, 'sample': 'sam']
 
     }
+
+    def "Check module detection"() {
+
+        when: "check pip"
+        Project project = project()
+        Python python = new Python(project)
+        def res = python.isModuleExists('pip')
+        then: "ok"
+        res
+
+        when: 'check not existing module'
+        res = python.isModuleExists('abababa')
+        then: "ok"
+        !res
+    }
 }

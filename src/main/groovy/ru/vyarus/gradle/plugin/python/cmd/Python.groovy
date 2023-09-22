@@ -313,6 +313,36 @@ class Python {
     }
 
     /**
+     * @param module module name
+     * @return true if module exists, false otherwise
+     * @see <a href="https://docs.python.org/2.7/library/imp.html#imp.find_module">old find_module (2.x)</a>
+     * @see <a href="https://docs.python.org/3/library/importlib.html#importlib.find_loader">find_loader</a>
+     * @see <a href="https://docs.python.org/3/library/importlib.html#importlib.util.find_spec">find_spec</a>
+     */
+    boolean isModuleExists(String module) {
+        String pythonVersion = getVersion()
+        List<String> res;
+        if (CliUtils.isVersionMatch(pythonVersion, "3.4")) {
+            res = readScriptOutput("import importlib.util",
+                    "print(importlib.util.find_spec('$module') is not None)")
+
+        } else if (CliUtils.isVersionMatch(pythonVersion, "3.0")) {
+            res = readScriptOutput("import importlib",
+                    "print(importlib.find_loader('$module') is not None)")
+
+        } else {
+            // python 2, submodules does not supported! (e.g. "mod.sub")
+            res = readScriptOutput("import imp",
+                    "try:",
+                    "    imp.find_module('$module')",
+                    "    print('True')",
+                    "except ImportError:",
+                    "    print('False')")
+        }
+        return res[0].toLowerCase() == "true"
+    }
+
+    /**
      * This is important for docker because windows host could call linux container and so host os must be ignored.
      *
      * @return true if target os is windows, false otherwise
@@ -401,7 +431,7 @@ class Python {
     }
 
     /**
-     * Checks if current environment is a virtualenv. It is impossible to use {@code sys.base_path},
+     * Checks if current environment is a virtualenv (or venv). It is impossible to use {@code sys.base_path},
      * {@code sys.real_path} or even {@code os.getenv('VIRTUAL_ENV')} for detection because they might be not set
      * even under execution within virtual environment. Instead, checked presence of "activation" script inside
      * python installation binary path: for virtual environment such script would be present.

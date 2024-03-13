@@ -9,7 +9,7 @@ import org.gradle.testkit.runner.TaskOutcome
  */
 class LegacyKitTest extends AbstractKitTest {
 
-    String GRADLE_VERSION = '5.3'
+    String GRADLE_VERSION = '7.0'
 
     def "Check simple plugin execution"() {
         setup:

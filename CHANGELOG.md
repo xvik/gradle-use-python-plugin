@@ -1,3 +1,4 @@
+* (BREAKING) Drop gradle 5 and 6 support
 * Fix `alwaysInstallModules = true` not triggers pipInstall for non-strict requirements file (#94)
   (required for case when requirements file links other files, which changes are not tracked) 
 * Add requirements file references (-r file) support under strict mode (#94) 

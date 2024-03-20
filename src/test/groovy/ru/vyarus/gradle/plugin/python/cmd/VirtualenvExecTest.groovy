@@ -10,7 +10,7 @@ class VirtualenvExecTest extends AbstractCliMockSupport {
 
     @Override
     void setup() {
-        env= new Virtualenv(project, 'env')
+        env= new Virtualenv(gradleEnv(), 'env')
     }
 
     def "Check execution"() {

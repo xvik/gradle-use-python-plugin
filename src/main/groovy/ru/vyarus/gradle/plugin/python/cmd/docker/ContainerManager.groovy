@@ -3,10 +3,10 @@ package ru.vyarus.gradle.plugin.python.cmd.docker
 import groovy.transform.CompileStatic
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.GradleException
-import org.gradle.api.Project
 import org.testcontainers.containers.BindMode
 import org.testcontainers.containers.Container
 import org.testcontainers.containers.output.OutputFrame
+import ru.vyarus.gradle.plugin.python.cmd.env.Environment
 import ru.vyarus.gradle.plugin.python.util.DurationFormatter
 
 import java.nio.charset.StandardCharsets
@@ -56,20 +56,20 @@ class ContainerManager {
 
     private final String image
     private final boolean windowsImage
-    private final Project project
+    private final Environment environment
     private final String projectRootPath
     private final String projectDockerPath
 
     private PythonContainer container
     private Config containerConfig
 
-    ContainerManager(String image, boolean windows, Project project) {
+    ContainerManager(String image, boolean windows, Environment environment) {
         this.image = image
         this.windowsImage = windows
-        this.project = project
-        this.projectRootPath = project.rootProject.projectDir.absolutePath
+        this.environment = environment
+        this.projectRootPath = environment.rootDir.absolutePath
         this.projectDockerPath =
-                (windows ? DOCKER_WINDOWS_PROJECT_PATH : DOCKER_PROJECT_PATH) + project.rootProject.name
+                (windows ? DOCKER_WINDOWS_PROJECT_PATH : DOCKER_PROJECT_PATH) + environment.rootName
     }
 
     /**
@@ -151,17 +151,17 @@ class ContainerManager {
      *
      * @param config docker configuration
      * @param workDir working directory (may be null)
-     * @param environment environment variables (may be null)
+     * @param envVars environment variables (may be null)
      */
-    synchronized void restartIfRequired(DockerConfig config, String workDir, Map<String, Object> environment) {
-        Config upd = new Config(config, workDir, environment)
+    synchronized void restartIfRequired(DockerConfig config, String workDir, Map<String, Object> envVars) {
+        Config upd = new Config(config, workDir, envVars)
         if (container == null) {
             start(upd)
         } else {
             // compare started container configuration
             String diff = containerConfig.diff(upd)
             if (diff) {
-                project.logger.lifecycle('Restarting container due to changed {}', diff)
+                environment.logger.lifecycle('Restarting container due to changed {}', diff)
                 stop()
                 start(upd)
             }
@@ -201,7 +201,7 @@ class ContainerManager {
     synchronized int exec(String[] command, OutputStream out) {
         long watch = System.currentTimeMillis()
         Container.ExecResult res = container.execInContainer(StandardCharsets.UTF_8, command)
-        project.logger.info('Command executed in pre-started container ({}) in {}',
+        environment.logger.info('Command executed in pre-started container ({}) in {}',
                 container.containerName, DurationFormatter.format(System.currentTimeMillis() - watch))
         if (res.stdout != null) {
             out.write(res.stdout.getBytes(StandardCharsets.UTF_8))
@@ -251,9 +251,9 @@ class ContainerManager {
                 sleep(300)
             }
         } catch (GradleException ex) {
-            project.logger.lifecycle('Exclusive container failed to start: {}', ex.message)
+            environment.logger.lifecycle('Exclusive container failed to start: {}', ex.message)
             // normally it would not be visible, but it would be possible to see it with --info flag
-            project.logger.info('Container error stacktrace', ex)
+            environment.logger.info('Container error stacktrace', ex)
         } finally {
             // if container already finished (limited time task), then no log here (no actual stop performed)
             // and for infinite task user will not see this log (stopping just in case)
@@ -296,7 +296,7 @@ class ContainerManager {
         container.withStartupTimeout(Duration.ofSeconds(STARTUP_TIMEOUT))
                 .withLogConsumer { OutputFrame frame ->
                     if (frame.bytes != null) {
-                        project.logger.lifecycle('[docker{}] {}', container.containerName, frame.utf8String)
+                        environment.logger.lifecycle('[docker{}] {}', container.containerName, frame.utf8String)
                     }
                 }
         doStart('container', container, config.docker, config.workDir, config.env)
@@ -318,7 +318,7 @@ class ContainerManager {
             throw new GradleException(collectErrors(ex), ex)
         }
         String info = config != null ? formatContainerInfo(config, workDir, env) : ''
-        project.logger.lifecycle('[docker] {} \'{}\' ({}) started in {}{}',
+        environment.logger.lifecycle('[docker] {} \'{}\' ({}) started in {}{}',
                 message, image, container.containerName, DurationFormatter.format(System.currentTimeMillis() - watch),
                 NL + info)
     }
@@ -342,10 +342,10 @@ class ContainerManager {
             String name = container.containerName
             try {
                 container.stop()
-                project.logger.lifecycle('[docker] {} \'{}\' ({}) stopped in {}',
+                environment.logger.lifecycle('[docker] {} \'{}\' ({}) stopped in {}',
                         message, image, name, DurationFormatter.format(System.currentTimeMillis() - watch))
             } catch (Exception ex) {
-                project.logger.warn("Container '$name' stop failed", ex)
+                environment.logger.warn("Container '$name' stop failed", ex)
             }
         }
     }
@@ -369,7 +369,7 @@ class ContainerManager {
     }
 
     private String getDockerWorkDir(String workDir) {
-        workDir ? toDockerPath(project.file(workDir).absolutePath) : projectDockerPath
+        workDir ? toDockerPath(environment.file(workDir).absolutePath) : projectDockerPath
     }
 
     private Map<Integer, Integer> parseMappings(Set<String> mappings) {

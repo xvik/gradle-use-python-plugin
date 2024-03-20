@@ -1,6 +1,6 @@
 package ru.vyarus.gradle.plugin.python.task
 
-import org.gradle.testfixtures.ProjectBuilder
+
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.TaskOutcome
 import ru.vyarus.gradle.plugin.python.AbstractKitTest
@@ -17,7 +17,7 @@ class PipUpdatesTaskKitTest extends AbstractKitTest {
 
         setup:
         // make sure old version installed
-        new Pip(ProjectBuilder.builder().build()).install('extract-msg==0.28.0')
+        new Pip(gradleEnv()).install('extract-msg==0.28.0')
 
         build """
             plugins {
@@ -92,7 +92,7 @@ class PipUpdatesTaskKitTest extends AbstractKitTest {
 
         setup:
         // use the latest version
-        new Python(ProjectBuilder.builder().build()).callModule('pip', 'install extract-msg --upgrade --user')
+        new Python(gradleEnv()).callModule('pip', 'install extract-msg --upgrade --user')
 
         build """
             plugins {
@@ -118,7 +118,7 @@ class PipUpdatesTaskKitTest extends AbstractKitTest {
 
         setup:
         // use the latest version
-        new Pip(ProjectBuilder.builder().build()).install('extract-msg==0.28.0')
+        new Pip(gradleEnv()).install('extract-msg==0.28.0')
 
         build """
             plugins {

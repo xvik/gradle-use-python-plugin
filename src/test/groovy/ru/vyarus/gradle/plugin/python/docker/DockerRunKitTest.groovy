@@ -23,12 +23,16 @@ class DockerRunKitTest extends AbstractKitTest {
 
             python {               
                 docker.use = true
-            }
-            
-            tasks.register('sample', PythonTask) {
-                command = '-c print(\\'samplee\\')'
+                environment 'PYTHON_ENV_TEST', 'IN-CONTAINER'
             }
 
+            // use environment variable to make sure python executed in docker            
+            tasks.register('sample', PythonTask) {
+                doFirst {
+                    println 'OUTER ENV: ' + System.getenv('PYTHON_ENV_TEST')
+                }
+                command = '-c "import os; print(\\'CONTAINER ENV: \\' + str(os.getenv(\\'PYTHON_ENV_TEST\\')))"'
+            }
         """
 
         when: "run task"
@@ -38,7 +42,8 @@ class DockerRunKitTest extends AbstractKitTest {
         then: "task successful"
         result.task(':sample').outcome == TaskOutcome.SUCCESS
         result.output.contains('[docker] container')
-        result.output.contains('samplee')
+        result.output.contains('OUTER ENV: null')
+        result.output.contains('CONTAINER ENV: IN-CONTAINER')
     }
 
 

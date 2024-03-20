@@ -1,7 +1,7 @@
 package ru.vyarus.gradle.plugin.python.cmd.docker
 
 import groovy.transform.CompileStatic
-import org.gradle.api.Project
+import ru.vyarus.gradle.plugin.python.cmd.env.Environment
 
 /**
  * Global docker containers manager. All python tasks, requiring the same container (by full image name) would use
@@ -37,13 +37,13 @@ class DockerFactory {
      * @param project project instance
      * @return container manager instance (most likely, already started)
      */
-    static synchronized ContainerManager getContainer(DockerConfig config, Project project) {
+    static synchronized ContainerManager getContainer(DockerConfig config, Environment environment) {
         if (config == null) {
             return null
         }
         String key = config.image
         if (!CONTAINERS.containsKey(key)) {
-            CONTAINERS.put(key, new ContainerManager(config.image, config.windows, project))
+            CONTAINERS.put(key, new ContainerManager(config.image, config.windows, environment))
         }
         return CONTAINERS.get(key)
     }
@@ -54,5 +54,12 @@ class DockerFactory {
     static synchronized void shutdownAll() {
         CONTAINERS.values().each { it.stop() }
         CONTAINERS.clear()
+    }
+
+    /**
+     * @return active containers count (not stopped)
+     */
+    static synchronized int getActiveContainersCount() {
+        return CONTAINERS.values().stream().filter { !it.started }.count()
     }
 }

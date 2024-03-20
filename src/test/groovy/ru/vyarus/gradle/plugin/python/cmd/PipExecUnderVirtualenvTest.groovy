@@ -20,7 +20,7 @@ class PipExecUnderVirtualenvTest extends AbstractCliMockSupport {
         bin.createNewFile() // force virtualenv detection
         assert bin.exists()
         execCase({ it.contains('sys.prefix') }, "3.5\n${root}\n${binPath + '/python3'}")
-        pip = new Pip(project)
+        pip = new Pip(gradleEnv())
     }
 
     def "Check execution"() {

@@ -1,11 +1,10 @@
 package ru.vyarus.gradle.plugin.python.cmd
 
 import groovy.transform.CompileStatic
-import groovy.transform.Memoized
 import org.gradle.api.GradleException
-import org.gradle.api.Project
 import org.gradle.api.logging.LogLevel
 import ru.vyarus.gradle.plugin.python.cmd.docker.DockerConfig
+import ru.vyarus.gradle.plugin.python.cmd.env.Environment
 import ru.vyarus.gradle.plugin.python.util.CliUtils
 import ru.vyarus.gradle.plugin.python.util.PythonExecutionFailed
 
@@ -42,12 +41,12 @@ class Pip {
     // --trusted-host
     List<String> trustedHosts = []
 
-    Pip(Project project) {
-        this(project, null, null)
+    Pip(Environment environment) {
+        this(environment, null, null)
     }
 
-    Pip(Project project, String pythonPath, String binary) {
-        this(new Python(project, pythonPath, binary).logLevel(LogLevel.LIFECYCLE))
+    Pip(Environment environment, String pythonPath, String binary) {
+        this(new Python(environment, pythonPath, binary).logLevel(LogLevel.LIFECYCLE))
     }
 
     // preferred way for construction because allows configured python instance re-usage
@@ -238,27 +237,29 @@ class Pip {
     /**
      * @return pip version string (minor.major.micro)
      */
-    @Memoized
     String getVersion() {
-        // first try to parse line to avoid duplicate python call
-        Matcher matcher = VERSION.matcher(versionLine)
-        if (matcher.find()) {
-            // note: this will drop beta postfix (e.g. for 10.0.0b2 version will be 10.0.0)
-            return matcher.group(1)
-        }
-        // if can't recognize version, ask directly
-        return python.withHiddenLog {
-            python.readOutput('-c \"import pip; print(pip.__version__)\"')
+        python.getOrCompute('pip.version') {
+            // first try to parse line to avoid duplicate python call
+            Matcher matcher = VERSION.matcher(versionLine)
+            if (matcher.find()) {
+                // note: this will drop beta postfix (e.g. for 10.0.0b2 version will be 10.0.0)
+                return matcher.group(1)
+            }
+            // if can't recognize version, ask directly
+            return python.withHiddenLog {
+                python.readOutput('-c \"import pip; print(pip.__version__)\"')
+            }
         }
     }
 
     /**
      * @return pip --version output
      */
-    @Memoized
     String getVersionLine() {
-        return python.withHiddenLog {
-            python.readOutput('-m pip --version')
+        return python.getOrCompute('pip.version.line') {
+            return python.withHiddenLog {
+                python.readOutput('-m pip --version')
+            }
         }
     }
 
@@ -276,6 +277,11 @@ class Pip {
         } finally {
             this.userScope = isUserScope
         }
+    }
+
+    @Override
+    String toString() {
+        return versionLine
     }
 
     private String applyFlags(String cmd) {

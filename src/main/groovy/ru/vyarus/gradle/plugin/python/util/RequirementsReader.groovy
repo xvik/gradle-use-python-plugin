@@ -1,8 +1,8 @@
 package ru.vyarus.gradle.plugin.python.util
 
 import groovy.transform.CompileStatic
-import org.gradle.api.Project
 import ru.vyarus.gradle.plugin.python.PythonExtension
+import ru.vyarus.gradle.plugin.python.cmd.env.Environment
 
 /**
  * Read requirements file and convert it into plugin's modules declaration syntax (the same as modules declared in
@@ -26,11 +26,11 @@ class RequirementsReader {
      * @param requirements extension
      * @return found file or null
      */
-    static File find(Project project, PythonExtension.Requirements requirements) {
+    static File find(Environment environment, PythonExtension.Requirements requirements) {
         if (!requirements.use) {
             return null
         }
-        File reqs = project.file(requirements.file)
+        File reqs = environment.file(requirements.file)
         return reqs.exists() ? reqs : null
     }
 
@@ -78,13 +78,13 @@ class RequirementsReader {
      * Returns path, relative for current project if file located somewhere inside root project. Otherwise returns
      * absolute file path (file located outside project dir)
      *
-     * @param project current project
+     * @param environment gradle environment
      * @param file file to get path of
      * @return relative file path if file is located inside project or absolute path
      */
-    static String relativePath(Project project, File file) {
-        if (file.canonicalPath.startsWith(project.rootProject.rootDir.canonicalPath)) {
-            return project.relativePath(file)
+    static String relativePath(Environment environment, File file) {
+        if (file.canonicalPath.startsWith(environment.rootDir.canonicalPath)) {
+            return environment.relativePath(file)
         }
         return file.canonicalPath
     }

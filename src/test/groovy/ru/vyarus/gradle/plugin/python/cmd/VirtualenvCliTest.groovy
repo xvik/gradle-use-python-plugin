@@ -11,7 +11,7 @@ import ru.vyarus.gradle.plugin.python.util.CliUtils
 class VirtualenvCliTest extends AbstractTest {
 
     void setup() {
-        Pip pip = new Pip(project())
+        Pip pip = new Pip(gradleEnv())
         if (!pip.isInstalled(Virtualenv.PIP_NAME)) {
             pip.install(Virtualenv.PIP_NAME)
         }
@@ -20,7 +20,7 @@ class VirtualenvCliTest extends AbstractTest {
     def "Check incorrect virtualenv creation"() {
 
         when: "create virtualenv cli without path"
-        new Virtualenv(project(), null)
+        new Virtualenv(gradleEnv(), null)
         then: "error"
         thrown(IllegalArgumentException)
     }
@@ -28,8 +28,7 @@ class VirtualenvCliTest extends AbstractTest {
     def "Check virtualenv detection"() {
 
         when: "call check env existence"
-        Project project = project()
-        Virtualenv env = new Virtualenv(project, 'env')
+        Virtualenv env = new Virtualenv(gradleEnv(), 'env')
         then: "env not exists"
         !env.exists()
 
@@ -47,8 +46,7 @@ class VirtualenvCliTest extends AbstractTest {
     def "Check env creation"() {
 
         when: "create new env"
-        Project project = project()
-        Virtualenv env = new Virtualenv(project, 'env')
+        Virtualenv env = new Virtualenv(gradleEnv(), 'env')
         assert !env.exists()
         env.createPythonOnly()
         then: "env created"
@@ -64,7 +62,7 @@ class VirtualenvCliTest extends AbstractTest {
 
         when: "prepare virtualenv"
         Project project = project()
-        Virtualenv env = new Virtualenv(project, 'env')
+        Virtualenv env = new Virtualenv(gradleEnv(project), 'env')
         then: "path correct"
         env.path == 'env'
         env.pythonPath == CliUtils.canonicalPath(project.rootDir.absolutePath, isWin ? 'env/Scripts' : 'env/bin')

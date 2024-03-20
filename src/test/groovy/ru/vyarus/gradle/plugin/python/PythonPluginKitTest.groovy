@@ -96,9 +96,10 @@ class PythonPluginKitTest extends AbstractKitTest {
 
             python {
                 scope = VIRTUALENV
-                pip 'extract-msg:0.28.0'
                 pythonPath = "${env.pythonPath.replace('\\', '\\\\')}"
                 virtualenvVersion = "20.4.0"
+                
+                pip 'extract-msg:0.28.0'
             }            
         """
 

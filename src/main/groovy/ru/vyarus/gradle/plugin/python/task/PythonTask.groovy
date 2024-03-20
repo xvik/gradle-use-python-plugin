@@ -108,7 +108,7 @@ class PythonTask extends BasePythonTask {
     private void initWorkDirIfRequired() {
         String dir = getWorkDir()
         if (dir && isCreateWorkDir()) {
-            File wrkd = project.file(dir)
+            File wrkd = gradleEnv.file(dir)
             if (!wrkd.exists()) {
                 wrkd.mkdirs()
             }

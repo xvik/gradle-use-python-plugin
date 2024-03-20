@@ -4,9 +4,10 @@ import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Delete
 import org.gradle.api.tasks.TaskProvider
-import ru.vyarus.gradle.plugin.python.cmd.docker.DockerFactory
+import ru.vyarus.gradle.plugin.python.service.EnvService
 import ru.vyarus.gradle.plugin.python.task.BasePythonTask
 import ru.vyarus.gradle.plugin.python.task.CheckPythonTask
 import ru.vyarus.gradle.plugin.python.task.PythonTask
@@ -33,10 +34,13 @@ import ru.vyarus.gradle.plugin.python.util.RequirementsReader
 @SuppressWarnings('DuplicateStringLiteral')
 class PythonPlugin implements Plugin<Project> {
 
+    private Provider<EnvService> envService
+
     @Override
-    @CompileStatic(TypeCheckingMode.SKIP)
     void apply(Project project) {
         PythonExtension extension = project.extensions.create('python', PythonExtension, project)
+
+        initService(project, extension)
 
         // simplify direct tasks usage
         project.extensions.extraProperties.set(PipInstallTask.simpleName, PipInstallTask)
@@ -44,6 +48,20 @@ class PythonPlugin implements Plugin<Project> {
         // configuration shortcut
         PythonExtension.Scope.values().each { project.extensions.extraProperties.set(it.name(), it) }
 
+        createTasks(project, extension)
+    }
+
+    private void initService(Project project, PythonExtension extension) {
+        // service used to shutdown docker properly and hold actual python path link
+        envService = project.gradle.sharedServices.registerIfAbsent(
+                'pythonEnvironmentService', EnvService, spec -> { })
+
+        // can't use service properties because each project in multi-module project must have unique path
+        envService.get().defaultProvider(project.path, { extension.pythonPath } as Provider<String>)
+    }
+
+    @SuppressWarnings('BuilderMethodWithSideEffects')
+    private void createTasks(Project project, PythonExtension extension) {
         // validate installed python
         TaskProvider<CheckPythonTask> checkTask = project.tasks.register('checkPython', CheckPythonTask) {
             it.with {
@@ -80,10 +98,9 @@ class PythonPlugin implements Plugin<Project> {
         }
 
         configureDefaults(project, extension, checkTask, installTask)
-        configureDocker(project)
     }
 
-    @SuppressWarnings('MethodSize')
+    @SuppressWarnings(['MethodSize', 'AbcMetric'])
     @CompileStatic(TypeCheckingMode.SKIP)
     private void configureDefaults(Project project,
                                    PythonExtension extension,
@@ -94,7 +111,8 @@ class PythonPlugin implements Plugin<Project> {
             task.with {
                 // apply default path for all python tasks
                 task.conventionMapping.with {
-                    pythonPath = { extension.pythonPath }
+                    // IMPORTANT: pythonPath might change after checkPythonTask (switched to environment)
+                    pythonPath = { envService.get().getPythonPath(project.path) }
                     pythonBinary = { extension.pythonBinary }
                     validateSystemBinary = { extension.validateSystemBinary }
                     // important to copy map because each task must have independent instance
@@ -125,7 +143,7 @@ class PythonPlugin implements Plugin<Project> {
                 useCache = { extension.usePipCache }
                 trustedHosts = { extension.trustedHosts }
                 extraIndexUrls = { extension.extraIndexUrls }
-                requirements = { RequirementsReader.find(project, extension.requirements) }
+                requirements = { RequirementsReader.find(task.gradleEnv, extension.requirements) }
                 strictRequirements = { extension.requirements.strict }
             }
         }
@@ -135,6 +153,21 @@ class PythonPlugin implements Plugin<Project> {
             task.conventionMapping.with {
                 showInstalledVersions = { extension.showInstalledVersions }
                 alwaysInstallModules = { extension.alwaysInstallModules }
+                envPath = { extension.envPath }
+            }
+        }
+
+        project.tasks.withType(CheckPythonTask).configureEach { task ->
+            task.envService = this.envService
+            task.conventionMapping.with {
+                scope = { extension.scope }
+                envPath = { extension.envPath }
+                minPythonVersion = { extension.minPythonVersion }
+                minPipVersion = { extension.minPipVersion }
+                installVirtualenv = { extension.installVirtualenv }
+                virtualenvVersion = { extension.virtualenvVersion }
+                minVirtualenvVersion = { extension.minVirtualenvVersion }
+                envCopy = { extension.envCopy }
             }
         }
     }
@@ -145,13 +178,5 @@ class PythonPlugin implements Plugin<Project> {
         task.docker.windows.convention(project.provider { docker.windows })
         task.docker.ports.convention(project.provider { docker.ports })
         task.docker.exclusive.convention(false)
-    }
-
-    private void configureDocker(Project project) {
-        project.gradle.buildFinished {
-            // close started docker containers at the end (mainly for tests, because docker instances are
-            // project-specific and there would be problem in gradle tests always started in new dir)
-            DockerFactory.shutdownAll()
-        }
     }
 }

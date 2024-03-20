@@ -1,10 +1,9 @@
 package ru.vyarus.gradle.plugin.python.cmd
 
 import groovy.transform.CompileStatic
-import groovy.transform.Memoized
-import org.gradle.api.Project
 import org.gradle.api.logging.LogLevel
 import ru.vyarus.gradle.plugin.python.cmd.docker.DockerConfig
+import ru.vyarus.gradle.plugin.python.cmd.env.Environment
 import ru.vyarus.gradle.plugin.python.util.CliUtils
 
 import java.nio.file.Paths
@@ -24,7 +23,7 @@ class Virtualenv {
 
     public static final String PIP_NAME = 'virtualenv'
 
-    private final Project project
+    private final Environment env
     private final Python python
 
     // module name
@@ -32,27 +31,27 @@ class Virtualenv {
     final String path
     final File location
 
-    Virtualenv(Project project, String path) {
-        this(project, null, null, path)
+    Virtualenv(Environment environment, String path) {
+        this(environment, null, null, path)
     }
 
     /**
      * Create virtualenv utility.
      *
-     * @param project gradle project instance
+     * @param environment gradle api access object
      * @param pythonPath python path (null to use global)
      * @param binary python binary name (null to use default python3 or python)
      * @param validateSystemBinary validate global python binary
      * @param path environment path (relative to project or absolute)
      */
-    Virtualenv(Project project, String pythonPath, String binary, String path) {
-        this.project = project
-        python = new Python(project, pythonPath, binary).logLevel(LogLevel.LIFECYCLE)
+    Virtualenv(Environment environment, String pythonPath, String binary, String path) {
+        this.env = environment
+        python = new Python(environment, pythonPath, binary).logLevel(LogLevel.LIFECYCLE)
         this.path = path
         if (!path) {
             throw new IllegalArgumentException('Virtualenv path not set')
         }
-        location = project.file(path)
+        location = environment.file(path)
     }
 
     /**
@@ -114,34 +113,36 @@ class Virtualenv {
     /**
      * @return virtualenv version (major.minor.micro)
      */
-    @Memoized
     String getVersion() {
-        // first try to parse line to avoid duplicate python call
-        Matcher matcher = VERSION.matcher(versionLine)
-        if (matcher.find()) {
-            // note: this will drop beta postfix (e.g. for 10.0.0b2 version will be 10.0.0)
-            return matcher.group(1)
-        }
-        // if can't recognize version, ask directly
-        return python.withHiddenLog {
-            python.readOutput("-c \"import $name; print(${name}.__version__)\"")
+        return python.getOrCompute('virtualenv.version') {
+            // first try to parse line to avoid duplicate python call
+            Matcher matcher = VERSION.matcher(versionLine)
+            if (matcher.find()) {
+                // note: this will drop beta postfix (e.g. for 10.0.0b2 version will be 10.0.0)
+                return matcher.group(1)
+            }
+            // if can't recognize version, ask directly
+            return python.withHiddenLog {
+                python.readOutput("-c \"import $name; print(${name}.__version__)\"")
+            }
         }
     }
 
     /**
      * @return virtualenv --version output
      */
-    @Memoized
     String getVersionLine() {
-        // virtualenv 20 returns long version string including location path
-        String res = python.withHiddenLog {
-            python.readOutput("-m $name --version")
+        return python.getOrCompute('virtualenv.version.line') {
+            // virtualenv 20 returns long version string including location path
+            String res = python.withHiddenLog {
+                python.readOutput("-m $name --version")
+            }
+            // virtualenv 16 and below return only raw version (backwards compatibility)
+            if (!res.startsWith(name)) {
+                res = "$name $res"
+            }
+            return res
         }
-        // virtualenv 16 and below return only raw version (backwards compatibility)
-        if (!res.startsWith(name)) {
-            res = "$name $res"
-        }
-        return res
     }
 
     /**
@@ -198,12 +199,13 @@ class Virtualenv {
     /**
      * @return python path to use for environment
      */
-    @Memoized
     String getPythonPath() {
-        String res = CliUtils.pythonBinPath(location.absolutePath, python.windows)
-        return Paths.get(path).absolute ? res
-                // use shorter relative path
-                : project.relativePath(res)
+        return python.getOrCompute('virtualenv.python.path') {
+            String res = CliUtils.pythonBinPath(location.absolutePath, python.windows)
+            return Paths.get(path).absolute ? res
+                    // use shorter relative path
+                    : env.relativePath(res)
+        }
     }
 
     /**
@@ -214,5 +216,10 @@ class Virtualenv {
      */
     Python getPython() {
         return python
+    }
+
+    @Override
+    String toString() {
+        return env.file(pythonPath).canonicalPath + " (virtualenv $version)"
     }
 }

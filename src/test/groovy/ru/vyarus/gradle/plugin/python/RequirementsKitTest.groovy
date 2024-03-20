@@ -75,7 +75,7 @@ requests[socks,security] == 2.28.1
         result = run('pipInstall')
 
         then: "no need to update"
-        result.task(':pipInstall').outcome == TaskOutcome.UP_TO_DATE
+        result.task(':pipInstall').outcome == TaskOutcome.SUCCESS // up to date check removed
 
         when: "run again with changed file"
         file('requirements.txt') << """
@@ -127,7 +127,7 @@ requests[socks,security] == 2.28.1
         result = run('pipInstall')
 
         then: "task ignored"
-        result.task(':pipInstall').outcome == TaskOutcome.UP_TO_DATE
+        result.task(':pipInstall').outcome == TaskOutcome.SUCCESS // up to date check removed
 
         when: "run with changed sub file"
         file('req-prod.txt') << """
@@ -380,7 +380,7 @@ extract-msg == 0.34.3
         result = run('pipInstall')
 
         then: "task successful"
-        result.task(':pipInstall').outcome == TaskOutcome.UP_TO_DATE
+        result.task(':pipInstall').outcome == TaskOutcome.SUCCESS // up to date check removed
     }
 
     def "Check non-strict mode up to date check for changed file"() {

@@ -15,18 +15,18 @@ class VenvFromVenvCreationTest extends AbstractTest {
 
         setup:
         Project project = project()
-        Virtualenv env = new Virtualenv(project, 'initial')
+        Virtualenv env = new Virtualenv(gradleEnv(project), 'initial')
         env.create(true)
 
         // second, derived from first one
-        Virtualenv env2 = new Virtualenv(project, env.pythonPath, null, "second")
+        Virtualenv env2 = new Virtualenv(gradleEnv(project), env.pythonPath, null, "second")
         env2.python.extraArgs('-v') // enable logs
-        Pip pip = new Pip(project, env.pythonPath, null).userScope(false)
+        Pip pip = new Pip(gradleEnv(project), env.pythonPath, null).userScope(false)
         pip.install(env2.name + "==20.4.0")
         env2.createPythonOnly()
 
         when: "validating pip in second environment"
-        Pip pip2 = new Pip(project, env2.pythonPath, null).userScope(false)
+        Pip pip2 = new Pip(gradleEnv(project), env2.pythonPath, null).userScope(false)
         println pip2.version
 
         then: "pip not exists"

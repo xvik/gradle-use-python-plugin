@@ -43,6 +43,7 @@ class ParallelExecutionKitTest extends AbstractKitTest {
 
         when: "run check all modules to initiate concurrent virtualenv installation"
         debug()
+        println '--------------------------------------------------------- START'
         BuildResult result = run('checkPython', '--parallel', '--max-workers=5')
 
         then: "tasks successful"

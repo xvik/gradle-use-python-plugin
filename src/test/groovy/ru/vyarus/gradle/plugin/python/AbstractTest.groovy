@@ -3,6 +3,8 @@ package ru.vyarus.gradle.plugin.python
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
+import ru.vyarus.gradle.plugin.python.cmd.env.Environment
+import ru.vyarus.gradle.plugin.python.cmd.env.GradleEnvironment
 import spock.lang.Specification
 import spock.lang.TempDir
 
@@ -34,6 +36,14 @@ abstract class AbstractTest extends Specification {
         File target = file(toFile)
         target.parentFile.mkdirs()
         target << getClass().getResourceAsStream(source).text
+    }
+
+    Environment gradleEnv() {
+        gradleEnv(project())
+    }
+
+    Environment gradleEnv(Project project) {
+        GradleEnvironment.create(project)
     }
 
     static class ExtendedProjectBuilder {

@@ -13,7 +13,7 @@ class PipExecTest extends AbstractCliMockSupport {
         // required for virtualenv detection in pip (which must not detect env now)
         // (this can't be done with spies or mocks)
         execCase({it.contains('sys.prefix')}, '3.5\n/usr/\n/usr/python3')
-        pip = new Pip(project)
+        pip = new Pip(gradleEnv())
     }
 
     def "Check execution"() {

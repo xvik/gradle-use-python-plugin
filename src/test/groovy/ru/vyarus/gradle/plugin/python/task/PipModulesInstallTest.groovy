@@ -38,7 +38,7 @@ class PipModulesInstallTest extends AbstractKitTest {
         result = run('pipInstall')
         then: "package not installed"
         result.task(':checkPython').outcome == TaskOutcome.SUCCESS
-        result.task(':pipInstall').outcome == TaskOutcome.UP_TO_DATE
+        result.task(':pipInstall').outcome == TaskOutcome.SUCCESS // up to date check removed
         !result.output.contains('Successfully built boson')
         !result.output.contains('boson-0.9')
     }
@@ -69,6 +69,6 @@ class PipModulesInstallTest extends AbstractKitTest {
         result = run('pipInstall')
         then: "package not installed"
         result.task(':checkPython').outcome == TaskOutcome.SUCCESS
-        result.task(':pipInstall').outcome == TaskOutcome.UP_TO_DATE
+        result.task(':pipInstall').outcome == TaskOutcome.SUCCESS // up to date check removed
     }
 }

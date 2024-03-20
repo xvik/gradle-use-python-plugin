@@ -1,10 +1,13 @@
 package ru.vyarus.gradle.plugin.python
 
 import org.apache.tools.ant.taskdefs.condition.Os
+import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import ru.vyarus.gradle.plugin.python.cmd.Virtualenv
+import ru.vyarus.gradle.plugin.python.cmd.env.Environment
+import ru.vyarus.gradle.plugin.python.cmd.env.GradleEnvironment
 import spock.lang.Specification
 import spock.lang.TempDir
 
@@ -97,7 +100,15 @@ abstract class AbstractKitTest extends Specification {
 
     // custom virtualenv to use for simulations
     Virtualenv env(String path = '.gradle/python', String binary = null) {
-        new Virtualenv(ProjectBuilder.builder()
-                .withProjectDir(testProjectDir).build(), null, binary, path)
+        new Virtualenv(gradleEnv(ProjectBuilder.builder()
+                .withProjectDir(testProjectDir).build()), null, binary, path)
+    }
+
+    Environment gradleEnv() {
+        gradleEnv(ProjectBuilder.builder().build())
+    }
+
+    Environment gradleEnv(Project project) {
+        GradleEnvironment.create(project)
     }
 }

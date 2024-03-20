@@ -1,16 +1,17 @@
 package ru.vyarus.gradle.plugin.python.cmd
 
 import groovy.transform.CompileStatic
-import groovy.transform.Memoized
 import groovy.transform.TypeCheckingMode
-import org.gradle.api.Project
 import org.gradle.api.logging.LogLevel
 import org.gradle.api.logging.Logger
 import ru.vyarus.gradle.plugin.python.cmd.docker.DockerConfig
+import ru.vyarus.gradle.plugin.python.cmd.env.Environment
 import ru.vyarus.gradle.plugin.python.cmd.exec.PythonBinary
 import ru.vyarus.gradle.plugin.python.util.CliUtils
 import ru.vyarus.gradle.plugin.python.util.OutputLogger
 import ru.vyarus.gradle.plugin.python.util.PythonExecutionFailed
+
+import java.util.function.Supplier
 
 /**
  * Python commands execution utility. Use global python or binary in provided python path.
@@ -32,10 +33,10 @@ import ru.vyarus.gradle.plugin.python.util.PythonExecutionFailed
  */
 @CompileStatic
 @SuppressWarnings(['ConfusingMethodName', 'StaticMethodsBeforeInstanceMethods',
-        'DuplicateNumberLiteral', 'MethodCount'])
+        'DuplicateNumberLiteral', 'MethodCount', 'ClassSize'])
 class Python {
 
-    private final Project project
+    private final Environment environment
     private final PythonBinary binary
 
     private String outputPrefix = '\t'
@@ -43,13 +44,13 @@ class Python {
     private final List<String> pythonArgs = []
     private final List<String> extraArgs = []
 
-    Python(Project project) {
-        this(project, null, null)
+    Python(Environment environment) {
+        this(environment, null, null)
     }
 
-    Python(Project project, String pythonPath, String binary) {
-        this.project = project
-        this.binary = new PythonBinary(project, pythonPath, binary)
+    Python(Environment environment, String pythonPath, String binary) {
+        this.environment = environment
+        this.binary = new PythonBinary(environment, pythonPath, binary)
     }
 
     /**
@@ -242,13 +243,13 @@ class Python {
             try {
                 processExecution(args, os)
                 String output = os.toString().trim()
-                project.logger.info(CliUtils.prefixOutput(output, outputPrefix))
+                environment.logger.info(CliUtils.prefixOutput(output, outputPrefix))
                 return output
             } catch (Throwable th) {
                 // print process output, because it might contain important error details
                 String output = os.toString().trim()
                 if (output) {
-                    project.logger.error(CliUtils.prefixOutput(output, outputPrefix))
+                    environment.logger.error(CliUtils.prefixOutput(output, outputPrefix))
                 }
                 throw th
             }
@@ -264,7 +265,7 @@ class Python {
      * @throws PythonExecutionFailed when process fails
      */
     void exec(Object args) {
-        exec(project.logger, args)
+        exec(environment.logger, args)
     }
 
     /**
@@ -319,27 +320,28 @@ class Python {
      * @see <a href="https://docs.python.org/3/library/importlib.html#importlib.find_loader">find_loader</a>
      * @see <a href="https://docs.python.org/3/library/importlib.html#importlib.util.find_spec">find_spec</a>
      */
+    @SuppressWarnings('BlockEndsWithBlankLine')
     boolean isModuleExists(String module) {
-        String pythonVersion = getVersion()
-        List<String> res;
-        if (CliUtils.isVersionMatch(pythonVersion, "3.4")) {
-            res = readScriptOutput("import importlib.util",
+        String pythonVersion = version
+        List<String> res
+        if (CliUtils.isVersionMatch(pythonVersion, '3.4')) {
+            res = readScriptOutput('import importlib.util',
                     "print(importlib.util.find_spec('$module') is not None)")
 
-        } else if (CliUtils.isVersionMatch(pythonVersion, "3.0")) {
-            res = readScriptOutput("import importlib",
+        } else if (CliUtils.isVersionMatch(pythonVersion, '3.0')) {
+            res = readScriptOutput('import importlib',
                     "print(importlib.find_loader('$module') is not None)")
 
         } else {
             // python 2, submodules does not supported! (e.g. "mod.sub")
-            res = readScriptOutput("import imp",
-                    "try:",
+            res = readScriptOutput('import imp',
+                    'try:',
                     "    imp.find_module('$module')",
-                    "    print('True')",
-                    "except ImportError:",
-                    "    print('False')")
+                    '    print(\'True\')',
+                    'except ImportError:',
+                    '    print(\'False\')')
         }
-        return res[0].toLowerCase() == "true"
+        return res[0].toLowerCase() == 'true'
     }
 
     /**
@@ -357,7 +359,6 @@ class Python {
      *
      * @return python home directory (works for global python too)
      */
-    @Memoized
     String getHomeDir() {
         return resolveInfo()[1]
     }
@@ -400,11 +401,12 @@ class Python {
      *
      * @return directory under python home containing python binary (always absolute path)
      */
-    @Memoized
     @SuppressWarnings('ClosureAsLastMethodParameter')
     String getBinaryDir() {
-        // sys.executable and sys.prefix
-        return binary.getBinaryDir({ resolveInfo()[2]?.trim() }, { homeDir })
+        return getOrCompute("binary.dir:${binary.identity}") {
+            // sys.executable and sys.prefix
+            return binary.getBinaryDir({ resolveInfo()[2]?.trim() }, { homeDir })
+        } as String
     }
 
     /**
@@ -425,7 +427,6 @@ class Python {
     /**
      * @return python version in format major.minor.micro
      */
-    @Memoized
     String getVersion() {
         return resolveInfo()[0]
     }
@@ -441,11 +442,12 @@ class Python {
      *
      * @return true if used python is a virtualenv, false for normal python installation
      */
-    @Memoized
     boolean isVirtualenv() {
-        // always absolute path
-        String path = binaryDir + File.separator + 'activate'
-        return binary.exists(path)
+        return getOrCompute('python.is.virtualenv') {
+            // always absolute path
+            String path = binaryDir + File.separator + 'activate'
+            return binary.exists(path)
+        } as Boolean
     }
 
     /**
@@ -489,6 +491,26 @@ class Python {
         binary.targetOsCanonicalPath(usedBinary)
     }
 
+    /**
+     * Shortcut to cache values related to the same python (not the same instance, but the same python, related
+     * to current gradle project).
+     * <p>
+     * Project-specific map used for caching (to unify cache for all python instances, created per task).
+     * Actual cache key also includes python path to avoid clashes when multiple pythons used.
+     *
+     * @param key cache key
+     * @param value value computation action
+     * @return cached or computed value
+     */
+    public <T> T getOrCompute(String key, Supplier<T> value) {
+        return environment.projectCache(key + ':' + binary.identity, value)
+    }
+
+    @Override
+    String toString() {
+        return "$canonicalHomeDir (python $version)"
+    }
+
     @CompileStatic(TypeCheckingMode.SKIP)
     private void processExecution(Object args, OutputStream os) {
         binary.exec(args, pythonArgs, extraArgs, os, logLevel)
@@ -499,23 +521,24 @@ class Python {
      *
      * @return [raw python version, python home path, python executable]
      */
-    @Memoized
     private List<String> resolveInfo() {
-        String[] cmd = [
-                'ver=sys.version_info',
-                'print(str(ver.major)+\'.\'+str(ver.minor)+\'.\'+str(ver.micro))',
-                'print(sys.prefix)',
-                'print(sys.executable)',
-        ]
-        withHiddenLog {
-            // raw version, home path, executable
-            List<String> res = readScriptOutput(cmd)
-            // remove possible relative section from path (/dd/dd/../tt -> /dd/tt)
-            // without following symlinks (very important!)
-            res.set(1, CliUtils.canonicalPath(project.rootDir.absolutePath, res.get(1)))
-            res.set(2, CliUtils.canonicalPath(project.rootDir.absolutePath, res.get(2)))
+        return (List<String>) getOrCompute('python.info') {
+            String[] cmd = [
+                    'ver=sys.version_info',
+                    'print(str(ver.major)+\'.\'+str(ver.minor)+\'.\'+str(ver.micro))',
+                    'print(sys.prefix)',
+                    'print(sys.executable)',
+            ]
+            withHiddenLog {
+                // raw version, home path, executable
+                List<String> res = readScriptOutput(cmd)
+                // remove possible relative section from path (/dd/dd/../tt -> /dd/tt)
+                // without following symlinks (very important!)
+                res.set(1, CliUtils.canonicalPath(environment.rootDir.absolutePath, res.get(1)))
+                res.set(2, CliUtils.canonicalPath(environment.rootDir.absolutePath, res.get(2)))
 
-            return res
+                return res
+            }
         }
     }
 
@@ -523,7 +546,6 @@ class Python {
         List<String> cmd = []
         cmd.add('import sys')
         cmd.addAll(lines)
-
         // IMPORTANT -S should not be used here as it affects behaviour a lot (even sys.prefix may be different)
         return readOutput("-c \"${cmd.join(';')}\"").readLines()
     }

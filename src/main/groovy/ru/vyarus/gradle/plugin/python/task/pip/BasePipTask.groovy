@@ -1,7 +1,6 @@
 package ru.vyarus.gradle.plugin.python.task.pip
 
 import groovy.transform.CompileStatic
-import groovy.transform.Memoized
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Internal
@@ -89,6 +88,10 @@ class BasePipTask extends BasePythonTask {
     @Input
     boolean strictRequirements
 
+    private List<String> requirementModulesCache
+    private List<PipModule> modulesListCache
+    private Pip pipCache
+
     /**
      * Shortcut for {@link #pip(java.lang.Iterable)}.
      *
@@ -166,39 +169,49 @@ class BasePipTask extends BasePythonTask {
      *
      * @return pip modules from requirements file (in plugin's format) or empty list
      */
-    @Memoized
+    // note: groovy memoized can't be used because of configuration cache!
     @SuppressWarnings('UnnecessaryGetter')
     private List<String> getRequirementsModules() {
-        if (getStrictRequirements()) {
-            File file = getRequirements()
-            List<String> res = RequirementsReader.read(file)
-            if (!res.isEmpty()) {
-                logger.warn('{} modules to install read from requirements file: {} (strict mode)',
-                        res.size(), RequirementsReader.relativePath(project, file))
+        if (requirementModulesCache == null) {
+            if (getStrictRequirements()) {
+                File file = getRequirements()
+                List<String> res = RequirementsReader.read(file)
+                if (!res.isEmpty()) {
+                    logger.warn('{} modules to install read from requirements file: {} (strict mode)',
+                            res.size(), RequirementsReader.relativePath(gradleEnv, file))
+                }
+                requirementModulesCache = res
+            } else {
+                requirementModulesCache = Collections.emptyList()
             }
-            return res
         }
-        return Collections.emptyList()
+        return requirementModulesCache
     }
 
-    @Memoized
+    // note: groovy memoized can't be used because of configuration cache!
     private List<PipModule> buildModulesList() {
-        Map<String, PipModule> mods = [:] // linked map
-        // sequential parsing in order to override duplicate definitions
-        // (latter defined module overrides previous definition) and preserve definition order
-        allModules.each {
-            PipModule mod = PipModule.parse(it)
-            mods[mod.name] = mod
+        if (modulesListCache == null) {
+            Map<String, PipModule> mods = [:] // linked map
+            // sequential parsing in order to override duplicate definitions
+            // (latter defined module overrides previous definition) and preserve definition order
+            allModules.each {
+                PipModule mod = PipModule.parse(it)
+                mods[mod.name] = mod
+            }
+            modulesListCache = new ArrayList(mods.values())
         }
-        return new ArrayList(mods.values())
+        return modulesListCache
     }
 
-    @Memoized
+    // note: groovy memoized can't be used because of configuration cache!
     private Pip buildPip() {
-        return new Pip(python)
-                .userScope(getUserScope())
-                .useCache(getUseCache())
-                .trustedHosts(getTrustedHosts())
-                .extraIndexUrls(getExtraIndexUrls())
+        if (pipCache == null) {
+            pipCache = new Pip(python)
+                    .userScope(getUserScope())
+                    .useCache(getUseCache())
+                    .trustedHosts(getTrustedHosts())
+                    .extraIndexUrls(getExtraIndexUrls())
+        }
+        return pipCache
     }
 }

@@ -3,6 +3,7 @@ package ru.vyarus.gradle.plugin.python.cmd
 import org.gradle.api.GradleException
 import org.gradle.api.logging.LogLevel
 import ru.vyarus.gradle.plugin.python.util.PythonExecutionFailed
+import ru.vyarus.gradle.plugin.python.util.TestLogger
 
 /**
  * @author Vyacheslav Rusakov
@@ -14,7 +15,7 @@ class PythonExecTest extends AbstractCliMockSupport {
 
     @Override
     void setup() {
-        python = new Python(project).validateSystemBinary(false)
+        python = new Python(gradleEnv()).validateSystemBinary(false)
     }
 
     def "Check success"() {
@@ -98,7 +99,7 @@ class PythonExecTest extends AbstractCliMockSupport {
 
         setup:
         mockExec(project, 'sample output', 0)
-        python = new Python(project, 'some/path', null)
+        python = new Python(gradleEnv(), 'some/path', null)
         file('some/path').mkdirs()
         file('some/path/python.exe').createNewFile()
 
@@ -112,7 +113,7 @@ class PythonExecTest extends AbstractCliMockSupport {
 
         setup:
         mockExec(project, 'sample output', 0)
-        python = new Python(project, null, 'pyt').validateSystemBinary(false)
+        python = new Python(gradleEnv(), null, 'pyt').validateSystemBinary(false)
 
         when: "call module"
         python.exec('mmm')
@@ -123,7 +124,7 @@ class PythonExecTest extends AbstractCliMockSupport {
     def "Check global python validation"() {
 
         when: 'incorrect global binary declared'
-        python = new Python(project, null, 'pyt').validate()
+        python = new Python(gradleEnv(), null, 'pyt').validate()
 
         then: "failed"
         def ex = thrown(GradleException)
@@ -135,7 +136,7 @@ class PythonExecTest extends AbstractCliMockSupport {
 
         setup:
         mockExec(project, 'sample output', 0)
-        python = new Python(project, 'some/path', 'py')
+        python = new Python(gradleEnv(), 'some/path', 'py')
         file('some/path').mkdirs()
         file('some/path/py.exe').createNewFile()
 
@@ -149,7 +150,7 @@ class PythonExecTest extends AbstractCliMockSupport {
 
         setup:
         mockExec(project, 'sample output', 0)
-        python = new Python(project, 'some/path/', 'py')
+        python = new Python(gradleEnv(), 'some/path/', 'py')
         file('some/path').mkdirs()
         file('some/path/py.exe').createNewFile()
 
@@ -163,8 +164,8 @@ class PythonExecTest extends AbstractCliMockSupport {
 
         setup:
         mockExec(project, null, 0)
-        project.logger.appendLevel = true
-        python = new Python(project).logLevel(LogLevel.LIFECYCLE)
+        (project.logger as TestLogger).appendLevel = true
+        python = new Python(gradleEnv()).logLevel(LogLevel.LIFECYCLE)
 
         when: "call module"
         python.exec('mmm')
@@ -188,7 +189,7 @@ class PythonExecTest extends AbstractCliMockSupport {
 
         setup:
         mockExec(project, null, 0)
-        python = new Python(project)
+        python = new Python(gradleEnv())
 
         when: "call with -c"
         python.exec('-c something')

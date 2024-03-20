@@ -1,7 +1,6 @@
 package ru.vyarus.gradle.plugin.python.task
 
 import groovy.transform.CompileStatic
-import groovy.transform.Memoized
 import org.gradle.api.Action
 import org.gradle.api.GradleException
 import org.gradle.api.internal.ConventionTask
@@ -12,11 +11,12 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.Optional
-import org.gradle.util.ClosureBackedAction
 import ru.vyarus.gradle.plugin.python.cmd.Python
 import ru.vyarus.gradle.plugin.python.cmd.docker.ContainerManager
 import ru.vyarus.gradle.plugin.python.cmd.docker.DockerConfig
 import ru.vyarus.gradle.plugin.python.cmd.docker.DockerFactory
+import ru.vyarus.gradle.plugin.python.cmd.env.Environment
+import ru.vyarus.gradle.plugin.python.cmd.env.GradleEnvironment
 import ru.vyarus.gradle.plugin.python.util.CliUtils
 import ru.vyarus.gradle.plugin.python.util.OutputLogger
 
@@ -99,6 +99,14 @@ class BasePythonTask extends ConventionTask {
     @Nested
     DockerEnv docker = project.objects.newInstance(DockerEnv)
 
+    // Special object - lightweight project replacement to avoid calling project in actions.
+    // Plus, this object is configuration cache friendly
+    // Applied to all python tasks in plugin
+    @Internal
+    Environment gradleEnv = GradleEnvironment.create(project)
+
+    private Python pythonCache
+
     protected BasePythonTask() {
         group = 'python'
     }
@@ -141,17 +149,6 @@ class BasePythonTask extends ConventionTask {
             // do like this to workaround convention mapping mechanism which will treat empty map as incorrect value
             setEnvironment(envs)
         }
-    }
-
-    /**
-     * Configure docker container for python execution inside docker.
-     *
-     * @param closure configuration closure
-     * @return configured docker sub-configuration object
-     */
-    @SuppressWarnings('ConfusingMethodName')
-    DockerEnv docker(@DelegatesTo(value = DockerEnv, strategy = Closure.DELEGATE_FIRST) Closure closure) {
-        docker(new ClosureBackedAction<DockerEnv>(closure))
     }
 
     /**
@@ -204,8 +201,8 @@ class BasePythonTask extends ConventionTask {
      *
      * @param dir string path or File object for local directory to change file permissions on within docker
      */
-    void dockerChown(Object dir) {
-        dockerChown(project.file(dir).toPath())
+    void dockerChown(String dir) {
+        dockerChown(gradleEnv.file(dir).toPath())
     }
 
     /**
@@ -245,10 +242,10 @@ class BasePythonTask extends ConventionTask {
             return
         }
 
-        Path projectDir = project.rootProject.rootDir.toPath()
+        Path projectDir = gradleEnv.rootDir.toPath()
         int uid = (int) Files.getAttribute(projectDir, 'unix:uid', LinkOption.NOFOLLOW_LINKS)
         int gid = (int) Files.getAttribute(projectDir, 'unix:gid', LinkOption.NOFOLLOW_LINKS)
-        dockerExec(['chown' , '-Rh', "$uid:$gid", dir.toAbsolutePath()])
+        dockerExec(['chown', '-Rh', "$uid:$gid", dir.toAbsolutePath()])
     }
 
     /**
@@ -268,7 +265,7 @@ class BasePythonTask extends ConventionTask {
         }
         String[] args = CliUtils.parseArgs(cmd)
         // it would be pre-started container (used in checkPython)
-        ContainerManager manager = DockerFactory.getContainer(getDocker().toConfig(), project)
+        ContainerManager manager = DockerFactory.getContainer(getDocker().toConfig(), gradleEnv)
         // restart container if task parameters differ
         manager.restartIfRequired(getDocker().toConfig(), getWorkDir(), getEnvironment())
         // rewrite paths from host to docker fs
@@ -278,16 +275,19 @@ class BasePythonTask extends ConventionTask {
         return manager.exec(args, out)
     }
 
-    @Memoized
+    // note: groovy memoized can't be used because of configuration cache!
     private Python buildPython(String pythonPath, String pythonBinary) {
-        new Python(project, pythonPath, pythonBinary)
-                .logLevel(getLogLevel())
-                .workDir(getWorkDir())
-                .pythonArgs(getPythonArgs())
-                .environment(getEnvironment())
-                .validateSystemBinary(getValidateSystemBinary())
-                .withDocker(getDocker().toConfig())
-                .validate()
+        if (pythonCache == null) {
+            pythonCache = new Python(gradleEnv, pythonPath, pythonBinary)
+                    .logLevel(getLogLevel())
+                    .workDir(getWorkDir())
+                    .pythonArgs(getPythonArgs())
+                    .environment(getEnvironment())
+                    .validateSystemBinary(getValidateSystemBinary())
+                    .withDocker(getDocker().toConfig())
+                    .validate()
+        }
+        return pythonCache
     }
 
     /**
@@ -302,7 +302,7 @@ class BasePythonTask extends ConventionTask {
      * <p>
      * Note that all files created inside docker in mapped project directory will be owned with root (problem actual
      * only for linux users!). To overcome this for custom tasks use
-     * {@link BasePythonTask#dockerChown(java.lang.Object)} method inside {@code doFirst } or {@code doLast } blocks.
+     * {@link BasePythonTask#dockerChown(java.lang.String)} method inside {@code doFirst } or {@code doLast } blocks.
      *
      * @see ru.vyarus.gradle.plugin.python.cmd.docker.DockerFactory
      */

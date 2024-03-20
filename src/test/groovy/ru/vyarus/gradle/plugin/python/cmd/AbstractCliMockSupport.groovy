@@ -3,11 +3,17 @@ package ru.vyarus.gradle.plugin.python.cmd
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.Action
 import org.gradle.api.Project
+import org.gradle.api.internal.file.FileOperations
+import org.gradle.api.logging.Logger
+import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.ExtensionContainer
 import org.gradle.api.plugins.ExtraPropertiesExtension
 import org.gradle.internal.file.PathToFileResolver
+import org.gradle.process.ExecOperations
 import org.gradle.process.ExecSpec
 import org.gradle.process.internal.DefaultExecSpec
+import ru.vyarus.gradle.plugin.python.cmd.env.Environment
+import ru.vyarus.gradle.plugin.python.cmd.env.GradleEnvironment
 import ru.vyarus.gradle.plugin.python.util.ExecRes
 import ru.vyarus.gradle.plugin.python.util.TestLogger
 import spock.lang.Specification
@@ -42,6 +48,18 @@ abstract class AbstractCliMockSupport extends Specification {
         project.file(_) >> { new File(dir, it[0]) }
         project.getRootProject() >> { project }
         project.findProperty(_ as String) >> { args -> extraProps.get(args[0])}
+        // required for GradleEnvironment
+        ObjectFactory objects = Stub(ObjectFactory)
+        ExecOperations exec = Stub(ExecOperations)
+        exec.exec(_) >> { project.exec it[0] as Action }
+        FileOperations fs = Stub(FileOperations)
+        fs.file(_) >> { project.file(it[0]) }
+        objects.newInstance(_, _) >> { args ->
+            List params = [exec, fs]
+            params.addAll(args[1] as Object[])
+            // have to use special class because GradleEnvironment is abstract (assume gradle injection)
+            GradleEnv.newInstance(params as Object[]) }
+        project.getObjects() >> { objects }
 
         def ext = Stub(ExtensionContainer)
         project.getExtensions() >> { ext }
@@ -50,6 +68,14 @@ abstract class AbstractCliMockSupport extends Specification {
         props.set(_ as String, _) >> { args-> extraProps.put(args[0], args[1]) }
         props.get(_ as String) >> { args -> extraProps.get(args[0]) }
         props.has(_ as String) >> { args -> extraProps.containsKey(args[0]) }
+    }
+
+    Environment gradleEnv() {
+        gradleEnv(project)
+    }
+
+    Environment gradleEnv(Project project) {
+        GradleEnvironment.create(project)
     }
 
     // use to provide specialized output for executed commands
@@ -83,6 +109,28 @@ abstract class AbstractCliMockSupport extends Specification {
                 os.write(out.bytes)
             }
             return new ExecRes(res)
+        }
+    }
+
+    static class GradleEnv extends GradleEnvironment {
+        ExecOperations exec
+        FileOperations fs
+
+        GradleEnv(ExecOperations exec,  FileOperations fs, Logger logger, File projectDir, File rootDir, String rootName,
+                  String projectPath, Map<String, Object> globalCache, Map<String, Object> projectCache) {
+            super(logger, projectDir, rootDir, rootName, projectPath, globalCache, projectCache)
+            this.exec = exec
+            this.fs = fs
+        }
+
+        @Override
+        protected ExecOperations getExec() {
+            return exec
+        }
+
+        @Override
+        protected FileOperations getFs() {
+            return fs
         }
     }
 }

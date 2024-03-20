@@ -54,8 +54,9 @@ class PythonContainer extends GenericContainer<PythonContainer> {
     }
 
     @Override
+    @SuppressWarnings('UnnecessaryGetter')
     protected Logger logger() {
         // avoid direct logging of errors (prevent duplicates in log)
-        return NOPLoggerFactory.newInstance().getLogger(PythonContainer.name)
+        return NOPLoggerFactory.getConstructor().newInstance().getLogger(PythonContainer.name)
     }
 }

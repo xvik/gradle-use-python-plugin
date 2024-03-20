@@ -14,8 +14,7 @@ class PythonCliTest extends AbstractTest {
     def "Check python execution"() {
 
         when: "Use default configuration"
-        Project project = project()
-        Python python = new Python(project)
+        Python python = new Python(gradleEnv())
         def res = python.readOutput('-c "print(\'hello\')"')
         then: "ok"
         res == 'hello'
@@ -42,8 +41,7 @@ class PythonCliTest extends AbstractTest {
     def "Check error reporting"() {
 
         when: "call bad command"
-        Project project = project()
-        Python python = new Python(project)
+        Python python = new Python(gradleEnv())
         python.readOutput('-c "import fsdfdsfsd;"')
         then: "error"
         thrown(PythonExecutionFailed)
@@ -57,8 +55,7 @@ class PythonCliTest extends AbstractTest {
     def "Check configuration"() {
 
         setup:
-        Project project = project()
-        Python python = new Python(project)
+        Python python = new Python(gradleEnv())
 
         when: "set output prefix"
         python.outputPrefix('[]')
@@ -152,8 +149,7 @@ class PythonCliTest extends AbstractTest {
     def "Check module detection"() {
 
         when: "check pip"
-        Project project = project()
-        Python python = new Python(project)
+        Python python = new Python(gradleEnv())
         def res = python.isModuleExists('pip')
         then: "ok"
         res

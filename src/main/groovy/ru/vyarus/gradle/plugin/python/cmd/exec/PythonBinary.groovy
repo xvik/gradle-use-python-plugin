@@ -1,18 +1,14 @@
 package ru.vyarus.gradle.plugin.python.cmd.exec
 
 import groovy.transform.CompileStatic
-import groovy.transform.Memoized
 import groovy.transform.TypeCheckingMode
 import org.apache.tools.ant.taskdefs.condition.Os
-import org.gradle.api.Action
-import org.gradle.api.Project
 import org.gradle.api.logging.LogLevel
-import org.gradle.process.ExecResult
-import org.gradle.process.ExecSpec
 import ru.vyarus.gradle.plugin.python.cmd.LoggedCommandCleaner
 import ru.vyarus.gradle.plugin.python.cmd.docker.ContainerManager
 import ru.vyarus.gradle.plugin.python.cmd.docker.DockerConfig
 import ru.vyarus.gradle.plugin.python.cmd.docker.DockerFactory
+import ru.vyarus.gradle.plugin.python.cmd.env.Environment
 import ru.vyarus.gradle.plugin.python.util.CliUtils
 import ru.vyarus.gradle.plugin.python.util.DurationFormatter
 import ru.vyarus.gradle.plugin.python.util.PythonExecutionFailed
@@ -32,15 +28,16 @@ import java.nio.file.Paths
 @CompileStatic
 final class PythonBinary {
 
-    private static final String PROP_PYTHON3 = 'ru.vyarus.python3.detected'
     private static final String PYTHON3 = 'python3'
 
     private static final String SPACE = ' '
     private static final String NL = '\n'
 
     private static final Object SYNC = new Object()
+    // used to avoid duplicate global python3 binary detection on linux
+    private static volatile Boolean python3detected
 
-    private final Project project
+    private final Environment environment
 
     // pre-init
 
@@ -68,8 +65,8 @@ final class PythonBinary {
     // special cleaners for logged commands to hide sensitive data (like passwords)
     private final List<LoggedCommandCleaner> logCleaners = []
 
-    PythonBinary(Project project, String pythonPath, String binary) {
-        this.project = project
+    PythonBinary(Environment environment, String pythonPath, String binary) {
+        this.environment = environment
         this.sourcePythonPath = pythonPath
         this.sourcePythonBinary = binary
 
@@ -86,7 +83,7 @@ final class PythonBinary {
         beforeInit('Docker config must be set before initialization')
         if (docker) {
             this.dockerConfig = docker
-            this.docker = DockerFactory.getContainer(docker, project)
+            this.docker = DockerFactory.getContainer(docker, environment)
         }
     }
 
@@ -131,7 +128,7 @@ final class PythonBinary {
     String getBinaryDir(Closure<String> sysExecutableProvider, Closure<String> sysPrefixProvider) {
         init()
         // use resolved executable to avoid incorrect resolution in case of venv inside venv
-        String path = customBinaryPath ? project.file(executable).absolutePath : sysExecutableProvider.call()
+        String path = customBinaryPath ? environment.file(executable).absolutePath : sysExecutableProvider.call()
         int idx = path.lastIndexOf(File.separator)
 
         String res
@@ -160,6 +157,16 @@ final class PythonBinary {
         return docker != null
     }
 
+    /**
+     * @return string to identify python (within current project)
+     */
+    String getIdentity() {
+        return (isDocker() ? '[docker]' : '') +
+                (sourcePythonPath == null ? '' :
+                        environment.file(sourcePythonPath).canonicalPath
+                                .replace(environment.rootDir.canonicalPath, '')) + (sourcePythonBinary ?: '')
+    }
+
     // checks (absolute!) path for existence
     // method required for correct checking for files existence inside docker
     // LIMITED TO FILES
@@ -176,7 +183,11 @@ final class PythonBinary {
                                           : "test -f $path && echo \"exists\""] as String[])
             return res == 'exists'
         }
-        return new File(path).exists()
+
+        File file = new File(path)
+        boolean res = file.exists()
+        environment.logger.info('File {} exists: {}', file.absolutePath, res)
+        return res
     }
 
     void exec(Object args,
@@ -189,7 +200,7 @@ final class PythonBinary {
         String[] cmdArgs = getCommandArguments(workDir, args, pythonArgs, extraArgs)
 
         // important to show arguments as array to easily spot args parsing problems
-        project.logger.info('Python arguments: {}', cmdArgs)
+        environment.logger.info('Python arguments: {}', cmdArgs)
 
         String[] cmd = [exec]
         cmd += cmdArgs
@@ -203,11 +214,11 @@ final class PythonBinary {
 
         String commandLine = cmd.join(SPACE)
         String formattedCommand = cleanLoggedCommand(commandLine.replace('\r', '').replace(NL, SPACE))
-        project.logger.log(logLevel, "[python] $formattedCommand")
+        environment.logger.log(logLevel, "[python] $formattedCommand")
 
         long start = System.currentTimeMillis()
         int res = rawExec(cmd, outputConsumer)
-        project.logger.info('Python execution time: {}',
+        environment.logger.info('Python execution time: {}',
                 DurationFormatter.format(System.currentTimeMillis() - start))
         if (res != 0) {
             // duplicating output in error message to be sure it would be visible
@@ -230,7 +241,7 @@ final class PythonBinary {
         }
         synchronized (this) {
             if (!initialized) {
-                this.executable = findPython(project, sourcePythonPath, sourcePythonBinary, validateBinary)
+                this.executable = findPython(environment, sourcePythonPath, sourcePythonBinary, validateBinary)
                 // direct executable must be called with cmd
                 // (https://docs.gradle.org/4.1/dsl/org.gradle.api.tasks.Exec.html)
                 this.withCmd = sourcePythonPath && windows
@@ -241,25 +252,29 @@ final class PythonBinary {
         }
     }
 
-    @Memoized
-    private static String getPythonBinary(String pythonPath, String binary, boolean python3Available, boolean windows) {
-        String res = binary ?: 'python'
-        if (pythonPath) {
-            String path = pythonPath + (pythonPath.endsWith(File.separator) ? '' : File.separator)
-            // $pythonPath/$binaryName(.exe)
-            res = windows ? "${path}${res}.exe" : "$path$res"
-        } else if (!binary && python3Available) {
-            res = PYTHON3
-        }
-        return res
+    // @Memoized can't be used due to configuration cache
+    private String getPythonBinary(String pythonPath, String binary, boolean python3Available) {
+        // not identity as cacke key because it would contain wrong path
+        return environment.globalCache("python.binary:$pythonPath$binary") {
+            String res = binary ?: 'python'
+            if (pythonPath) {
+                String path = pythonPath + (pythonPath.endsWith(File.separator) ? '' : File.separator)
+                // $pythonPath/$binaryName(.exe)
+                res = windows ? "${path}${res}.exe" : "$path$res"
+            } else if (!binary && python3Available) {
+                res = PYTHON3
+            }
+            return res
+        } as String
     }
 
-    // cached (statically) to prevent multiple fs lookups because multiple Python objects would be constructed
-    @Memoized
-    private static File findSystemBinary(String binary) {
-        // manually searching in system path to point to possibly incorrect PATH variable used in process
-        // (might happen when process not started from user shell)
-        return CliUtils.searchSystemBinary(binary)
+    // @Memoized can't be used due to configuration cache
+    private File findSystemBinary(String binary) {
+        return environment.globalCache("system.binary:$binary") {
+            // manually searching in system path to point to possibly incorrect PATH variable used in process
+            // (might happen when process not started from user shell)
+            return CliUtils.searchSystemBinary(binary)
+        } as File
     }
 
     @SuppressWarnings('Instanceof')
@@ -293,15 +308,15 @@ final class PythonBinary {
         }
     }
 
-    private String findPython(Project project, String pythonPath, String binary, boolean validateBinary) {
+    private String findPython(Environment environment, String pythonPath, String binary, boolean validateBinary) {
         String normalizedPath = pythonPath == null ? null : Paths.get(pythonPath).normalize().toString()
         // detecting python3 binary only if default python usage assumed (to avoid redundant python calls)
-        boolean python3found = (binary || pythonPath) ? false : detectPython3Binary(project)
-        String executable = getPythonBinary(normalizedPath, binary, python3found, windows)
+        boolean python3found = (binary || pythonPath) ? false : detectPython3Binary()
+        String executable = getPythonBinary(normalizedPath, binary, python3found)
         // search not performed for docker!
         if (validateBinary && !pythonPath && !docker) {
             // search would fail if no binary found in system paths
-            project.logger.info('Found python binary: {}', findSystemBinary(executable).absolutePath)
+            environment.logger.info('Found python binary: {}', findSystemBinary(executable).absolutePath)
         }
         return executable
     }
@@ -309,19 +324,19 @@ final class PythonBinary {
     // note: @Memoized not used because it would store link to Project object which could lead to significant
     // memory leak. And that's why this check is performed outside of getPythonBinary method
     @CompileStatic(TypeCheckingMode.SKIP)
-    @SuppressWarnings('SynchronizedMethod')
-    private boolean detectPython3Binary(Project project) {
+    @SuppressWarnings('AssignmentToStaticFieldFromInstanceMethod')
+    private boolean detectPython3Binary() {
         synchronized (SYNC) {
             // root project property used for cache execution result in multi-module project
-            if (project.rootProject.findProperty(PROP_PYTHON3) == null) {
+            if (python3detected == null) {
+                // on windows python binary could not be named python3
                 if (windows) {
-                    project.rootProject.extensions.extraProperties.set(PROP_PYTHON3, false)
+                    python3detected = false
                 } else {
-                    project.rootProject.extensions.extraProperties.set(PROP_PYTHON3,
-                            rawExec([PYTHON3, '--version'] as String[]) != null)
+                    python3detected = rawExec([PYTHON3, '--version'] as String[]) != null
                 }
             }
-            return project.rootProject.findProperty(PROP_PYTHON3)
+            return python3detected
         }
     }
 
@@ -339,7 +354,7 @@ final class PythonBinary {
 
     private void prepareEnvironment() {
         if (dockerConfig.exclusive) {
-            project.logger.lifecycle("[docker] executing command in exclusive container '{}' \n{}",
+            environment.logger.lifecycle("[docker] executing command in exclusive container '{}' \n{}",
                     dockerConfig.image, docker.formatContainerInfo(dockerConfig, workDir, envVars))
         } else {
             // first executed command will start container and all subsequent calls would use already
@@ -367,22 +382,7 @@ final class PythonBinary {
                     ? docker.execExclusive(command, out, dockerConfig, workDir, envVars)
                     : docker.exec(command, out)
         }
-        ExecResult res = project.exec new Action<ExecSpec>() {
-            @Override
-            void execute(ExecSpec spec) {
-                spec.commandLine command
-                spec.standardOutput = out
-                spec.errorOutput = out
-                spec.ignoreExitValue = true
-                if (workDir) {
-                    spec.setWorkingDir(workDir)
-                }
-                if (envVars) {
-                    spec.environment(envVars)
-                }
-            }
-        }
-        return res.exitValue
+        return environment.exec(command, out, out, workDir, envVars)
     }
 
     /**
@@ -395,7 +395,7 @@ final class PythonBinary {
         // on win non global python could be called only through cmd
         return withCmd ? 'cmd'
                 // use absolute python path if work dir set (relative will simply not work)
-                : (wrkDirUsed && customBinaryPath ? CliUtils.canonicalPath(project.file(executable)) : executable)
+                : (wrkDirUsed && customBinaryPath ? CliUtils.canonicalPath(environment.file(executable)) : executable)
     }
 
     /**
@@ -409,7 +409,7 @@ final class PythonBinary {
         init()
         boolean wrkDirUsed = workDir as boolean
         return withCmd ? CliUtils
-                .wincmdArgs(executable, project.projectDir, prepareArgs(args, pythonArgs, extraArgs), wrkDirUsed)
+                .wincmdArgs(executable, environment.projectDir, prepareArgs(args, pythonArgs, extraArgs), wrkDirUsed)
                 : prepareArgs(args, pythonArgs, extraArgs)
     }
 

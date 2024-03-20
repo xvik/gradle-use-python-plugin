@@ -1,6 +1,6 @@
 package ru.vyarus.gradle.plugin.python.task
 
-import org.gradle.testfixtures.ProjectBuilder
+
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.TaskOutcome
 import ru.vyarus.gradle.plugin.python.AbstractKitTest
@@ -16,7 +16,7 @@ class PipListTaskKitTest extends AbstractKitTest {
 
         setup:
         // to show at least something
-        new Pip(ProjectBuilder.builder().build()).install('extract-msg==0.28.0')
+        new Pip(gradleEnv()).install('extract-msg==0.28.0')
 
         build """
             plugins {
@@ -39,7 +39,7 @@ class PipListTaskKitTest extends AbstractKitTest {
 
         setup:
         // to show at least something
-        new Pip(ProjectBuilder.builder().build()).install('extract-msg==0.28.0')
+        new Pip(gradleEnv()).install('extract-msg==0.28.0')
 
         build """
             plugins {

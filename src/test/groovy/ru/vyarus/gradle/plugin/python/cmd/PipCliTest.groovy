@@ -1,7 +1,8 @@
 package ru.vyarus.gradle.plugin.python.cmd
 
-import org.gradle.api.Project
+
 import ru.vyarus.gradle.plugin.python.AbstractTest
+import ru.vyarus.gradle.plugin.python.cmd.env.Environment
 
 /**
  * @author Vyacheslav Rusakov
@@ -12,8 +13,7 @@ class PipCliTest extends AbstractTest {
     def "Check pip cli usage"() {
 
         when: "call pip"
-        Project project = project()
-        Pip pip = new Pip(project)
+        Pip pip = new Pip(gradleEnv())
         pip.exec('list')
         then: 'ok'
         true
@@ -32,8 +32,7 @@ class PipCliTest extends AbstractTest {
     def "Check pip utils"() {
 
         when: "call pip"
-        Project project = project()
-        Pip pip = new Pip(project)
+        Pip pip = new Pip(gradleEnv())
         pip.exec('list')
         then: "ok"
         pip.version =~ /\d+\.\d+(\.\d+)?/
@@ -43,8 +42,7 @@ class PipCliTest extends AbstractTest {
     def "Check version parse fail"() {
 
         when: "prepare pip"
-        Project project = project()
-        Pip pip = new FooPip(project)
+        Pip pip = new FooPip(gradleEnv())
         then: "ok"
         pip.version =~ /\d+\.\d+(\.\d+)?/
 
@@ -52,8 +50,8 @@ class PipCliTest extends AbstractTest {
 
     class FooPip extends Pip {
 
-        FooPip(Project project) {
-            super(project)
+        FooPip(Environment environment) {
+            super(environment)
         }
 
         @Override

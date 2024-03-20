@@ -2,12 +2,17 @@ package ru.vyarus.gradle.plugin.python.task
 
 import groovy.transform.CompileStatic
 import org.gradle.api.GradleException
+import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 import org.gradle.process.internal.ExecException
 import ru.vyarus.gradle.plugin.python.PythonExtension
 import ru.vyarus.gradle.plugin.python.cmd.Pip
 import ru.vyarus.gradle.plugin.python.cmd.Python
 import ru.vyarus.gradle.plugin.python.cmd.Virtualenv
+import ru.vyarus.gradle.plugin.python.service.EnvService
 import ru.vyarus.gradle.plugin.python.task.pip.BasePipTask
 import ru.vyarus.gradle.plugin.python.util.CliUtils
 import ru.vyarus.gradle.plugin.python.util.PythonExecutionFailed
@@ -33,19 +38,74 @@ import ru.vyarus.gradle.plugin.python.util.PythonExecutionFailed
 @SuppressWarnings('UnnecessaryGetter')
 class CheckPythonTask extends BasePipTask {
 
-    private static final String PROP_VENV_INSTALLED = 'ru.vyarus.python.virtualenv.installed'
+    private static final String PROP_VENV_INSTALLED = 'virtualenv.installed'
     private static final Object SYNC = new Object()
     private boolean virtual = false
     private boolean envCreated = false
 
+    /**
+     * Virtualenv scope
+     */
+    @Input
+    PythonExtension.Scope scope
+
+    /**
+     * Virtualenv folder path
+     */
+    @Input
+    String envPath
+
+    /**
+     * Minimal allowed python version
+     */
+    @Input
+    @Optional
+    String minPythonVersion
+
+    /**
+     * Minimal allowed pip version
+     */
+    @Input
+    @Optional
+    String minPipVersion
+
+    /**
+     * Automatically install virtualenv (if pip modules used)
+     */
+    @Input
+    boolean installVirtualenv
+
+    /**
+     * Virtualenv version to install. Used only if no virtualenv already installed
+     */
+    @Input
+    String virtualenvVersion
+
+    /**
+     * Minimal virtualenv version to work with
+     */
+    @Input
+    @Optional
+    String minVirtualenvVersion
+
+    /**
+     * Copy virtual environment instaead of symlink
+     */
+    @Input
+    boolean envCopy
+
+    // service holds actual pythonPath. All tasks would use it for lazy default, but check task could CHANGE it
+    // (that's why it's important to call it before all other tasks)
+    @Internal
+    Provider<EnvService> envService
+
     @TaskAction
     @SuppressWarnings('UnnecessaryGetter')
     void run() {
-        PythonExtension ext = project.extensions.findByType(PythonExtension)
-        boolean envRequested = ext.scope >= PythonExtension.Scope.VIRTUALENV_OR_USER
+        boolean envRequested = getScope() >= PythonExtension.Scope.VIRTUALENV_OR_USER
         Virtualenv env = envRequested
                 // synchronize work dir between python instances
-                ? new Virtualenv(project, getPythonPath(), getPythonBinary(), ext.envPath)
+                ? new Virtualenv(gradleEnv, getPythonPath(), getPythonBinary(), getEnvPath())
                 .validateSystemBinary(getValidateSystemBinary())
                 .withDocker(getDocker().toConfig())
                 .workDir(getWorkDir())
@@ -60,20 +120,20 @@ class CheckPythonTask extends BasePipTask {
             } else {
                 // normal flow: check global installation - try to create virtualenv (if modules required)
 
-                checkPython(ext)
+                checkPython()
 
                 if (modulesInstallationRequired) {
-                    checkPip(ext)
+                    checkPip()
                     // only if virtualenv usage requested
                     if (envRequested) {
-                        virtual = checkEnv(env, ext)
+                        virtual = checkEnv(env)
                     }
                 }
             }
         }
 
         if (virtual) {
-            switchEnvironment(env, ext)
+            switchEnvironment(env)
         }
 
         if (!python.canonicalBinaryDir.startsWith(python.canonicalHomeDir)) {
@@ -84,9 +144,9 @@ class CheckPythonTask extends BasePipTask {
         }
     }
 
-    private void checkPython(PythonExtension ext) {
+    private void checkPython() {
         // important because python could change on second execution
-        Python python = new Python(project, pythonPath, pythonBinary)
+        Python python = new Python(gradleEnv, pythonPath, pythonBinary)
                 .workDir(getWorkDir())
                 .environment(getEnvironment())
                 .validateSystemBinary(isValidateSystemBinary())
@@ -102,23 +162,22 @@ class CheckPythonTask extends BasePipTask {
                     : 'Please install it (http://docs.python-guide.org/en/latest/starting/installation/) ' +
                     'or configure correct location with \'python.pythonPath\'.'), ex)
         }
-        checkPythonVersion(python, ext)
+        checkPythonVersion(python)
     }
 
-    private void checkPythonVersion(Python python, PythonExtension ext) {
+    private void checkPythonVersion(Python python) {
         String version = python.version
-        String minVersion = ext.minPythonVersion
-        if (!CliUtils.isVersionMatch(version, minVersion)) {
+        if (!CliUtils.isVersionMatch(version, getMinPythonVersion())) {
             throw new GradleException("Python ($python.homeDir) verion $version does not match minimal " +
-                    "required version: $minVersion")
+                    "required version: ${getMinPythonVersion()}")
         }
         logger.lifecycle('Using python {} from {} ({})',
                 python.version, python.canonicalHomeDir, python.canonicalUsedBinary)
     }
 
-    private void checkPip(PythonExtension ext) {
+    private void checkPip() {
         // important because python could change on second execution
-        Pip pip = new Pip(project, getPythonPath(), getPythonBinary())
+        Pip pip = new Pip(gradleEnv, getPythonPath(), getPythonBinary())
                 .userScope(false)
                 .workDir(getWorkDir())
                 .environment(getEnvironment())
@@ -128,25 +187,24 @@ class CheckPythonTask extends BasePipTask {
         try {
             pip.versionLine
         } catch (PythonExecutionFailed ex) {
-            throw new GradleException("Pip is not installed${virtual ? " on virtualenv $ext.envPath" : ''}. " +
+            throw new GradleException("Pip is not installed${virtual ? " on virtualenv $envPath" : ''}. " +
                     'Please install it (https://pip.pypa.io/en/stable/installing/).', ex)
         }
-        checkPipVersion(pip, ext)
+        checkPipVersion(pip)
     }
 
-    private void checkPipVersion(Pip pip, PythonExtension ext) {
+    private void checkPipVersion(Pip pip) {
         String version = pip.version
-        String minVersion = ext.minPipVersion
-        if (!CliUtils.isVersionMatch(version, minVersion)) {
+        if (!CliUtils.isVersionMatch(version, getMinPipVersion())) {
             throw new GradleException("Pip verion $version does not match minimal " +
-                    "required version: $minVersion. Use 'pip install -U pip' to upgrade pip.")
+                    "required version: ${getMinPipVersion()}. Use 'pip install -U pip' to upgrade pip.")
         }
         logger.lifecycle('Using {}', pip.versionLine)
     }
 
     @SuppressWarnings('MethodSize')
-    private boolean checkEnv(Virtualenv env, PythonExtension ext) {
-        Pip pip = new Pip(project, getPythonPath(), getPythonBinary())
+    private boolean checkEnv(Virtualenv env) {
+        Pip pip = new Pip(gradleEnv, getPythonPath(), getPythonBinary())
                 .userScope(true)
                 .workDir(getWorkDir())
                 .environment(getEnvironment())
@@ -154,18 +212,18 @@ class CheckPythonTask extends BasePipTask {
                 .withDocker(getDocker().toConfig())
                 .validate()
         // to avoid calling pip in EACH module (in multi-module project) to verify virtualenv existence
-        Boolean venvInstalled = project.rootProject.findProperty(PROP_VENV_INSTALLED)
+        Boolean venvInstalled = gradleEnv.globalCache(PROP_VENV_INSTALLED, null)
         if (venvInstalled == null) {
             venvInstalled = pip.isInstalled(env.name)
-            project.rootProject.extensions.extraProperties.set(PROP_VENV_INSTALLED, venvInstalled)
+            gradleEnv.updateGlobalCache(PROP_VENV_INSTALLED, venvInstalled)
         }
         if (!venvInstalled) {
-            if (ext.installVirtualenv) {
+            if (isInstallVirtualenv()) {
                 // automatically install virtualenv if allowed (in --user)
                 // by default, exact (configured) version used to avoid side effects!)
-                pip.install(env.name + (ext.virtualenvVersion ? "==$ext.virtualenvVersion" : ''))
-                project.rootProject.extensions.extraProperties.set(PROP_VENV_INSTALLED, true)
-            } else if (ext.scope == PythonExtension.Scope.VIRTUALENV) {
+                pip.install(env.name + (getVirtualenvVersion() ? "==${getVirtualenvVersion()}" : ''))
+                gradleEnv.updateGlobalCache(PROP_VENV_INSTALLED, true)
+            } else if (getScope() == PythonExtension.Scope.VIRTUALENV) {
                 // virtualenv strictly required - fail
                 throw new GradleException('Virtualenv is not installed. Please install it ' +
                         '(https://virtualenv.pypa.io/en/stable/installation/) or change target pip ' +
@@ -179,36 +237,36 @@ class CheckPythonTask extends BasePipTask {
         if (pip.python.virtualenv) {
             logger.error('WARNING: Global python is already a virtualenv: \'{}\'. New environment would be ' +
                     'created based on it: \'{}\'. In most cases, everything would work as expected.',
-                    pip.python.binaryDir, ext.envPath)
+                    pip.python.binaryDir, getEnvPath())
         }
 
-        logger.lifecycle("Using $env.versionLine (in '$ext.envPath')")
+        logger.lifecycle("Using $env.versionLine (in '${getEnvPath()}')")
 
-        if (!CliUtils.isVersionMatch(env.version, ext.minVirtualenvVersion)) {
+        if (!CliUtils.isVersionMatch(env.version, getMinVirtualenvVersion())) {
             throw new GradleException("Installed virtualenv version $env.version does not match minimal " +
-                    "required version $ext.minVirtualenvVersion. \nVirtualenv $ext.minVirtualenvVersion is " +
+                    "required version ${getMinVirtualenvVersion()}. \nVirtualenv ${getMinVirtualenvVersion()} is " +
                     'recommended but older version could also be used. \nEither configure lower minimal required ' +
                     "version with [python.minVirtualenvVersion=\'$env.version\'] \nor upgrade installed " +
-                    "virtualenv with [pip install -U virtualenv==${ext.virtualenvVersion}] \n(or just remove " +
+                    "virtualenv with [pip install -U virtualenv==${getVirtualenvVersion()}] \n(or just remove " +
                     'virtualenv with [pip uninstall virtualenv] and plugin will install the correct version itself)')
         }
 
         // symlink by default (copy if requested by user config)
-        env.create(ext.envCopy)
+        env.create(isEnvCopy())
         envCreated = true
         return true
     }
 
     @SuppressWarnings('UnnecessaryGetter')
-    private void switchEnvironment(Virtualenv env, PythonExtension ext) {
+    private void switchEnvironment(Virtualenv env) {
         // switch environment and check again
-        ext.pythonPath = env.pythonPath
-        this.pythonPath = ext.pythonPath
+        envService.get().setPythonPath(gradleEnv.projectPath, env.pythonPath)
+        this.pythonPath = env.pythonPath
 
-        checkPython(ext)
+        checkPython()
         // only if pip required or requirements file present
         if (modulesInstallationRequired) {
-            checkPip(ext)
+            checkPip()
         }
 
         if (!python.isVirtualenv()) {

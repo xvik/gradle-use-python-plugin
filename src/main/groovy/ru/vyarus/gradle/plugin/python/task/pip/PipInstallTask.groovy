@@ -1,9 +1,8 @@
 package ru.vyarus.gradle.plugin.python.task.pip
 
 import groovy.transform.CompileStatic
-import groovy.transform.Memoized
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
-import ru.vyarus.gradle.plugin.python.PythonExtension
 import ru.vyarus.gradle.plugin.python.util.RequirementsReader
 
 import java.util.concurrent.ConcurrentHashMap
@@ -50,14 +49,26 @@ class PipInstallTask extends BasePipTask {
     @Optional
     List<String> options = []
 
+    /**
+     * Virtual environment path. Required to perform chown inside docker container.
+     */
+    @Input
+    String envPath
+
+    private List<String> modulesToInstallCache
+
     PipInstallTask() {
+        // providers required to workaround configuration cache
+        Provider<Boolean> onlyIfProvider = project.provider { modulesInstallationRequired }
         // useful only when dependencies declared (directly or with requirements file)
-        onlyIf { modulesInstallationRequired }
-        // task will always run for the first time (even if deps are ok), but all consequent runs will be up-to-date
-        // note: for requirements file up-to-date check will correctly count file modification date.
-        // "alwaysInstallModules" might be used in case when requirements file links other files and so dependent
-        // file change would not trigger task execution (because referenced file not changed)
-        outputs.upToDateWhen { modulesToInstall.empty && !isAlwaysInstallModules() }
+        onlyIf { onlyIfProvider.get() }
+
+        // REMINDER: it is possible to implement up to date state for task, but hard to make it compatible with
+        // configuration cache, because it requires several python calls (version and pip freeze). So, for simplicity,
+        // always running task instead (considering that configuration cache would be always enabled for gradle 9)
+
+        // Provider<Boolean> upToDateProvider = project.provider {modulesToInstall.empty && !isAlwaysInstallModules()}
+        // outputs.upToDateWhen { upToDateProvider.get() }
     }
 
     @TaskAction
@@ -71,7 +82,7 @@ class PipInstallTask extends BasePipTask {
         synchronized (getSync(pip.python.binaryDir)) {
             if (directReqsInstallRequired) {
                 // process requirements with pip
-                pip.exec("install -r ${RequirementsReader.relativePath(project, file)}")
+                pip.exec("install -r ${RequirementsReader.relativePath(gradleEnv, file)}")
             }
             // in non strict mode requirements would be parsed manually and installed as separate modules
             // see BasePipTask.getAllModules()
@@ -86,7 +97,7 @@ class PipInstallTask extends BasePipTask {
             logger.lifecycle('All required modules are already installed with correct versions')
         } else {
             // chown created files so user could remove them on host (unroot)
-            dockerChown(project.extensions.getByType(PythonExtension).envPath)
+            dockerChown(getEnvPath())
         }
 
         if (isShowInstalledVersions()) {
@@ -123,29 +134,32 @@ class PipInstallTask extends BasePipTask {
         return SYNC.get(path)
     }
 
-    @Memoized
+    // note: groovy memoized can't be used because of configuration cache!
     private List<String> buildModulesToInstall() {
-        List<String> res = []
-        if (!modulesList.empty) {
-            // use list of installed modules to check if 'pip install' is required for module
-            // have to always use global list (even if user scope used) to avoid redundant installation attempts
-            List<String> installed = (isAlwaysInstallModules() ? ''
-                    : pip.inGlobalScope { pip.readOutput('freeze') } as String).toLowerCase().readLines()
-            // install modules
-            modulesList.each { PipModule mod ->
-                boolean found = false
-                mod.toFreezeStrings().each {
-                    if (installed.contains(it.toLowerCase())) {
-                        found = true
+        if (modulesToInstallCache == null) {
+            List<String> res = []
+            if (!modulesList.empty) {
+                // use list of installed modules to check if 'pip install' is required for module
+                // have to always use global list (even if user scope used) to avoid redundant installation attempts
+                List<String> installed = (isAlwaysInstallModules() ? ''
+                        : pip.inGlobalScope { pip.readOutput('freeze') } as String).toLowerCase().readLines()
+                // install modules
+                modulesList.each { PipModule mod ->
+                    boolean found = false
+                    mod.toFreezeStrings().each {
+                        if (installed.contains(it.toLowerCase())) {
+                            found = true
+                        }
+                    }
+                    // don't install if already installed (assume dependencies are also installed)
+                    if (!found) {
+                        logger.info('Required pip module not installed: {}', mod)
+                        res.add(mod.toPipInstallString())
                     }
                 }
-                // don't install if already installed (assume dependencies are also installed)
-                if (!found) {
-                    logger.info('Required pip module not installed: {}', mod)
-                    res.add(mod.toPipInstallString())
-                }
             }
+            modulesToInstallCache = res
         }
-        return res
+        return modulesToInstallCache
     }
 }

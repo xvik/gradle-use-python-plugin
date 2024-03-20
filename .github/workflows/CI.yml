@@ -10,8 +10,8 @@ jobs:
     name: Java ${{ matrix.java }}, python ${{ matrix.python }}
     strategy:
       matrix:
-        java: [8, 11]
-        python: ['3.8', '3.10']
+        java: [8, 11, 17]
+        python: ['3.10', '3.12']
         pip: ['22.0.4']
         virtualenv: ['20.4.2']
 

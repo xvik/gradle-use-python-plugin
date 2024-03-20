@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         java: [8, 11, 17]
-        python: ['3.10', '3.12']
+        python: ['3.10', '3.11']
         pip: ['22.0.4']
         virtualenv: ['20.4.2']
 

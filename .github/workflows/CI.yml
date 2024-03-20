@@ -11,9 +11,17 @@ jobs:
     strategy:
       matrix:
         java: [8, 11, 17]
-        python: ['3.10', '3.11']
+        python: ['3.8', '3.10', '3.11']
         pip: ['22.0.4']
         virtualenv: ['20.4.2']
+
+        exclude:
+          - java: 8
+            python: '3.11'
+          - java: 11
+            python: '3.8'
+          - java: 17
+            python: '3.8'
 
     steps:
       - uses: actions/checkout@v3

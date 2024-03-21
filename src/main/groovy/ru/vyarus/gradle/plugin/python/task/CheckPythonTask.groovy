@@ -206,6 +206,7 @@ class CheckPythonTask extends BasePipTask {
     private boolean checkEnv(Virtualenv env) {
         Pip pip = new Pip(gradleEnv, getPythonPath(), getPythonBinary())
                 .userScope(true)
+                .breakSystemPackages(isBreakSystemPackages())
                 .workDir(getWorkDir())
                 .environment(getEnvironment())
                 .validateSystemBinary(isValidateSystemBinary())

@@ -91,15 +91,27 @@ class PythonExtension {
      * <p>
      * Essentially, disabling this option adds {@code --no-cache-dir} for all pip calls.
      *
-     * @see <a href="https://pip.pypa.io/en/stable/reference/pip_install/#caching">--no-cache-dir</a>
+     * @see <a href="https://pip.pypa.io/en/stable/topics/caching/#disabling-caching">--no-cache-dir</a>
      */
     boolean usePipCache = true
+
+    /**
+     * Option required to overcome "error: externally-managed-environment" error. Such error could appear on linux
+     * when non-default python used, installed by apt: e.g. python3.12 installed as "apt install python3.12".
+     * In this case python prevents user to use pip for system modules installation and assume apt usage instead.
+     * This option applies "--break-system-packages" flag in install task to hide this error. Modules would be
+     * installed into local user directory (like ~/.local/lib/python3.12).
+     *
+     * @see <a href="https://pip.pypa.io/en/stable/cli/pip_install/#cmdoption-break-system-packages">
+     *     --break-system-packages</a>
+     */
+    boolean breakSystemPackages = false
 
     /**
      * This can be used to if you host your own pypi besides the default global one.
      * Applies to {@code pip install}, {@code pip download}, {@code pip list} and {@code pip wheel}.
      *
-     * @see <a href="https://pip.pypa.io/en/stable/reference/pip_install/#install-extra-index-url">--extra-index-url</a>
+     * @see <a href="https://pip.pypa.io/en/stable/cli/pip_install/#cmdoption-extra-index-url">--extra-index-url</a>
      */
     List<String> extraIndexUrls = []
 
@@ -108,7 +120,7 @@ class PythonExtension {
      * Can be used in combination with {@link #extraIndexUrls} to use your own pypi server.
      * Applies only for {@code pip install} (other commends does not support this option).
      *
-     * @see <a href="https://pip.pypa.io/en/stable/reference/pip/#trusted-host">--trusted-host</a>
+     * @see <a href="https://pip.pypa.io/en/stable/cli/pip/#cmdoption-trusted-host">--trusted-host</a>
      */
     List<String> trustedHosts = []
 
@@ -210,7 +222,7 @@ class PythonExtension {
      * Note that it requires both vcs version (e.g. commit hash) and package version in order to be able to perform
      * up-to-date check. You can specify branch name or tag (for example, for git) instead of direct hash, but
      * prefer using exact version (hash or tags, not branches) in order to get reproducible builds.
-     * See <a href="https://pip.pypa.io/en/stable/reference/pip_install/#vcs-support">pip vcs docs</p>.
+     * See <a href="https://pip.pypa.io/en/stable/topics/vcs-support/">pip vcs docs</p>.
      * <p>
      * Duplicate declarations are allowed: in this case the latest declaration will be used.
      * <p>

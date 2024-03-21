@@ -48,6 +48,16 @@ class BasePipTask extends BasePythonTask {
     boolean useCache = true
 
     /**
+     * Allow to install system packages with pip for no-default python installation (on linux)
+     * installed with apt. Might be required when such python is configured in pythonBinary
+     * (e.g. python3.12).
+     * <p>
+     * Disabled by default because it is a security measure (should be disable with caution)
+     */
+    @Input
+    boolean breakSystemPackages = false
+
+    /**
      * Affects only {@code pip install} by applying {@code --trusted-host} (other pip commands does not support
      * this option).
      * <p>
@@ -209,6 +219,7 @@ class BasePipTask extends BasePythonTask {
             pipCache = new Pip(python)
                     .userScope(getUserScope())
                     .useCache(getUseCache())
+                    .breakSystemPackages(getBreakSystemPackages())
                     .trustedHosts(getTrustedHosts())
                     .extraIndexUrls(getExtraIndexUrls())
         }

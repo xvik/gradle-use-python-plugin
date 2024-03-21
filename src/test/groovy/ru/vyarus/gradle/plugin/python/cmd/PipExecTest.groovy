@@ -150,4 +150,23 @@ class PipExecTest extends AbstractCliMockSupport {
         pip.trustedHosts = []
     }
 
+    def "Check pip break system packages"() {
+        setup:
+        mockExec(project, null, 0)
+        pip.breakSystemPackages(true)
+
+        when: "new option applied"
+        pip.install('mod')
+        then: "flag applied"
+        logger.res =~ /\[python] python(3)? -m pip install mod --user --break-system-packages/
+
+        when: "call different command"
+        pip.exec('list')
+        then: "no flag applied"
+        logger.res =~ /\[python] python(3)? -m pip list --user/
+
+        cleanup:
+        pip.breakSystemPackages(false)
+    }
+
 }

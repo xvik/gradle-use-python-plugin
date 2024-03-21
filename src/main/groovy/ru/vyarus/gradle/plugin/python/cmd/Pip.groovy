@@ -25,6 +25,7 @@ class Pip {
 
     public static final String USER = '--user'
     public static final String NO_CACHE = '--no-cache-dir'
+    public static final String BREAK_SYSTEM_PACKAGES = '--break-system-packages'
     private static final String INSTALL_TASK = 'install'
     private static final String LIST_TASK = 'list'
     private static final List<String> USER_AWARE_COMMANDS = [INSTALL_TASK, LIST_TASK, 'freeze']
@@ -36,6 +37,8 @@ class Pip {
     // --no-cache-dir for install task
     // may be changed externally
     boolean useCache = true
+    // --break-system-packages for install task
+    boolean breakSystemPackages = false
     // --extra-index-url
     List<String> extraIndexUrls = []
     // --trusted-host
@@ -78,6 +81,19 @@ class Pip {
      */
     Pip useCache(boolean cache) {
         this.useCache = cache
+        return this
+    }
+
+    /**
+     * Useful for linux non-default pythons installed with apt (e.g. apt install python3.12). Enabling this option
+     * would remove error "This environment is externally managed" and install packages into local user directory
+     * (~/.local/lib/python3.12).
+     *
+     * @param disablePackageSecurity true to disable python's externally managed environment check
+     * @return pip instance for chained calls
+     */
+    Pip breakSystemPackages(boolean disablePackageSecurity) {
+        this.breakSystemPackages = disablePackageSecurity
         return this
     }
 
@@ -294,6 +310,11 @@ class Pip {
         // --no-cache-dir (only for install command)
         if (!useCache && !cmd.contains(NO_CACHE) && cmd.startsWith(INSTALL_TASK)) {
             cmd += " $NO_CACHE"
+        }
+        // for linux alternative pythons like python3.12 (installed with apt: apt install python3.12)
+        // install would complain on direct packages installation with pip
+        if (breakSystemPackages && !cmd.contains(BREAK_SYSTEM_PACKAGES) && cmd.startsWith(INSTALL_TASK)) {
+            cmd += " $BREAK_SYSTEM_PACKAGES"
         }
 
         if (extraIndexUrls && EXTRA_INDEX_AWARE_COMMANDS.contains(extractCommand(cmd))) {

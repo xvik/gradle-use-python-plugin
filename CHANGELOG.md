@@ -6,6 +6,8 @@
 * Changed virtualenv version installed by default (python.virtualenvVersion) from 20.4.2 to 20.25.1
   (supports python 3.7 - 3.12)
 * Changed default docker image (python.docker.image) from python:3.10.8-alpine3.15 to python:3.11.8-alpine3.19
+* Add python.breakSystemPackages option: adds --break-system-packages for pip install
+  May be required on linux to install virtualenv on apt-managed python (e.g. python3.12)
 
 ### 3.0.0 (2022-10-22)
 * (breaking) Drop gradle 5.0-5.2 support (minimum required gradle is 5.3)

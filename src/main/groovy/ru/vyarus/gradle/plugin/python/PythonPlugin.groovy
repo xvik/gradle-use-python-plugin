@@ -141,6 +141,7 @@ class PythonPlugin implements Plugin<Project> {
                 // in case of virtualenv checkPython will manually disable it
                 userScope = { extension.scope != PythonExtension.Scope.GLOBAL }
                 useCache = { extension.usePipCache }
+                breakSystemPackages = { extension.breakSystemPackages }
                 trustedHosts = { extension.trustedHosts }
                 extraIndexUrls = { extension.extraIndexUrls }
                 requirements = { RequirementsReader.find(task.gradleEnv, extension.requirements) }

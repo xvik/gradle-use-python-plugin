@@ -177,7 +177,7 @@ python {
    installVirtualenv = true
    // if virtualenv not installed (in --user scope), plugin will install exactly this version
    // (known to be working version) to avoid side effects
-   virtualenvVersion = '20.4.2'
+   virtualenvVersion = '20.25.1'
    // minimal required virtualenv (v20 is recommended, but by default 16 set to not fail previous
   // setups)
    minVirtualenvVersion = '16'

@@ -3,6 +3,9 @@
   (required for case when requirements file links other files, which changes are not tracked) 
 * Add requirements file references (-r file) support under strict mode (#94) 
 * Configuration cache compatibility (#89)
+* Changed virtualenv version installed by default (python.virtualenvVersion) from 20.4.2 to 20.25.1
+  (supports python 3.7 and above)
+* Changed default docker image (python.docker.image) from python:3.10.8-alpine3.15 to python:3.11.8-alpine3.19
 
 ### 3.0.0 (2022-10-22)
 * (breaking) Drop gradle 5.0-5.2 support (minimum required gradle is 5.3)

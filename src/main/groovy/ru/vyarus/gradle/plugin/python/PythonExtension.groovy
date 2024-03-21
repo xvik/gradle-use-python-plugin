@@ -135,7 +135,7 @@ class PythonExtension {
      * it manually then you know what you are doing, otherwise "known to be working" version should be installed to
      * avoid problems.
      */
-    String virtualenvVersion = '20.4.2'
+    String virtualenvVersion = '20.25.1'
     /**
      * Minimal required virtualenv version. It is recommended to use virtualenv 20 instead of 16 or older because
      * it was a complete rewrite (and now it is stable enough). The most important moment is pip installation
@@ -409,7 +409,7 @@ class PythonExtension {
          *
          * @see <a href="https://hub.docker.com/_/python">python image</a>
          */
-        String image = 'python:3.10.8-alpine3.15'
+        String image = 'python:3.11.8-alpine3.19'
 
         /**
          * Required container port mappings - port to open from container to be accessible on host.

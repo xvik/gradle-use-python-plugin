@@ -66,6 +66,39 @@ If you need to switch python versions often, you can use [pyenv](https://github.
 see [this article](https://www.liquidweb.com/kb/how-to-install-pyenv-on-ubuntu-18-04/) for ubuntu installation guide.
 But pay attention to PATH: plugin may not "see" pyenv due to [different PATH](configuration.md#python-location) (when not launched from shell).
 
+### Externally managed environment
+
+On linux, multiple python packages could be installed. For example:
+
+```
+sudo apt install python3.12
+```
+
+Install python 3.12 accessible with `python3.12` binary, whereas `python3` would be a different python (e.g. 3.9)
+
+To use sych python specify:
+
+```groovy
+python {
+    pythonBinary = 'python3.12'
+    breakSystemPackages = true
+}
+```
+
+`breakSystemPackages` is required if you need to install pip modules and target python
+does not have virtualenv installed (so plugin would try to install it).
+
+Without `breakSystemPackages` you'll see the following error:
+
+```
+error: externally-managed-environment
+
+× This environment is externally managed
+╰─> To install Python packages system-wide, try apt install
+    python3-xyz, where xyz is the package you are trying to
+    install.
+```
+
 ### Possible pip issue warning (linux/macos)
 
 If `pip3 list -o` fails with: `TypeError: '>' not supported between instances of 'Version' and 'Version'`

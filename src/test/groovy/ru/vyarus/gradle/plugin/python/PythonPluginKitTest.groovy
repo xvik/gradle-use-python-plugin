@@ -97,7 +97,7 @@ class PythonPluginKitTest extends AbstractKitTest {
             python {
                 scope = VIRTUALENV
                 pythonPath = "${env.pythonPath.replace('\\', '\\\\')}"
-                virtualenvVersion = "20.4.0"
+                virtualenvVersion = "20.24.6"
                 
                 pip 'extract-msg:0.28.0'
             }            
@@ -108,7 +108,7 @@ class PythonPluginKitTest extends AbstractKitTest {
 
         then: "task successful"
         result.task(':checkPython').outcome == TaskOutcome.SUCCESS
-        result.output.contains('-m pip install virtualenv==20.4.0')
+        result.output.contains('-m pip install virtualenv==20.24.6')
     }
 
     def "Check install the latest virtualenv case"() {

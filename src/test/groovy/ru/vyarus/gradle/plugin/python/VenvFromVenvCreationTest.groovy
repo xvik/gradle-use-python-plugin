@@ -22,7 +22,7 @@ class VenvFromVenvCreationTest extends AbstractTest {
         Virtualenv env2 = new Virtualenv(gradleEnv(project), env.pythonPath, null, "second")
         env2.python.extraArgs('-v') // enable logs
         Pip pip = new Pip(gradleEnv(project), env.pythonPath, null).userScope(false)
-        pip.install(env2.name + "==20.4.0")
+        pip.install(env2.name + "==20.24.6")
         env2.createPythonOnly()
 
         when: "validating pip in second environment"

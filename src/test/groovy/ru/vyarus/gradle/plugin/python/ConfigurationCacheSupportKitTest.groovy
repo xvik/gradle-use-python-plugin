@@ -107,7 +107,7 @@ class ConfigurationCacheSupportKitTest extends AbstractKitTest {
                 scope = VIRTUALENV
                 pip 'extract-msg:0.28.0'
                 pythonPath = "${env.pythonPath.replace('\\', '\\\\')}"
-                virtualenvVersion = "20.4.0"
+                virtualenvVersion = "20.24.6"
             }            
         """
 
@@ -122,7 +122,7 @@ class ConfigurationCacheSupportKitTest extends AbstractKitTest {
 
         then: "task successful"
         result.task(':checkPython').outcome == TaskOutcome.SUCCESS
-        result.output.contains('-m pip install virtualenv==20.4.0')
+        result.output.contains("-m pip install virtualenv==20.24.6")
 
 
         when: "run from cache"
@@ -131,7 +131,7 @@ class ConfigurationCacheSupportKitTest extends AbstractKitTest {
 
         then: "cache used"
         result.output.contains('Reusing configuration cache.')
-        !result.output.contains('-m pip install virtualenv==20.4.0')
+        !result.output.contains('-m pip install virtualenv==20.24.6')
     }
 
     def "Check list task"() {

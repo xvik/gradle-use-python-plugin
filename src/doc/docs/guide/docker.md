@@ -307,3 +307,38 @@ It's just a warning, but if you want to remove it:
 ```groovy
 python.environment 'PIP_ROOT_USER_ACTION', 'ignore' 
 ```
+
+### Network problem
+
+You may face a connection error like this:
+
+```
+Using python 3.11.8 from /usr/local (python3)
+Using pip 24.0 from /usr/local/lib/python3.11/site-packages/pip (python 3.11)
+	 WARNING: Package(s) not found: virtualenv
+[python] python3 -m pip install virtualenv==20.25.1 --user
+	 WARNING: Retrying (Retry(total=4, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x75a5aad9e350>: Failed to establish a new connection: [Errno -3] Try again')': /simple/virtualenv/
+	 WARNING: Retrying (Retry(total=3, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x75a5aad9ead0>: Failed to establish a new connection: [Errno -3] Try again')': /simple/virtualenv/
+	 WARNING: Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x75a5aad9f250>: Failed to establish a new connection: [Errno -3] Try again')': /simple/virtualenv/
+	 WARNING: Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x75a5aad9fa50>: Failed to establish a new connection: [Errno -3] Try again')': /simple/virtualenv/
+	 WARNING: Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x75a5aadac450>: Failed to establish a new connection: [Errno -3] Try again')': /simple/virtualenv/
+	 ERROR: Could not find a version that satisfies the requirement virtualenv==20.25.1 (from versions: none)
+	 ERROR: No matching distribution found for virtualenv==20.25.1
+``` 
+
+It may appear, for example, due to enabled VPN on host.
+
+For **linux** (not mac!), the simplest workaround is to use host network directly:
+
+```groovy
+python {
+    docker {
+        use = true
+        useHostNetwork = true
+    }
+}
+```
+
+This way container would share the same network instead of creating a separate network with NAT.
+In this case, port mappings would not work (would be ignored) because all container ports
+are already available on host.

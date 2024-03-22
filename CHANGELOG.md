@@ -8,6 +8,9 @@
 * Changed default docker image (python.docker.image) from python:3.10.8-alpine3.15 to python:3.11.8-alpine3.19
 * Add python.breakSystemPackages option: adds --break-system-packages for pip install
   May be required on linux to install virtualenv on apt-managed python (e.g. python3.12)
+* Add host network option for docker: python.docker.useHostNetwork. 
+   Works only on linux. When enabled, all container ports automatically exposed on host 
+   and configured port mappings ignored 
 
 ### 3.0.0 (2022-10-22)
 * (breaking) Drop gradle 5.0-5.2 support (minimum required gradle is 5.3)

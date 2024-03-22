@@ -1,6 +1,7 @@
 package ru.vyarus.gradle.plugin.python.task
 
 import groovy.transform.CompileStatic
+import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.Action
 import org.gradle.api.GradleException
 import org.gradle.api.internal.ConventionTask
@@ -354,6 +355,16 @@ class BasePythonTask extends ConventionTask {
         abstract Property<Boolean> getExclusive()
 
         /**
+         * Use host network instead of custom isolated network. Works only on linux! When enabled, all container
+         * ports would be accessible directly on host (and the opposite). Port mappings would be ignored!
+         * <p>
+         * Might be useful to speed-up execution in some cases (due to absence of NAT) or to solve network problems
+         * (e.g. container might be blocked from external network due to enabled VPN on host).
+         */
+        @Input
+        abstract Property<Boolean> getUseHostNetwork()
+
+        /**
          * Required container port mappings - port to open from container to be accessible on host.
          * Note that normally ports are not required because python code executed inside container. This could
          * make sense for long-lived process like dev.server.
@@ -384,6 +395,9 @@ class BasePythonTask extends ConventionTask {
                     image: getImage().get(),
                     windows: getWindows().get(),
                     exclusive: getExclusive().get(),
+                    // works only on linux, so auto disable on mac and
+                    useHostNetwork: getUseHostNetwork().get()
+                            && Os.isFamily(Os.FAMILY_UNIX) && !Os.isFamily(Os.FAMILY_MAC),
                     ports: getPorts().get() as Set<String>) : null
         }
     }

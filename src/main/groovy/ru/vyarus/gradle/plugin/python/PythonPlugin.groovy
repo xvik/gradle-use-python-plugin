@@ -177,6 +177,7 @@ class PythonPlugin implements Plugin<Project> {
         task.docker.use.convention(project.provider { docker.use })
         task.docker.image.convention(project.provider { docker.image })
         task.docker.windows.convention(project.provider { docker.windows })
+        task.docker.useHostNetwork.convention(project.provider { docker.useHostNetwork })
         task.docker.ports.convention(project.provider { docker.ports })
         task.docker.exclusive.convention(false)
     }

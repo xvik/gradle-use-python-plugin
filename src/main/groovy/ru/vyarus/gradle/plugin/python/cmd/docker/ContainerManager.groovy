@@ -275,7 +275,10 @@ class ContainerManager {
             // only names because there might be secrets in values
                     .append(env.keySet().join(', ')).append(NL)
         }
-        if (config.ports != null && !config.ports.empty) {
+
+        if (config.useHostNetwork) {
+            res.append(String.format(labelPattern, 'Host network')).append(NL)
+        } else if (config.ports != null && !config.ports.empty) {
             res.append(String.format(labelPattern, 'Ports')).append(config.ports.join(', ')).append(NL)
         }
         return res.toString()
@@ -362,9 +365,20 @@ class ContainerManager {
             }
         }
 
-        parseMappings(config.ports).each { k, v ->
-            container.withFixedExposedPort(k, v)
+        Map<Integer, Integer> mappings = parseMappings(config.ports)
+        if (config.useHostNetwork) {
+            container.withNetworkMode('host')
+            if (!mappings.isEmpty()) {
+                environment.logger.warn('WARNING: Ignoring mapped ports {} configuration because container use host ' +
+                        'network and so all container ports would be available on host directly (mapping not ' +
+                        'possible). See python.docker.useHostNetwork option.', config.ports)
+            }
+        } else {
+            mappings.each { k, v ->
+                container.withFixedExposedPort(k, v)
+            }
         }
+
         return container
     }
 

@@ -135,6 +135,38 @@ class DockerRunKitTest extends AbstractKitTest {
         result.output.contains('\'printTt\' is not defined')
     }
 
+    def "Check host network usage"() {
+        setup:
+        build """
+            plugins {
+                id 'ru.vyarus.use-python'
+            }
+
+            python {               
+                docker.use = true
+                docker.useHostNetwork = true
+                docker.ports 5000, '5001:5020'
+            }
+            
+            tasks.register('sample', PythonTask) {
+                command = '-c print(\\'samplee\\')'
+            }
+
+        """
+
+        when: "run task"
+        debug()
+        BuildResult result = run('sample')
+
+        then: "task successful"
+        result.task(':sample').outcome == TaskOutcome.SUCCESS
+        result.output.contains('[docker] container')
+        result.output.contains('samplee')
+        !result.output.contains('Ports           5000, 5001:5020')
+        result.output.contains('Host network')
+    }
+
+
     def "Check port mappings"() {
         setup:
         build """

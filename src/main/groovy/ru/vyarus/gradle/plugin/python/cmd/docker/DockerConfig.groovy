@@ -19,5 +19,7 @@ class DockerConfig {
     boolean windows
     String image
     boolean exclusive
+    // would always be false for mac and win
+    boolean useHostNetwork
     Set<String> ports
 }

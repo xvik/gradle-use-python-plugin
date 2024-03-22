@@ -424,6 +424,20 @@ class PythonExtension {
         String image = 'python:3.11.8-alpine3.19'
 
         /**
+         * Use host network instead of custom isolated network. This might be useful to speed up execution in some
+         * cases (due to absence of NAT) or to overcome some network problems (e.g. enabled VPN on host may cause
+         * problems for container external connections),
+         * <p>
+         * Works only on linux! On other systems would be simply ignored.
+         * <p>
+         * When enabled, exposed ports could not be used! All container ports would be already available
+         * (because of shared network). Also, all host ports are available to container (again, due to same network).
+         *
+         * @see <a href="https://docs.docker.com/network/drivers/host/">docs</a>
+         */
+        boolean useHostNetwork = false
+
+        /**
          * Required container port mappings - port to open from container to be accessible on host.
          * Note that normally ports are not required because python code executed inside container. This could
          * make sense for long-lived process like dev.server.

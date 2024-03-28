@@ -8,6 +8,7 @@ import org.gradle.testkit.runner.GradleRunner
 import ru.vyarus.gradle.plugin.python.cmd.Virtualenv
 import ru.vyarus.gradle.plugin.python.cmd.env.Environment
 import ru.vyarus.gradle.plugin.python.cmd.env.GradleEnvironment
+import ru.vyarus.gradle.plugin.python.service.EnvService
 import spock.lang.Specification
 import spock.lang.TempDir
 
@@ -98,6 +99,13 @@ abstract class AbstractKitTest extends Specification {
                 .replace("\r", '')
     }
 
+    String unifyStats(String text) {
+        return unifyString(text)
+                .replaceAll(/\d{2}:\d{2}:\d{2}:\d{3}/, '11:11:11:111')
+                .replaceAll(/(\d\.?)+(ms|s)\s+/, '11ms                ')
+                .replaceAll(/11ms\s+\(overall\)/, '11ms (overall)')
+    }
+
     // custom virtualenv to use for simulations
     Virtualenv env(String path = '.gradle/python', String binary = null) {
         new Virtualenv(gradleEnv(ProjectBuilder.builder()
@@ -109,6 +117,12 @@ abstract class AbstractKitTest extends Specification {
     }
 
     Environment gradleEnv(Project project) {
-        GradleEnvironment.create(project)
+        GradleEnvironment.create(project, "gg", project.gradle.sharedServices.registerIfAbsent(
+                'pythonEnvironmentService', EnvService, spec -> {
+            EnvService.Params params = spec.parameters as EnvService.Params
+            params.printStats.set(false)
+            params.debug.set(false)
+        }
+        ), project.provider { false })
     }
 }

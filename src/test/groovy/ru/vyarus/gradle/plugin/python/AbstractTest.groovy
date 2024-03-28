@@ -5,6 +5,7 @@ import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import ru.vyarus.gradle.plugin.python.cmd.env.Environment
 import ru.vyarus.gradle.plugin.python.cmd.env.GradleEnvironment
+import ru.vyarus.gradle.plugin.python.service.EnvService
 import spock.lang.Specification
 import spock.lang.TempDir
 
@@ -18,7 +19,8 @@ abstract class AbstractTest extends Specification {
 
     boolean isWin = Os.isFamily(Os.FAMILY_WINDOWS)
 
-    @TempDir File testProjectDir
+    @TempDir
+    File testProjectDir
 
     Project project(Closure<Project> config = null) {
         projectBuilder(config).build()
@@ -43,7 +45,13 @@ abstract class AbstractTest extends Specification {
     }
 
     Environment gradleEnv(Project project) {
-        GradleEnvironment.create(project)
+        GradleEnvironment.create(project, "gg", project.gradle.sharedServices.registerIfAbsent(
+                'pythonEnvironmentService', EnvService, spec -> {
+            EnvService.Params params = spec.parameters as EnvService.Params
+            // only root project value counted for print stats activation
+            params.printStats.set(false)
+            params.debug.set(false)
+        }), project.provider { false })
     }
 
     static class ExtendedProjectBuilder {

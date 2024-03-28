@@ -17,7 +17,7 @@ import ru.vyarus.gradle.plugin.python.cmd.docker.ContainerManager
 import ru.vyarus.gradle.plugin.python.cmd.docker.DockerConfig
 import ru.vyarus.gradle.plugin.python.cmd.docker.DockerFactory
 import ru.vyarus.gradle.plugin.python.cmd.env.Environment
-import ru.vyarus.gradle.plugin.python.cmd.env.GradleEnvironment
+import ru.vyarus.gradle.plugin.python.service.EnvService
 import ru.vyarus.gradle.plugin.python.util.CliUtils
 import ru.vyarus.gradle.plugin.python.util.OutputLogger
 
@@ -32,21 +32,35 @@ import java.nio.file.Path
  * @since 01.12.2017
  */
 @CompileStatic
-class BasePythonTask extends ConventionTask {
+abstract class BasePythonTask extends ConventionTask {
 
     /**
      * Path to directory with python executable. Not required if python installed globally.
      * Automatically set from {@link ru.vyarus.gradle.plugin.python.PythonExtension#pythonPath}, but could
      * be overridden manually.
+     * <p>
+     * NOTE: Normally, this property would be ignored and python resolved by checkPython task would be used.
+     * In order to force this setting (e.g. to use global python for exact python task) set
+     * {@link #useCustomPython} to true.
      */
     @Input
     @Optional
     String pythonPath
 
     /**
+     * By default, {@link #pythonPath} property is ignored and used python resolved by checkPython task. This option
+     * must be enabled in order to force manually configured python path usage instead of global python settings
+     * (in most cases, virtual environment, selected by checkPython task).
+     */
+    @Input
+    Boolean useCustomPython = false
+
+    /**
      * Python binary name. When empty: use python3 or python for linux and python for windows.
      * Automatically set from {@link ru.vyarus.gradle.plugin.python.PythonExtension#pythonBinary}, but could
      * be overridden manually.
+     * <p>
+     * NOTE: binary is ignored when pythonPath set
      */
     @Input
     @Optional
@@ -100,11 +114,16 @@ class BasePythonTask extends ConventionTask {
     @Nested
     DockerEnv docker = project.objects.newInstance(DockerEnv)
 
+    // service holds actual pythonPath and global cache. All tasks would use it for lazy default, but check task
+    // could CHANGE it (that's why it's important to call it before all other tasks)
+    @Internal
+    abstract Property<EnvService> getEnvService()
+
     // Special object - lightweight project replacement to avoid calling project in actions.
     // Plus, this object is configuration cache friendly
     // Applied to all python tasks in plugin
     @Internal
-    Environment gradleEnv = GradleEnvironment.create(project)
+    abstract Property<Environment> getGradleEnv()
 
     private Python pythonCache
 
@@ -203,7 +222,7 @@ class BasePythonTask extends ConventionTask {
      * @param dir string path or File object for local directory to change file permissions on within docker
      */
     void dockerChown(String dir) {
-        dockerChown(gradleEnv.file(dir).toPath())
+        dockerChown(gradleEnv.get().file(dir).toPath())
     }
 
     /**
@@ -228,8 +247,10 @@ class BasePythonTask extends ConventionTask {
 
     @Internal
     protected Python getPython() {
-        // changes to path or binary would trigger python object re-creation
-        buildPython(getPythonPath(), getPythonBinary())
+        // use service to resolve pythonPath instead of property (but only when custom path not forced)
+        String path = getUseCustomPython() ? getPythonPath()
+                : envService.get().getPythonPath(gradleEnv.get().projectPath)
+        buildPython(path, getPythonBinary())
     }
 
     /**
@@ -243,7 +264,7 @@ class BasePythonTask extends ConventionTask {
             return
         }
 
-        Path projectDir = gradleEnv.rootDir.toPath()
+        Path projectDir = gradleEnv.get().rootDir.toPath()
         int uid = (int) Files.getAttribute(projectDir, 'unix:uid', LinkOption.NOFOLLOW_LINKS)
         int gid = (int) Files.getAttribute(projectDir, 'unix:gid', LinkOption.NOFOLLOW_LINKS)
         dockerExec(['chown', '-Rh', "$uid:$gid", dir.toAbsolutePath()])
@@ -266,7 +287,7 @@ class BasePythonTask extends ConventionTask {
         }
         String[] args = CliUtils.parseArgs(cmd)
         // it would be pre-started container (used in checkPython)
-        ContainerManager manager = DockerFactory.getContainer(getDocker().toConfig(), gradleEnv)
+        ContainerManager manager = DockerFactory.getContainer(getDocker().toConfig(), gradleEnv.get())
         // restart container if task parameters differ
         manager.restartIfRequired(getDocker().toConfig(), getWorkDir(), getEnvironment())
         // rewrite paths from host to docker fs
@@ -279,7 +300,7 @@ class BasePythonTask extends ConventionTask {
     // note: groovy memoized can't be used because of configuration cache!
     private Python buildPython(String pythonPath, String pythonBinary) {
         if (pythonCache == null) {
-            pythonCache = new Python(gradleEnv, pythonPath, pythonBinary)
+            pythonCache = new Python(gradleEnv.get(), pythonPath, pythonBinary)
                     .logLevel(getLogLevel())
                     .workDir(getWorkDir())
                     .pythonArgs(getPythonArgs())

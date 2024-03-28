@@ -7,6 +7,9 @@ import org.gradle.api.Project
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Delete
 import org.gradle.api.tasks.TaskProvider
+import org.gradle.build.event.BuildEventsListenerRegistry
+import ru.vyarus.gradle.plugin.python.cmd.env.Environment
+import ru.vyarus.gradle.plugin.python.cmd.env.GradleEnvironment
 import ru.vyarus.gradle.plugin.python.service.EnvService
 import ru.vyarus.gradle.plugin.python.task.BasePythonTask
 import ru.vyarus.gradle.plugin.python.task.CheckPythonTask
@@ -16,6 +19,8 @@ import ru.vyarus.gradle.plugin.python.task.pip.PipInstallTask
 import ru.vyarus.gradle.plugin.python.task.pip.PipListTask
 import ru.vyarus.gradle.plugin.python.task.pip.PipUpdatesTask
 import ru.vyarus.gradle.plugin.python.util.RequirementsReader
+
+import javax.inject.Inject
 
 /**
  * Use-python plugin. Plugin requires python installed globally or configured path to python binary.
@@ -32,15 +37,39 @@ import ru.vyarus.gradle.plugin.python.util.RequirementsReader
  */
 @CompileStatic
 @SuppressWarnings('DuplicateStringLiteral')
-class PythonPlugin implements Plugin<Project> {
+abstract class PythonPlugin implements Plugin<Project> {
 
-    private Provider<EnvService> envService
+    // need to be static and public for configuration cache support
+    static void configureDockerInTask(Project project, PythonExtension.Docker docker, BasePythonTask task) {
+        task.docker.use.convention(project.provider { docker.use })
+        task.docker.image.convention(project.provider { docker.image })
+        task.docker.windows.convention(project.provider { docker.windows })
+        task.docker.useHostNetwork.convention(project.provider { docker.useHostNetwork })
+        task.docker.ports.convention(project.provider { docker.ports })
+        task.docker.exclusive.convention(false)
+    }
+
+    static PythonExtension findRootExtension(Project project) {
+        PythonExtension rootExt = null
+        Project prj = project
+        while (prj != null) {
+            PythonExtension cand = prj.extensions.findByType(PythonExtension)
+            if (cand != null) {
+                rootExt = cand
+            }
+            prj = prj.parent
+        }
+        return rootExt
+    }
+
+    @Inject
+    abstract BuildEventsListenerRegistry getEventsListenerRegistry()
 
     @Override
     void apply(Project project) {
         PythonExtension extension = project.extensions.create('python', PythonExtension, project)
 
-        initService(project, extension)
+        Provider<EnvService> envService = initService(project)
 
         // simplify direct tasks usage
         project.extensions.extraProperties.set(PipInstallTask.simpleName, PipInstallTask)
@@ -48,20 +77,33 @@ class PythonPlugin implements Plugin<Project> {
         // configuration shortcut
         PythonExtension.Scope.values().each { project.extensions.extraProperties.set(it.name(), it) }
 
-        createTasks(project, extension)
+        createTasks(project, extension, envService)
     }
 
-    private void initService(Project project, PythonExtension extension) {
+    private Provider<EnvService> initService(Project project) {
         // service used to shutdown docker properly and hold actual python path link
-        envService = project.gradle.sharedServices.registerIfAbsent(
-                'pythonEnvironmentService', EnvService, spec -> { })
+        Provider<EnvService> envService = project.gradle.sharedServices.registerIfAbsent(
+                'pythonEnvironmentService', EnvService, spec -> {
+            // root extension used
+            PythonExtension rootExt = findRootExtension(project)
 
-        // can't use service properties because each project in multi-module project must have unique path
-        envService.get().defaultProvider(project.path, { extension.pythonPath } as Provider<String>)
+            EnvService.Params params = spec.parameters as EnvService.Params
+            // only root project value counted for print stats activation
+            params.printStats.set(project.provider { rootExt.printStats })
+            params.debug.set(project.provider { rootExt.debug })
+        })
+
+        // it is not required, but used to prevent KILLING service too early under configuration cache
+        eventsListenerRegistry.onTaskCompletion(envService)
+
+        // IMPORTANT: do not try to obtain service here (e.g. to init it) because it would cause eager parameters
+        // resolution!!!
+
+        return envService
     }
 
     @SuppressWarnings('BuilderMethodWithSideEffects')
-    private void createTasks(Project project, PythonExtension extension) {
+    private void createTasks(Project project, PythonExtension extension, Provider<EnvService> envService) {
         // validate installed python
         TaskProvider<CheckPythonTask> checkTask = project.tasks.register('checkPython', CheckPythonTask) {
             it.with {
@@ -97,7 +139,7 @@ class PythonPlugin implements Plugin<Project> {
             }
         }
 
-        configureDefaults(project, extension, checkTask, installTask)
+        configureDefaults(project, extension, checkTask, installTask, envService)
     }
 
     @SuppressWarnings(['MethodSize', 'AbcMetric'])
@@ -105,27 +147,36 @@ class PythonPlugin implements Plugin<Project> {
     private void configureDefaults(Project project,
                                    PythonExtension extension,
                                    TaskProvider<CheckPythonTask> checkTask,
-                                   TaskProvider<PipInstallTask> installTask) {
-
+                                   TaskProvider<PipInstallTask> installTask,
+                                   Provider<EnvService> envService) {
         project.tasks.withType(BasePythonTask).configureEach { task ->
-            task.with {
-                // apply default path for all python tasks
-                task.conventionMapping.with {
-                    // IMPORTANT: pythonPath might change after checkPythonTask (switched to environment)
-                    pythonPath = { envService.get().getPythonPath(project.path) }
-                    pythonBinary = { extension.pythonBinary }
-                    validateSystemBinary = { extension.validateSystemBinary }
-                    // important to copy map because each task must have independent instance
-                    environment = { extension.environment ? new HashMap<>(extension.environment) : null }
-                }
+            task.envService.set(envService)
+            task.usesService(envService)
 
-                // can't be implemented with convention mapping, only with properties
-                configureDockerInTask(project, extension.docker, task)
+            Environment gradleEnv = GradleEnvironment.create(project, task.name, envService,
+                    project.provider { findRootExtension(project).debug })
+            task.gradleEnv.set(gradleEnv)
+            doLast {
+                gradleEnv.printCacheState()
+            }
 
-                // all python tasks must be executed after check task to use correct environment (switch to virtualenv)
-                if (task.taskIdentity.type != CheckPythonTask) {
-                    dependsOn checkTask
-                }
+            task.conventionMapping.with {
+                // setting default value from extension to all tasks, but tasks would actually check
+                // service for actual pythonPath before python instance creation
+                // Only checkPython task will always use this default to initialize service value
+                pythonPath = { extension.pythonPath }
+                pythonBinary = { extension.pythonBinary }
+                validateSystemBinary = { extension.validateSystemBinary }
+                // important to copy map because each task must have independent instance
+                environment = { extension.environment ? new HashMap<>(extension.environment) : null }
+            }
+
+            // can't be implemented with convention mapping, only with properties
+            configureDockerInTask(project, extension.docker, task)
+
+            // all python tasks must be executed after check task to use correct environment (switch to virtualenv)
+            if (task.taskIdentity.type != CheckPythonTask) {
+                task.dependsOn checkTask
             }
         }
 
@@ -144,7 +195,7 @@ class PythonPlugin implements Plugin<Project> {
                 breakSystemPackages = { extension.breakSystemPackages }
                 trustedHosts = { extension.trustedHosts }
                 extraIndexUrls = { extension.extraIndexUrls }
-                requirements = { RequirementsReader.find(task.gradleEnv, extension.requirements) }
+                requirements = { RequirementsReader.find(task.gradleEnv.get(), extension.requirements) }
                 strictRequirements = { extension.requirements.strict }
             }
         }
@@ -159,7 +210,6 @@ class PythonPlugin implements Plugin<Project> {
         }
 
         project.tasks.withType(CheckPythonTask).configureEach { task ->
-            task.envService = this.envService
             task.conventionMapping.with {
                 scope = { extension.scope }
                 envPath = { extension.envPath }
@@ -171,14 +221,5 @@ class PythonPlugin implements Plugin<Project> {
                 envCopy = { extension.envCopy }
             }
         }
-    }
-
-    private void configureDockerInTask(Project project, PythonExtension.Docker docker, BasePythonTask task) {
-        task.docker.use.convention(project.provider { docker.use })
-        task.docker.image.convention(project.provider { docker.image })
-        task.docker.windows.convention(project.provider { docker.windows })
-        task.docker.useHostNetwork.convention(project.provider { docker.useHostNetwork })
-        task.docker.ports.convention(project.provider { docker.ports })
-        task.docker.exclusive.convention(false)
     }
 }

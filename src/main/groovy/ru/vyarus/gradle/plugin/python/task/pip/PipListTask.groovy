@@ -14,7 +14,7 @@ import org.gradle.api.tasks.TaskAction
  * @since 15.12.2017
  */
 @CompileStatic
-class PipListTask extends BasePipTask {
+abstract class PipListTask extends BasePipTask {
 
     /**
      * To see all modules from global scope, when user scope used.

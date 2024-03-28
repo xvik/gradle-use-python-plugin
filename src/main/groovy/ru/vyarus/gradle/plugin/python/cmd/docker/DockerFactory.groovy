@@ -51,9 +51,12 @@ class DockerFactory {
     /**
      * Shuts down started containers. Called at the end of the build.
      */
+    @SuppressWarnings('UnnecessaryGetter')
     static synchronized void shutdownAll() {
-        CONTAINERS.values().each { it.stop() }
-        CONTAINERS.clear()
+        if (!CONTAINERS.isEmpty()) {
+            CONTAINERS.values().each { it.stop() }
+            CONTAINERS.clear()
+        }
     }
 
     /**

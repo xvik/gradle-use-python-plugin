@@ -112,7 +112,6 @@ class ConfigurationCacheSupportKitTest extends AbstractKitTest {
         """
 
         when: "run task"
-        debug()
         BuildResult result = run('--configuration-cache', '--configuration-cache-problems=warn', 'checkPython')
 
         then: "no configuration cache incompatibilities"
@@ -149,6 +148,7 @@ class ConfigurationCacheSupportKitTest extends AbstractKitTest {
         """
 
         when: "run task"
+        println "\n\n----------------------------------------------------------------------------------"
         BuildResult result = run('--configuration-cache', '--configuration-cache-problems=warn', 'pipList')
 
         then: "no configuration cache incompatibilities"
@@ -193,6 +193,7 @@ class ConfigurationCacheSupportKitTest extends AbstractKitTest {
         """
 
         when: "run task"
+        println "\n\n----------------------------------------------------------------------------------"
         BuildResult result = run('--configuration-cache', '--configuration-cache-problems=warn', 'pipUpdates')
 
         then: "no configuration cache incompatibilities"
@@ -239,6 +240,7 @@ class ConfigurationCacheSupportKitTest extends AbstractKitTest {
 
 
         when: "run task"
+        println "\n\n----------------------------------------------------------------------------------"
         result = run('--configuration-cache', '--configuration-cache-problems=warn', 'pipUpdates')
 
         then: "no configuration cache incompatibilities"

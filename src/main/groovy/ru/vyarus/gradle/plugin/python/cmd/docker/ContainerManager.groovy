@@ -176,6 +176,13 @@ class ContainerManager {
     }
 
     /**
+     * @return container name or null if container not started yet
+     */
+    String getContainerName() {
+        return container?.running ? container.containerName : null
+    }
+
+    /**
      * Stops started container or do nothing if not started.
      */
     synchronized void stop() {

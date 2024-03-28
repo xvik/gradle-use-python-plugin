@@ -11,7 +11,7 @@ import org.gradle.api.tasks.TaskAction
  * @since 01.12.2017
  */
 @CompileStatic
-class PipUpdatesTask extends BasePipTask {
+abstract class PipUpdatesTask extends BasePipTask {
 
     /**
      * True to show all available updates. By default (false): show only updates for configured modules.

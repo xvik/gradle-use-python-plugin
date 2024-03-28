@@ -19,7 +19,7 @@ import ru.vyarus.gradle.plugin.python.cmd.Python
  * @since 11.11.2017
  */
 @CompileStatic
-class PythonTask extends BasePythonTask {
+abstract class PythonTask extends BasePythonTask {
 
     /**
      * Create work directory if it doesn't exist. Enabled by default.
@@ -108,7 +108,7 @@ class PythonTask extends BasePythonTask {
     private void initWorkDirIfRequired() {
         String dir = getWorkDir()
         if (dir && isCreateWorkDir()) {
-            File wrkd = gradleEnv.file(dir)
+            File wrkd = gradleEnv.get().file(dir)
             if (!wrkd.exists()) {
                 wrkd.mkdirs()
             }

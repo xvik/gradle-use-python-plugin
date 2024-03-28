@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap
  * @since 11.11.2017
  */
 @CompileStatic
-class PipInstallTask extends BasePipTask {
+abstract class PipInstallTask extends BasePipTask {
 
     // sync to avoid parallel installation into THE SAME environment
     private static final Map<String, Object> SYNC = new ConcurrentHashMap<>()
@@ -57,6 +57,7 @@ class PipInstallTask extends BasePipTask {
 
     private List<String> modulesToInstallCache
 
+    @SuppressWarnings('AbstractClassWithPublicConstructor')
     PipInstallTask() {
         // providers required to workaround configuration cache
         Provider<Boolean> onlyIfProvider = project.provider { modulesInstallationRequired }
@@ -82,7 +83,7 @@ class PipInstallTask extends BasePipTask {
         synchronized (getSync(pip.python.binaryDir)) {
             if (directReqsInstallRequired) {
                 // process requirements with pip
-                pip.exec("install -r ${RequirementsReader.relativePath(gradleEnv, file)}")
+                pip.exec("install -r ${RequirementsReader.relativePath(gradleEnv.get(), file)}")
             }
             // in non strict mode requirements would be parsed manually and installed as separate modules
             // see BasePipTask.getAllModules()

@@ -16,7 +16,7 @@ import ru.vyarus.gradle.plugin.python.util.RequirementsReader
  * @since 01.12.2017
  */
 @CompileStatic
-class BasePipTask extends BasePythonTask {
+abstract class BasePipTask extends BasePythonTask {
 
     /**
      * List of modules to install. Module declaration format: 'name:version'.
@@ -188,7 +188,7 @@ class BasePipTask extends BasePythonTask {
                 List<String> res = RequirementsReader.read(file)
                 if (!res.isEmpty()) {
                     logger.warn('{} modules to install read from requirements file: {} (strict mode)',
-                            res.size(), RequirementsReader.relativePath(gradleEnv, file))
+                            res.size(), RequirementsReader.relativePath(gradleEnv.get(), file))
                 }
                 requirementModulesCache = res
             } else {

@@ -8,12 +8,16 @@ import org.gradle.api.logging.Logger
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.ExtensionContainer
 import org.gradle.api.plugins.ExtraPropertiesExtension
+import org.gradle.api.provider.Provider
+import org.gradle.api.provider.ProviderFactory
 import org.gradle.internal.file.PathToFileResolver
 import org.gradle.process.ExecOperations
 import org.gradle.process.ExecSpec
 import org.gradle.process.internal.DefaultExecSpec
 import ru.vyarus.gradle.plugin.python.cmd.env.Environment
 import ru.vyarus.gradle.plugin.python.cmd.env.GradleEnvironment
+import ru.vyarus.gradle.plugin.python.service.stat.PythonStat
+import ru.vyarus.gradle.plugin.python.service.value.CacheValueSource
 import ru.vyarus.gradle.plugin.python.util.ExecRes
 import ru.vyarus.gradle.plugin.python.util.TestLogger
 import spock.lang.Specification
@@ -26,7 +30,8 @@ import spock.lang.TempDir
 abstract class AbstractCliMockSupport extends Specification {
 
     // used to overcome manual file existence check on win
-    @TempDir File dir
+    @TempDir
+    File dir
 
     Project project
     TestLogger logger
@@ -47,7 +52,7 @@ abstract class AbstractCliMockSupport extends Specification {
         project.getProjectDir() >> { dir }
         project.file(_) >> { new File(dir, it[0]) }
         project.getRootProject() >> { project }
-        project.findProperty(_ as String) >> { args -> extraProps.get(args[0])}
+        project.findProperty(_ as String) >> { args -> extraProps.get(args[0]) }
         // required for GradleEnvironment
         ObjectFactory objects = Stub(ObjectFactory)
         ExecOperations exec = Stub(ExecOperations)
@@ -58,14 +63,26 @@ abstract class AbstractCliMockSupport extends Specification {
             List params = [exec, fs]
             params.addAll(args[1] as Object[])
             // have to use special class because GradleEnvironment is abstract (assume gradle injection)
-            GradleEnv.newInstance(params as Object[]) }
+            GradleEnv.newInstance(params as Object[])
+        }
         project.getObjects() >> { objects }
+
+        ProviderFactory providers = Stub(ProviderFactory)
+        providers.of(_, _) >> { args ->
+            Class cls = args[0] as Class
+            if (CacheValueSource.isAssignableFrom(cls)) {
+                return { [:] } as Provider
+            } else {
+                return { [] } as  Provider
+            }
+        }
+        project.getProviders() >> { providers }
 
         def ext = Stub(ExtensionContainer)
         project.getExtensions() >> { ext }
         def props = Stub(ExtraPropertiesExtension)
         ext.getExtraProperties() >> { props }
-        props.set(_ as String, _) >> { args-> extraProps.put(args[0], args[1]) }
+        props.set(_ as String, _) >> { args -> extraProps.put(args[0], args[1]) }
         props.get(_ as String) >> { args -> extraProps.get(args[0]) }
         props.has(_ as String) >> { args -> extraProps.containsKey(args[0]) }
     }
@@ -75,7 +92,7 @@ abstract class AbstractCliMockSupport extends Specification {
     }
 
     Environment gradleEnv(Project project) {
-        GradleEnvironment.create(project)
+        GradleEnvironment.create(project, "gg", {} as Provider, { false } as Provider)
     }
 
     // use to provide specialized output for executed commands
@@ -100,7 +117,7 @@ abstract class AbstractCliMockSupport extends Specification {
                     out = v
                 }
             }
-            if (out==output) {
+            if (out == output) {
                 println ">> Default execution, output: $out"
             }
 
@@ -116,9 +133,13 @@ abstract class AbstractCliMockSupport extends Specification {
         ExecOperations exec
         FileOperations fs
 
-        GradleEnv(ExecOperations exec,  FileOperations fs, Logger logger, File projectDir, File rootDir, String rootName,
-                  String projectPath, Map<String, Object> globalCache, Map<String, Object> projectCache) {
-            super(logger, projectDir, rootDir, rootName, projectPath, globalCache, projectCache)
+        GradleEnv(ExecOperations exec, FileOperations fs, Logger logger, File projectDir, File rootDir, String rootName,
+                  String projectPath, String taskName,
+                  Provider<Map<String, Object>> globalCache,
+                  Provider<Map<String, Object>> projectCache,
+                  Provider<List<PythonStat>> stats,
+                  Provider<Boolean> debug) {
+            super(logger, projectDir, rootDir, rootName, projectPath, taskName, globalCache, projectCache, stats, debug)
             this.exec = exec
             this.fs = fs
         }

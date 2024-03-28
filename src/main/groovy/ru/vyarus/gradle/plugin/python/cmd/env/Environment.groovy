@@ -7,6 +7,8 @@ import java.util.function.Supplier
 /**
  * Environment-specific apis provider. Object used as lightweight alternative to gradle {@link org.gradle.api.Project}
  * (which was used before), because project is not compatible with configuration cache.
+ * <p>
+ * NOTE: configuration cache stores entire objects (so they are created only when configuration cache is not enabled).
  *
  * @author Vyacheslav Rusakov
  * @since 15.03.2024
@@ -102,4 +104,26 @@ interface Environment {
      * @param value value
      */
     void updateGlobalCache(String key, Object value)
+
+    /**
+     * Print debug message if debug enabled.
+     *
+     * @param msg message
+     */
+    void debug(String msg)
+
+    /**
+     * Save command execution stat. Counts only python execution (possible direct docker commands ignored).
+     *
+     * @param containerName docker container name
+     * @param cmd executed command (cleared!)
+     * @param start start time
+     * @param success execution success
+     */
+    void stat(String containerName, String cmd, long start, boolean success)
+
+    /**
+     * Prints cache state (for debug), but only if debug enabled in the root project.
+     */
+    void printCacheState()
 }

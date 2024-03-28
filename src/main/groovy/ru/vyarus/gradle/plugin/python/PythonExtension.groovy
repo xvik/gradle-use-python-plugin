@@ -176,6 +176,23 @@ class PythonExtension {
      * By default use default virtualenv behaviour: symlink environment.
      */
     boolean envCopy
+
+    /**
+     * Print all executed python commands at the end of the build (including "invisible" internal commands, used by
+     * plugin for configuration).
+     * <p>
+     * IMPORTANT: in multi-module project only root project setting takes effect
+     */
+    boolean printStats = false
+
+    /**
+     * Enable debug messages (for cache and stats debugging). See {@link #printStats} for printing actually called
+     * commands (including invisible). Option for development purposes (especially with configuration cache).
+     * <p>
+     * IMPORTANT: in multi-module project only root project setting takes effect
+     */
+    boolean debug = false
+
     /**
      * Requirements file support. By default, plugin will search for requirements.txt file and would read all
      * declarations from there and use for manual installation (together with `python.modules` property). File could

@@ -34,8 +34,6 @@ final class PythonBinary {
     private static final String NL = '\n'
 
     private static final Object SYNC = new Object()
-    // used to avoid duplicate global python3 binary detection on linux
-    private static volatile Boolean python3detected
 
     private final Environment environment
 
@@ -45,7 +43,7 @@ final class PythonBinary {
     private final String sourcePythonBinary
 
     private boolean validateBinary = true
-    private ContainerManager docker
+    private ContainerManager dockerManager
     private DockerConfig dockerConfig
 
     // keeping actual work dir and environment here is important for docker to prevent redundant container
@@ -83,7 +81,7 @@ final class PythonBinary {
         beforeInit('Docker config must be set before initialization')
         if (docker) {
             this.dockerConfig = docker
-            this.docker = DockerFactory.getContainer(docker, environment)
+            this.dockerManager = DockerFactory.getContainer(docker, environment)
         }
     }
 
@@ -116,7 +114,7 @@ final class PythonBinary {
      * @return path with corrected separators or path as is if docker not used
      */
     String targetOsCanonicalPath(String path) {
-        return docker ? docker.canonicalPath(path) : path
+        return docker ? dockerManager.canonicalPath(path) : path
     }
 
     /**
@@ -144,17 +142,17 @@ final class PythonBinary {
         if (docker) {
             // in case of docker path might be either local or inside docker (depending on resolution method)
             // this way it would always be a docker path
-            res = docker.toDockerPath(res)
+            res = dockerManager.toDockerPath(res)
         }
         return res
     }
 
     boolean isWindows() {
-        return docker ? docker.windows : Os.isFamily(Os.FAMILY_WINDOWS)
+        return docker ? dockerManager.windows : Os.isFamily(Os.FAMILY_WINDOWS)
     }
 
     boolean isDocker() {
-        return docker != null
+        return dockerManager != null
     }
 
     /**
@@ -174,7 +172,7 @@ final class PythonBinary {
         init()
         if (docker) {
             // if path leads inside project then it might be checked locally
-            String localPath = docker.toLocalPath(path)
+            String localPath = dockerManager.toLocalPath(path)
             if (localPath != null) {
                 return new File(localPath).exists()
             }
@@ -207,13 +205,12 @@ final class PythonBinary {
         if (docker) {
             // change paths (according to docker mapping)
             // performed here in order to see actual command in logs and error message, plus, cleanups applied here
-            docker.convertCommand(cmd)
+            dockerManager.convertCommand(cmd)
             // called here to show container start/stop logs before executed command
             prepareEnvironment()
         }
 
-        String commandLine = cmd.join(SPACE)
-        String formattedCommand = cleanLoggedCommand(commandLine.replace('\r', '').replace(NL, SPACE))
+        String formattedCommand = cleanLoggedCommand(cmd)
         environment.logger.log(logLevel, "[python] $formattedCommand")
 
         long start = System.currentTimeMillis()
@@ -321,28 +318,23 @@ final class PythonBinary {
         return executable
     }
 
-    // note: @Memoized not used because it would store link to Project object which could lead to significant
-    // memory leak. And that's why this check is performed outside of getPythonBinary method
     @CompileStatic(TypeCheckingMode.SKIP)
     @SuppressWarnings('AssignmentToStaticFieldFromInstanceMethod')
     private boolean detectPython3Binary() {
-        synchronized (SYNC) {
-            // root project property used for cache execution result in multi-module project
-            if (python3detected == null) {
-                // on windows python binary could not be named python3
-                if (windows) {
-                    python3detected = false
-                } else {
-                    python3detected = rawExec([PYTHON3, '--version'] as String[]) != null
-                }
+        return environment.globalCache("python3.binary:${docker ? dockerManager.containerName : ''}", {
+            // on windows python binary could not be named python3
+            if (windows) {
+                return false
+            } else {
+                return rawExec([PYTHON3, '--version'] as String[]) != null
             }
-            return python3detected
-        }
+        })
     }
 
-    private String cleanLoggedCommand(String cmd) {
-        String res = cmd
-        logCleaners.each { res = it.clear(cmd) }
+    private String cleanLoggedCommand(String[] cmd) {
+        String commandLine = cmd.join(SPACE)
+        String res = commandLine.replace('\r', '').replace(NL, SPACE)
+        logCleaners.each { res = it.clear(res) }
         return res
     }
 
@@ -355,11 +347,11 @@ final class PythonBinary {
     private void prepareEnvironment() {
         if (dockerConfig.exclusive) {
             environment.logger.lifecycle("[docker] executing command in exclusive container '{}' \n{}",
-                    dockerConfig.image, docker.formatContainerInfo(dockerConfig, workDir, envVars))
+                    dockerConfig.image, dockerManager.formatContainerInfo(dockerConfig, workDir, envVars))
         } else {
             // first executed command will start container and all subsequent calls would use already
             // started container
-            docker.restartIfRequired(dockerConfig, workDir, envVars)
+            dockerManager.restartIfRequired(dockerConfig, workDir, envVars)
         }
     }
 
@@ -373,16 +365,27 @@ final class PythonBinary {
     // IMPORTANT: single point of execution for all python commands
     @SuppressWarnings('UnnecessarySetter')
     private int rawExec(String[] command, OutputStream out) {
-        if (docker) {
-            // required here for direct raw execution case (normally, start logs must appear before executed command)
-            if (!docker.started) {
-                docker.restartIfRequired(dockerConfig, workDir, envVars)
+        long start = System.currentTimeMillis()
+        int res = -1
+        String cmdForLog = cleanLoggedCommand(command)
+        try {
+            environment.debug(cmdForLog)
+            if (docker) {
+                // required here for direct raw execution case (normally, start logs must appear before
+                // executed command)
+                if (!dockerManager.started) {
+                    dockerManager.restartIfRequired(dockerConfig, workDir, envVars)
+                }
+                res = dockerConfig.exclusive
+                        ? dockerManager.execExclusive(command, out, dockerConfig, workDir, envVars)
+                        : dockerManager.exec(command, out)
+            } else {
+                res = environment.exec(command, out, out, workDir, envVars)
             }
-            return dockerConfig.exclusive
-                    ? docker.execExclusive(command, out, dockerConfig, workDir, envVars)
-                    : docker.exec(command, out)
+        } finally {
+            environment.stat(docker ? dockerManager.containerName : null, cmdForLog, start, res == 0)
         }
-        return environment.exec(command, out, out, workDir, envVars)
+        return res
     }
 
     /**

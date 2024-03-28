@@ -1,4 +1,5 @@
 * (BREAKING) Drop gradle 5 and 6 support
+* (BREAKING) All plugin tasks become abstract, so any custom task types should be abstract too
 * Fix `alwaysInstallModules = true` not triggers pipInstall for non-strict requirements file (#94)
   (required for case when requirements file links other files, which changes are not tracked) 
 * Add requirements file references (-r file) support under strict mode (#94) 
@@ -6,11 +7,15 @@
 * Changed virtualenv version installed by default (python.virtualenvVersion) from 20.4.2 to 20.25.1
   (supports python 3.7 - 3.12)
 * Changed default docker image (python.docker.image) from python:3.10.8-alpine3.15 to python:3.11.8-alpine3.19
-* Add python.breakSystemPackages option: adds --break-system-packages for pip install
-  May be required on linux to install virtualenv on apt-managed python (e.g. python3.12)
-* Add host network option for docker: python.docker.useHostNetwork. 
-   Works only on linux. When enabled, all container ports automatically exposed on host 
-   and configured port mappings ignored 
+* New options (python.):
+  - breakSystemPackages: adds --break-system-packages for pip install
+    May be required on linux to install virtualenv on apt-managed python (e.g. python3.12)
+  - docker.useHostNetwork: use host network for docker 
+     Works only on linux. When enabled, all container ports automatically exposed on host 
+     and configured port mappings ignored 
+  - printStats: show all executed python commands (including plugin internal) at the end of the build (with timings)
+* To use different python for PythonTask useCustomPython = true must be declared now
+  (otherwise, pythonPath select by checkPython task would be used (and task's pythonPath ignored))
 
 ### 3.0.0 (2022-10-22)
 * (breaking) Drop gradle 5.0-5.2 support (minimum required gradle is 5.3)

@@ -33,8 +33,6 @@ final class PythonBinary {
     private static final String SPACE = ' '
     private static final String NL = '\n'
 
-    private static final Object SYNC = new Object()
-
     private final Environment environment
 
     // pre-init
@@ -159,7 +157,7 @@ final class PythonBinary {
      * @return string to identify python (within current project)
      */
     String getIdentity() {
-        return (isDocker() ? '[docker]' : '') +
+        return (docker ? '[docker]' : '') +
                 (sourcePythonPath == null ? '' :
                         environment.file(sourcePythonPath).canonicalPath
                                 .replace(environment.rootDir.canonicalPath, '')) + (sourcePythonBinary ?: '')
@@ -321,14 +319,10 @@ final class PythonBinary {
     @CompileStatic(TypeCheckingMode.SKIP)
     @SuppressWarnings('AssignmentToStaticFieldFromInstanceMethod')
     private boolean detectPython3Binary() {
-        return environment.globalCache("python3.binary:${docker ? dockerManager.containerName : ''}", {
+        return environment.globalCache("python3.binary:${docker ? dockerManager.containerName : ''}") {
             // on windows python binary could not be named python3
-            if (windows) {
-                return false
-            } else {
-                return rawExec([PYTHON3, '--version'] as String[]) != null
-            }
-        })
+            return !windows && rawExec([PYTHON3, '--version'] as String[]) != null
+        }
     }
 
     private String cleanLoggedCommand(String[] cmd) {

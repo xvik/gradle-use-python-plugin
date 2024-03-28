@@ -14,7 +14,7 @@ import java.text.SimpleDateFormat
 @CompileStatic
 class StatsPrinter {
 
-    @SuppressWarnings(['SimpleDateFormatMissingLocale', 'Println'])
+    @SuppressWarnings(['SimpleDateFormatMissingLocale', 'Println', 'UnnecessaryGetter'])
     static String print(List<PythonStat> stats) {
         if (stats.empty) {
             return ''

@@ -22,6 +22,9 @@ class ConfigurationCacheSupportKitTest extends AbstractKitTest {
             python {
                 scope = USER
                 pip 'extract-msg:0.28.0'
+                
+                printStats = true
+                debug = true
             }
             
             tasks.register('sample', PythonTask) {
@@ -43,6 +46,19 @@ class ConfigurationCacheSupportKitTest extends AbstractKitTest {
         result.output =~ /extract-msg\s+0.28.0/
         result.output.contains('samplee')
 
+        unifyStats(result.output).contains("""Python execution stats:
+
+task                                        started         duration            
+:checkPython                                11:11:11:111    11ms                python3 --version
+:checkPython                                11:11:11:111    11ms                python3 -c exec("import sys;ver=sys.version_info;print(str(ver.major)+'.'+str(ver.minor)+'.'+str(ver.micro));print(sys.prefix);print(sys.executable)")
+:checkPython                                11:11:11:111    11ms                python3 -m pip --version
+:pipInstall                                 11:11:11:111    11ms                python3 -m pip freeze
+:pipInstall                                 11:11:11:111    11ms                python3 -m pip list --format=columns --user
+:sample                                     11:11:11:111    11ms                python3 -c exec("print('samplee')")
+
+    Executed 6 commands in 11ms (overall)""")
+
+
         when: "run from cache"
         println '\n\n------------------- FROM CACHE ----------------------------------------'
         result = run('--configuration-cache', '--configuration-cache-problems=warn', 'sample')
@@ -51,6 +67,18 @@ class ConfigurationCacheSupportKitTest extends AbstractKitTest {
         result.output.contains('Reusing configuration cache.')
         result.output =~ /extract-msg\s+0.28.0/
         result.output.contains('samplee')
+
+        unifyStats(result.output).contains("""Python execution stats:
+
+task                                        started         duration            
+:checkPython                                11:11:11:111    11ms                python3 --version
+:checkPython                                11:11:11:111    11ms                python3 -c exec("import sys;ver=sys.version_info;print(str(ver.major)+'.'+str(ver.minor)+'.'+str(ver.micro));print(sys.prefix);print(sys.executable)")
+:checkPython                                11:11:11:111    11ms                python3 -m pip --version
+:pipInstall                                 11:11:11:111    11ms                python3 -m pip freeze
+:pipInstall                                 11:11:11:111    11ms                python3 -m pip list --format=columns --user
+:sample                                     11:11:11:111    11ms                python3 -c exec("print('samplee')")
+
+    Executed 6 commands in 11ms (overall)""")
     }
 
     def "Check env plugin execution"() {
@@ -63,6 +91,9 @@ class ConfigurationCacheSupportKitTest extends AbstractKitTest {
             python {
                 scope = VIRTUALENV
                 pip 'extract-msg:0.28.0'
+                
+                printStats = true
+                debug = true
             }
             
             tasks.register('sample', PythonTask) {
@@ -84,6 +115,25 @@ class ConfigurationCacheSupportKitTest extends AbstractKitTest {
         result.output =~ /extract-msg\s+0.28.0/
         result.output.contains('samplee')
 
+        unifyStats(result.output).contains("""Python execution stats:
+
+task                                        started         duration            
+:checkPython                                11:11:11:111    11ms                python3 --version
+:checkPython                                11:11:11:111    11ms                python3 -c exec("import sys;ver=sys.version_info;print(str(ver.major)+'.'+str(ver.minor)+'.'+str(ver.micro));print(sys.prefix);print(sys.executable)")
+:checkPython                                11:11:11:111    11ms                python3 -m pip --version
+:checkPython                                11:11:11:111    11ms                python3 -m pip show virtualenv
+:checkPython                                11:11:11:111    11ms                python3 -m virtualenv --version
+:checkPython                                11:11:11:111    11ms                python3 -m virtualenv .gradle/python
+:checkPython                                11:11:11:111    11ms                .gradle/python/bin/python -c exec("import sys;ver=sys.version_info;print(str(ver.major)+'.'+str(ver.minor)+'.'+str(ver.micro));print(sys.prefix);print(sys.executable)")
+:checkPython                                11:11:11:111    11ms                .gradle/python/bin/python -m pip --version
+:pipInstall                                 11:11:11:111    11ms                .gradle/python/bin/python -m pip freeze
+:pipInstall                                 11:11:11:111    11ms                .gradle/python/bin/python -m pip install extract-msg==0.28.0
+:pipInstall                                 11:11:11:111    11ms                .gradle/python/bin/python -m pip list --format=columns
+:sample                                     11:11:11:111    11ms                .gradle/python/bin/python -c exec("print('samplee')")
+
+    Executed 12 commands in 11ms (overall)""")
+
+
         when: "run from cache"
         println '\n\n------------------- FROM CACHE ----------------------------------------'
         result = run('--configuration-cache', '--configuration-cache-problems=warn', 'sample')
@@ -92,6 +142,18 @@ class ConfigurationCacheSupportKitTest extends AbstractKitTest {
         result.output.contains('Reusing configuration cache.')
         result.output =~ /extract-msg\s+0.28.0/
         result.output.contains('samplee')
+
+        unifyStats(result.output).contains("""Python execution stats:
+
+task                                        started         duration            
+:checkPython                                11:11:11:111    11ms                python3 --version
+:checkPython                                11:11:11:111    11ms                .gradle/python/bin/python -c exec("import sys;ver=sys.version_info;print(str(ver.major)+'.'+str(ver.minor)+'.'+str(ver.micro));print(sys.prefix);print(sys.executable)")
+:checkPython                                11:11:11:111    11ms                .gradle/python/bin/python -m pip --version
+:pipInstall                                 11:11:11:111    11ms                .gradle/python/bin/python -m pip freeze
+:pipInstall                                 11:11:11:111    11ms                .gradle/python/bin/python -m pip list --format=columns
+:sample                                     11:11:11:111    11ms                .gradle/python/bin/python -c exec("print('samplee')")
+
+    Executed 6 commands in 11ms (overall)""")
     }
 
     def "Check exact virtualenv version installation"() {
@@ -108,6 +170,9 @@ class ConfigurationCacheSupportKitTest extends AbstractKitTest {
                 pip 'extract-msg:0.28.0'
                 pythonPath = "${env.pythonPath.replace('\\', '\\\\')}"
                 virtualenvVersion = "20.24.6"
+                
+                printStats = true
+                debug = true
             }            
         """
 
@@ -123,6 +188,19 @@ class ConfigurationCacheSupportKitTest extends AbstractKitTest {
         result.task(':checkPython').outcome == TaskOutcome.SUCCESS
         result.output.contains("-m pip install virtualenv==20.24.6")
 
+        unifyStats(result.output).contains("""Python execution stats:
+
+task                                        started         duration            
+:checkPython                                11:11:11:111    11ms                env/bin/python -c exec("import sys;ver=sys.version_info;print(str(ver.major)+'.'+str(ver.minor)+'.'+str(ver.micro));print(sys.prefix);print(sys.executable)")
+:checkPython                                11:11:11:111    11ms                env/bin/python -m pip --version
+:checkPython                                11:11:11:111    11ms                FAILED   env/bin/python -m pip show virtualenv
+:checkPython                                11:11:11:111    11ms                env/bin/python -m pip install virtualenv==20.24.6
+:checkPython                                11:11:11:111    11ms                env/bin/python -m virtualenv --version
+:checkPython                                11:11:11:111    11ms                env/bin/python -m virtualenv .gradle/python
+:checkPython                                11:11:11:111    11ms                .gradle/python/bin/python -c exec("import sys;ver=sys.version_info;print(str(ver.major)+'.'+str(ver.minor)+'.'+str(ver.micro));print(sys.prefix);print(sys.executable)")
+:checkPython                                11:11:11:111    11ms                .gradle/python/bin/python -m pip --version
+
+    Executed 8 commands in 11ms (overall)""")
 
         when: "run from cache"
         println '\n\n------------------- FROM CACHE ----------------------------------------'
@@ -131,6 +209,14 @@ class ConfigurationCacheSupportKitTest extends AbstractKitTest {
         then: "cache used"
         result.output.contains('Reusing configuration cache.')
         !result.output.contains('-m pip install virtualenv==20.24.6')
+
+        unifyStats(result.output).contains("""Python execution stats:
+
+task                                        started         duration            
+:checkPython                                11:11:11:111    11ms                .gradle/python/bin/python -c exec("import sys;ver=sys.version_info;print(str(ver.major)+'.'+str(ver.minor)+'.'+str(ver.micro));print(sys.prefix);print(sys.executable)")
+:checkPython                                11:11:11:111    11ms                .gradle/python/bin/python -m pip --version
+
+    Executed 2 commands in 11ms (overall)""")
     }
 
     def "Check list task"() {
@@ -144,7 +230,12 @@ class ConfigurationCacheSupportKitTest extends AbstractKitTest {
                 id 'ru.vyarus.use-python'
             }
             
-            python.scope = USER
+            python {
+                scope = USER
+                
+                printStats = true
+                debug = true
+            }
         """
 
         when: "run task"
@@ -161,6 +252,15 @@ class ConfigurationCacheSupportKitTest extends AbstractKitTest {
         result.output.contains('pip list --format=columns --user')
         result.output =~ /extract-msg\s+0.28.0/
 
+        unifyStats(result.output).contains("""Python execution stats:
+
+task                                        started         duration            
+:checkPython                                11:11:11:111    11ms                python3 --version
+:checkPython                                11:11:11:111    11ms                python3 -c exec("import sys;ver=sys.version_info;print(str(ver.major)+'.'+str(ver.minor)+'.'+str(ver.micro));print(sys.prefix);print(sys.executable)")
+:pipList                                    11:11:11:111    11ms                python3 -m pip list --format=columns --user
+
+    Executed 3 commands in 11ms (overall)""")
+
 
         when: "run from cache"
         println '\n\n------------------- FROM CACHE ----------------------------------------'
@@ -171,6 +271,15 @@ class ConfigurationCacheSupportKitTest extends AbstractKitTest {
         result.task(':pipList').outcome == TaskOutcome.SUCCESS
         result.output.contains('pip list --format=columns --user')
         result.output =~ /extract-msg\s+0.28.0/
+
+        unifyStats(result.output).contains("""Python execution stats:
+
+task                                        started         duration            
+:checkPython                                11:11:11:111    11ms                python3 --version
+:checkPython                                11:11:11:111    11ms                python3 -c exec("import sys;ver=sys.version_info;print(str(ver.major)+'.'+str(ver.minor)+'.'+str(ver.micro));print(sys.prefix);print(sys.executable)")
+:pipList                                    11:11:11:111    11ms                python3 -m pip list --format=columns --user
+
+    Executed 3 commands in 11ms (overall)""")
     }
 
 
@@ -188,6 +297,9 @@ class ConfigurationCacheSupportKitTest extends AbstractKitTest {
             python {
                 scope = USER
                 pip 'extract-msg:0.28.0'
+                
+                printStats = true
+                debug = true
             }
 
         """
@@ -206,6 +318,15 @@ class ConfigurationCacheSupportKitTest extends AbstractKitTest {
         result.output.contains('The following modules could be updated:')
         result.output =~ /extract-msg\s+0.28.0/
 
+        unifyStats(result.output).contains("""Python execution stats:
+
+task                                        started         duration            
+:checkPython                                11:11:11:111    11ms                python3 --version
+:checkPython                                11:11:11:111    11ms                python3 -c exec("import sys;ver=sys.version_info;print(str(ver.major)+'.'+str(ver.minor)+'.'+str(ver.micro));print(sys.prefix);print(sys.executable)")
+:checkPython                                11:11:11:111    11ms                python3 -m pip --version
+:pipUpdates                                 11:11:11:111    11ms                python3 -m pip list -o -l --format=columns --user
+
+    Executed 4 commands in 11ms (overall)""")
 
 
         when: "run from cache"
@@ -215,6 +336,16 @@ class ConfigurationCacheSupportKitTest extends AbstractKitTest {
         then: "cache used"
         result.output.contains('Reusing configuration cache.')
         result.task(':pipUpdates').outcome == TaskOutcome.SUCCESS
+
+        unifyStats(result.output).contains("""Python execution stats:
+
+task                                        started         duration            
+:checkPython                                11:11:11:111    11ms                python3 --version
+:checkPython                                11:11:11:111    11ms                python3 -c exec("import sys;ver=sys.version_info;print(str(ver.major)+'.'+str(ver.minor)+'.'+str(ver.micro));print(sys.prefix);print(sys.executable)")
+:checkPython                                11:11:11:111    11ms                python3 -m pip --version
+:pipUpdates                                 11:11:11:111    11ms                python3 -m pip list -o -l --format=columns --user
+
+    Executed 4 commands in 11ms (overall)""")
     }
 
     def "Check updates detected in environment"() {
@@ -228,6 +359,9 @@ class ConfigurationCacheSupportKitTest extends AbstractKitTest {
             python {
                 scope = VIRTUALENV
                 pip 'extract-msg:0.28.0'
+                
+                printStats = true
+                debug = true
             }
 
         """
@@ -253,6 +387,16 @@ class ConfigurationCacheSupportKitTest extends AbstractKitTest {
         result.output.contains('The following modules could be updated:')
         result.output =~ /extract-msg\s+0.28.0/
 
+        unifyStats(result.output).contains("""Python execution stats:
+
+task                                        started         duration            
+:checkPython                                11:11:11:111    11ms                python3 --version
+:checkPython                                11:11:11:111    11ms                .gradle/python/bin/python -c exec("import sys;ver=sys.version_info;print(str(ver.major)+'.'+str(ver.minor)+'.'+str(ver.micro));print(sys.prefix);print(sys.executable)")
+:checkPython                                11:11:11:111    11ms                .gradle/python/bin/python -m pip --version
+:pipUpdates                                 11:11:11:111    11ms                .gradle/python/bin/python -m pip list -o -l --format=columns
+
+    Executed 4 commands in 11ms (overall)""")
+
 
         when: "run from cache"
         println '\n\n------------------- FROM CACHE ----------------------------------------'
@@ -261,6 +405,16 @@ class ConfigurationCacheSupportKitTest extends AbstractKitTest {
         then: "cache used"
         result.output.contains('Reusing configuration cache.')
         result.task(':pipUpdates').outcome == TaskOutcome.SUCCESS
+
+        unifyStats(result.output).contains("""Python execution stats:
+
+task                                        started         duration            
+:checkPython                                11:11:11:111    11ms                python3 --version
+:checkPython                                11:11:11:111    11ms                .gradle/python/bin/python -c exec("import sys;ver=sys.version_info;print(str(ver.major)+'.'+str(ver.minor)+'.'+str(ver.micro));print(sys.prefix);print(sys.executable)")
+:checkPython                                11:11:11:111    11ms                .gradle/python/bin/python -m pip --version
+:pipUpdates                                 11:11:11:111    11ms                .gradle/python/bin/python -m pip list -o -l --format=columns
+
+    Executed 4 commands in 11ms (overall)""")
     }
 
 
@@ -269,6 +423,11 @@ class ConfigurationCacheSupportKitTest extends AbstractKitTest {
         build """
             plugins {
                 id 'ru.vyarus.use-python'
+            }
+            
+            python {
+                printStats = true
+                debug = true
             }
 
         """
@@ -298,6 +457,25 @@ requests[socks,security] == 2.28.1
         result.output =~ /boson\s+1.4/
         result.output =~ /requests\s+2.28.1/
 
+        unifyStats(result.output).contains("""Python execution stats:
+
+task                                        started         duration            
+:checkPython                                11:11:11:111    11ms                python3 --version
+:checkPython                                11:11:11:111    11ms                python3 -c exec("import sys;ver=sys.version_info;print(str(ver.major)+'.'+str(ver.minor)+'.'+str(ver.micro));print(sys.prefix);print(sys.executable)")
+:checkPython                                11:11:11:111    11ms                python3 -m pip --version
+:checkPython                                11:11:11:111    11ms                python3 -m pip show virtualenv
+:checkPython                                11:11:11:111    11ms                python3 -m virtualenv --version
+:checkPython                                11:11:11:111    11ms                python3 -m virtualenv .gradle/python
+:checkPython                                11:11:11:111    11ms                .gradle/python/bin/python -c exec("import sys;ver=sys.version_info;print(str(ver.major)+'.'+str(ver.minor)+'.'+str(ver.micro));print(sys.prefix);print(sys.executable)")
+:checkPython                                11:11:11:111    11ms                .gradle/python/bin/python -m pip --version
+:pipInstall                                 11:11:11:111    11ms                .gradle/python/bin/python -m pip freeze
+:pipInstall                                 11:11:11:111    11ms                .gradle/python/bin/python -m pip install extract-msg==0.34.3
+:pipInstall                                 11:11:11:111    11ms                .gradle/python/bin/python -m pip install git+https://github.com/ictxiangxin/boson/@ea7d9113f71a7eb79083208d4f3bbb74feeb149f#egg=boson
+:pipInstall                                 11:11:11:111    11ms                .gradle/python/bin/python -m pip install requests[socks,security]==2.28.1
+:pipInstall                                 11:11:11:111    11ms                .gradle/python/bin/python -m pip list --format=columns
+
+    Executed 13 commands in 11ms (overall)""")
+
 
         when: "run from cache"
         println '\n\n------------------- FROM CACHE ----------------------------------------'
@@ -308,6 +486,17 @@ requests[socks,security] == 2.28.1
         result.task(':pipInstall').outcome == TaskOutcome.SUCCESS
         result.output.contains('3 modules to install read from requirements file: requirements.txt (strict mode)')
         result.output.contains('All required modules are already installed with correct versions')
+
+        unifyStats(result.output).contains("""Python execution stats:
+
+task                                        started         duration            
+:checkPython                                11:11:11:111    11ms                python3 --version
+:checkPython                                11:11:11:111    11ms                .gradle/python/bin/python -c exec("import sys;ver=sys.version_info;print(str(ver.major)+'.'+str(ver.minor)+'.'+str(ver.micro));print(sys.prefix);print(sys.executable)")
+:checkPython                                11:11:11:111    11ms                .gradle/python/bin/python -m pip --version
+:pipInstall                                 11:11:11:111    11ms                .gradle/python/bin/python -m pip freeze
+:pipInstall                                 11:11:11:111    11ms                .gradle/python/bin/python -m pip list --format=columns
+
+    Executed 5 commands in 11ms (overall)""")
     }
 
 
@@ -323,6 +512,9 @@ requests[socks,security] == 2.28.1
             python {               
                 docker.use = true                
                 environment 'PYTHON_ENV_TEST', 'IN-CONTAINER'
+                
+                printStats = true
+                debug = true
             }
 
             // use environment variable to make sure python executed in docker            
@@ -349,6 +541,17 @@ requests[socks,security] == 2.28.1
         result.output.contains('OUTER ENV: null')
         result.output.contains('CONTAINER ENV: IN-CONTAINER')
 
+        unifyStats(result.output).contains("""Python execution stats:
+
+task                                        started        docker container     duration            
+:checkPython                                11:11:11:111   /test_container    11ms                python3 --version
+:checkPython                                11:11:11:111   /test_container    11ms                python3 --version
+:checkPython                                11:11:11:111   /test_container    11ms                python3 -c exec("import sys;ver=sys.version_info;print(str(ver.major)+'.'+str(ver.minor)+'.'+str(ver.micro));print(sys.prefix);print(sys.executable)")
+:sample                                     11:11:11:111   /test_container    11ms                python3 -c exec("import os; print('CONTAINER ENV: ' + str(os.getenv('PYTHON_ENV_TEST')))")
+
+    Executed 4 commands in 11ms (overall)""")
+
+
         when: "run from cache"
         println '\n\n------------------- FROM CACHE ----------------------------------------'
         result = run('--configuration-cache', '--configuration-cache-problems=warn', 'sample')
@@ -358,5 +561,15 @@ requests[socks,security] == 2.28.1
         result.output.contains('Reusing configuration cache.')
         result.output.contains('OUTER ENV: null')
         result.output.contains('CONTAINER ENV: IN-CONTAINER')
+
+        unifyStats(result.output).contains("""Python execution stats:
+
+task                                        started        docker container     duration            
+:checkPython                                11:11:11:111   /test_container    11ms                python3 --version
+:checkPython                                11:11:11:111   /test_container    11ms                python3 --version
+:checkPython                                11:11:11:111   /test_container    11ms                python3 -c exec("import sys;ver=sys.version_info;print(str(ver.major)+'.'+str(ver.minor)+'.'+str(ver.micro));print(sys.prefix);print(sys.executable)")
+:sample                                     11:11:11:111   /test_container    11ms                python3 -c exec("import os; print('CONTAINER ENV: ' + str(os.getenv('PYTHON_ENV_TEST')))")
+
+    Executed 4 commands in 11ms (overall)""")
     }
 }

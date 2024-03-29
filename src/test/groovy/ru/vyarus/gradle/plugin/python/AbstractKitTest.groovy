@@ -104,6 +104,7 @@ abstract class AbstractKitTest extends Specification {
                 .replaceAll(/\d{2}:\d{2}:\d{2}:\d{3}/, '11:11:11:111')
                 .replaceAll(/(\d\.?)+(ms|s)\s+/, '11ms                ')
                 .replaceAll(/11ms\s+\(overall\)/, '11ms (overall)')
+                .replaceAll(/ +\/[a-z_]+ +/, "   /test_container    ")
     }
 
     // custom virtualenv to use for simulations

@@ -44,7 +44,7 @@ class StatsPrinter {
             collector.duplicates.each {
                 res.append("\n\t\t$it.key (${it.value.size()})\n")
                 it.value.each {
-                    res.append("\t\t\t$it.fullTaskName\n")
+                    res.append("\t\t\t$it.fullTaskName   (work dir: ${it.workDir})\n")
                 }
             }
         }

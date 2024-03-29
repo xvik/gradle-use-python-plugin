@@ -226,12 +226,12 @@ task                                        started         duration
     Duplicate executions:
 
 \t\tsomething (2)
-\t\t\t:gg
-\t\t\t:hh
+\t\t\t:gg   (work dir: null)
+\t\t\t:hh   (work dir: null)
 
 \t\tother (2)
-\t\t\t:tt
-\t\t\t:pp
+\t\t\t:tt   (work dir: null)
+\t\t\t:pp   (work dir: null)
 """
     }
 }

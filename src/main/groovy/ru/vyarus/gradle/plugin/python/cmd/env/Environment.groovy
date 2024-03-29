@@ -52,6 +52,15 @@ interface Environment {
     String relativePath(File file)
 
     /**
+     * Rebuild relative or absolute path relative to current to root project. If path not lying inside root project
+     * then path remain absolute.
+     *
+     * @param path path to convert
+     * @return path relative to root project
+     */
+    String relativeRootPath(String path)
+
+    /**
      * Execute command (external process).
      *
      * @param cmd command
@@ -117,10 +126,13 @@ interface Environment {
      *
      * @param containerName docker container name
      * @param cmd executed command (cleared!)
+     * @param workDir working directory (may be null)
+     * @param globalPython true to indicate global python call
      * @param start start time
      * @param success execution success
      */
-    void stat(String containerName, String cmd, long start, boolean success)
+    @SuppressWarnings('ParameterCount')
+    void stat(String containerName, String cmd, String workDir, boolean globalPython, long start, boolean success)
 
     /**
      * Prints cache state (for debug), but only if debug enabled in the root project.

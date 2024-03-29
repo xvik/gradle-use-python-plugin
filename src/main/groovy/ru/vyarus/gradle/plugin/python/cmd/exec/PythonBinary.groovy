@@ -14,6 +14,7 @@ import ru.vyarus.gradle.plugin.python.util.DurationFormatter
 import ru.vyarus.gradle.plugin.python.util.PythonExecutionFailed
 
 import java.nio.file.Paths
+import java.util.function.Supplier
 
 /**
  * Abstraction for python binary paths logic. Separated from {@link ru.vyarus.gradle.plugin.python.cmd.Python} to
@@ -24,7 +25,7 @@ import java.nio.file.Paths
  * @author Vyacheslav Rusakov
  * @since 30.08.2022
  */
-@SuppressWarnings('ConfusingMethodName')
+@SuppressWarnings(['ConfusingMethodName', 'MethodCount'])
 @CompileStatic
 final class PythonBinary {
 
@@ -157,10 +158,7 @@ final class PythonBinary {
      * @return string to identify python (within current project)
      */
     String getIdentity() {
-        return (docker ? '[docker]' : '') +
-                (sourcePythonPath == null ? '' :
-                        environment.file(sourcePythonPath).canonicalPath
-                                .replace(environment.rootDir.canonicalPath, '')) + (sourcePythonBinary ?: '')
+        return buildIdentity(sourcePythonPath, sourcePythonBinary, docker)
     }
 
     // checks (absolute!) path for existence
@@ -247,10 +245,39 @@ final class PythonBinary {
         }
     }
 
+    /**
+     * Shortcut to cache values related to the same python (not the same instance, but the same python, related
+     * to current gradle project).
+     * <p>
+     * Actual cache key also includes python path to avoid clashes when multiple pythons used. If python path
+     * contain current project path (subproject in multi-module environment) then project cache would be used,
+     * otherwise global cache.
+     *
+     * @param key cache key
+     * @param value value computation action
+     * @return cached or computed value
+     */
+    public <T> T getOrCompute(String key, Supplier<T> value) {
+        String id = identity
+        if (id.startsWith(environment.relativeRootPath(environment.projectDir.absolutePath))) {
+            return environment.projectCache("$key:$id", value)
+        }
+        return environment.globalCache("$key:$id", value)
+    }
+
+    private String buildIdentity(String pythonPath, String binary, boolean docker) {
+        return ((pythonPath == null ? '' : CliUtils.canonicalPath(environment.file(pythonPath))
+                .replace(environment.rootDir.path + '/', '')) + (binary ?: '')) +
+                (docker ? '[docker]' : '')
+    }
+
     // @Memoized can't be used due to configuration cache
     private String getPythonBinary(String pythonPath, String binary, boolean python3Available) {
-        // not identity as cacke key because it would contain wrong path
-        return environment.globalCache("python.binary:$pythonPath$binary") {
+        // not identity for back reference (..) sub projects because it would mix with root project and
+        // produce incorrect path for one or another. From the other side, path like ../somthing could be common
+        // for multiple sub projects and so it makes sense to cache it globally
+        String id = pythonPath?.startsWith('..') ? "$pythonPath:$binary" : buildIdentity(pythonPath, binary, docker)
+        return environment.globalCache("python.binary:$id") {
             String res = binary ?: 'python'
             if (pythonPath) {
                 String path = pythonPath + (pythonPath.endsWith(File.separator) ? '' : File.separator)
@@ -363,7 +390,8 @@ final class PythonBinary {
         int res = -1
         String cmdForLog = cleanLoggedCommand(command)
         try {
-            environment.debug(cmdForLog)
+            environment.debug(cmdForLog + '    (WorkDir: ' + (workDir != null ? workDir :
+                    environment.relativeRootPath(environment.projectDir.path)) + ')')
             if (docker) {
                 // required here for direct raw execution case (normally, start logs must appear before
                 // executed command)
@@ -377,7 +405,8 @@ final class PythonBinary {
                 res = environment.exec(command, out, out, workDir, envVars)
             }
         } finally {
-            environment.stat(docker ? dockerManager.containerName : null, cmdForLog, start, res == 0)
+            environment.stat(docker ? dockerManager.containerName : null, cmdForLog, workDir,
+                    !customBinaryPath, start, res == 0)
         }
         return res
     }

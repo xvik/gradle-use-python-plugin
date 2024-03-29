@@ -21,7 +21,10 @@ class ParallelExecutionKitTest extends AbstractKitTest {
         build("""
             plugins {
                 id 'ru.vyarus.use-python'
-            }     
+            }
+
+            python.printStats = true
+            python.debug = true     
 
             subprojects {
                 apply plugin: 'ru.vyarus.use-python'
@@ -65,6 +68,9 @@ class ParallelExecutionKitTest extends AbstractKitTest {
                 id 'ru.vyarus.use-python'
             }     
 
+            python.printStats = true
+            python.debug = true 
+
             subprojects {
                 apply plugin: 'ru.vyarus.use-python'
                 
@@ -103,7 +109,10 @@ class ParallelExecutionKitTest extends AbstractKitTest {
         build("""
             plugins {
                 id 'ru.vyarus.use-python'
-            }     
+            } 
+
+            python.printStats = true
+            python.debug = true     
 
             subprojects {
                 apply plugin: 'ru.vyarus.use-python'
@@ -144,7 +153,10 @@ class ParallelExecutionKitTest extends AbstractKitTest {
         build("""
             plugins {
                 id 'ru.vyarus.use-python'
-            }     
+            } 
+
+            python.printStats = true
+            python.debug = true     
 
             subprojects {
                 apply plugin: 'ru.vyarus.use-python'

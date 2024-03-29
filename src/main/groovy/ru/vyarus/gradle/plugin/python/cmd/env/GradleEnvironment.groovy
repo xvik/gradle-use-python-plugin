@@ -134,6 +134,19 @@ abstract class GradleEnvironment implements Environment {
     }
 
     @Override
+    String relativeRootPath(String path) {
+        String res = file(path).absolutePath
+        String root = rootDir.absolutePath
+        if (res.startsWith(root)) {
+            res = res.replace(root, '')
+            if (res.startsWith('/') || res.startsWith('\\')) {
+                res = res.substring(1)
+            }
+        }
+        return res
+    }
+
+    @Override
     int exec(String[] cmd, OutputStream out, OutputStream err, String workDir, Map<String, Object> envVars) {
         ExecResult res = exec.exec new Action<ExecSpec>() {
             @Override
@@ -194,7 +207,7 @@ abstract class GradleEnvironment implements Environment {
     }
 
     @Override
-    void stat(String containerName, String cmd, long start, boolean success) {
+    void stat(String containerName, String cmd, String workDir, boolean globalPython, long start, boolean success) {
         List<PythonStat> statList = stats.get()
         synchronized (statList) {
             statList.add(new PythonStat(
@@ -202,6 +215,7 @@ abstract class GradleEnvironment implements Environment {
                     projectPath: projectPath,
                     taskName: taskName,
                     cmd: cmd,
+                    workDir: relativeRootPath((workDir != null ? file(workDir) : projectDir).absolutePath),
                     start: start,
                     success: success,
                     duration: System.currentTimeMillis() - start
@@ -216,19 +230,23 @@ abstract class GradleEnvironment implements Environment {
     @Override
     void printCacheState() {
         if (debug.get()) {
-            StringBuilder res = new StringBuilder(
-                    "\n--------------------------------------------------- state after $projectPath$taskName \n")
+            StringBuilder res = new StringBuilder('\n--------------------------------------------------- state after '
+                    + "${"$projectPath:$taskName".replaceAll('::', ':')} \n")
             if (projectPath == ':') {
                 res.append('\n\tGLOBAL CACHE is the same as project cache for root project\n')
             } else {
                 Map<String, Object> cache = cacheGlobal.get()
-                res.append("\tGLOBAL CACHE (instance ${System.identityHashCode(cache)}) [${cache.size()}]\n")
-                cache.each { res.append("\t\t$it.key = $it.value\n") }
+                synchronized (cache) {
+                    res.append("\tGLOBAL CACHE (instance ${System.identityHashCode(cache)}) [${cache.size()}]\n")
+                    new TreeSet<>(cache.keySet()).each { res.append("\t\t$it = ${cache.get(it)}\n") }
+                }
             }
 
             Map<String, Object> cache = cacheProject.get()
-            res.append("\n\tPROJECT CACHE (instance ${System.identityHashCode(cache)}) [${cache.size()}]\n")
-            cache.each { res.append("\t\t$it.key = $it.value\n") }
+            synchronized (cache) {
+                res.append("\n\tPROJECT CACHE (instance ${System.identityHashCode(cache)}) [${cache.size()}]\n")
+                new TreeSet<>(cache.keySet()).each { res.append("\t\t$it = ${cache.get(it)}\n") }
+            }
 
             res.append('-------------------------------------------------------------------------\n')
             println res.toString()

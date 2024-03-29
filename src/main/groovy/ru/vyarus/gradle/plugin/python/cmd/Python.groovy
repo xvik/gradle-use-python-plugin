@@ -403,7 +403,7 @@ class Python {
      */
     @SuppressWarnings('ClosureAsLastMethodParameter')
     String getBinaryDir() {
-        return getOrCompute("binary.dir:${binary.identity}") {
+        return getOrCompute('binary.dir') {
             // sys.executable and sys.prefix
             return binary.getBinaryDir({ resolveInfo()[2]?.trim() }, { homeDir })
         } as String
@@ -495,15 +495,16 @@ class Python {
      * Shortcut to cache values related to the same python (not the same instance, but the same python, related
      * to current gradle project).
      * <p>
-     * Project-specific map used for caching (to unify cache for all python instances, created per task).
-     * Actual cache key also includes python path to avoid clashes when multiple pythons used.
+     * Actual cache key also includes python path to avoid clashes when multiple pythons used. If python path
+     * contain current project path (subproject in multi-module environment) then project cache would be used,
+     * otherwise global cache.
      *
      * @param key cache key
      * @param value value computation action
      * @return cached or computed value
      */
     public <T> T getOrCompute(String key, Supplier<T> value) {
-        return environment.projectCache(key + ':' + binary.identity, value)
+        return binary.getOrCompute(key, value)
     }
 
     @Override

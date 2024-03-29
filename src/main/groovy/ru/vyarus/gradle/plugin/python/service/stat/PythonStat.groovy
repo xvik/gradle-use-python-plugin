@@ -16,6 +16,7 @@ class PythonStat implements Comparable<PythonStat> {
     String projectPath
     String taskName
     String cmd
+    String workDir
     long start
     long duration
     boolean success

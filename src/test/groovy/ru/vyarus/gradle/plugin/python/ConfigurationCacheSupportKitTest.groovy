@@ -264,6 +264,53 @@ class ConfigurationCacheSupportKitTest extends AbstractKitTest {
     }
 
 
+    def "Check strict requirements support"() {
+        setup:
+        build """
+            plugins {
+                id 'ru.vyarus.use-python'
+            }
+
+        """
+        file('requirements.txt') << """
+# comment
+extract-msg == 0.34.3
+
+# vcs syntax (note, it's not valid syntax for pip due to version in egg part!) 
+git+https://github.com/ictxiangxin/boson/@ea7d9113f71a7eb79083208d4f3bbb74feeb149f#egg=boson-1.4
+
+# features syntax
+requests[socks,security] == 2.28.1
+"""
+
+        when: "run task"
+        BuildResult result = run('--configuration-cache', '--configuration-cache-problems=warn', 'pipInstall')
+
+        then: "no configuration cache incompatibilities"
+        result.output.contains("1 problem was found storing the configuration cache")
+        result.output.contains('Gradle runtime: support for using a Java agent with TestKit')
+        result.output.contains('Calculating task graph as no cached configuration is available for tasks:')
+
+        then: "task successful"
+        result.task(':pipInstall').outcome == TaskOutcome.SUCCESS
+        result.output.contains('-m virtualenv .gradle/python'.replace('/', File.separator))
+        result.output =~ /extract-msg\s+0.34.3/
+        result.output =~ /boson\s+1.4/
+        result.output =~ /requests\s+2.28.1/
+
+
+        when: "run from cache"
+        println '\n\n------------------- FROM CACHE ----------------------------------------'
+        result = run('--configuration-cache', '--configuration-cache-problems=warn', 'pipInstall')
+
+        then: "cache used"
+        result.output.contains('Reusing configuration cache.')
+        result.task(':pipInstall').outcome == TaskOutcome.SUCCESS
+        result.output.contains('3 modules to install read from requirements file: requirements.txt (strict mode)')
+        result.output.contains('All required modules are already installed with correct versions')
+    }
+
+
     // testcontainers doesn't work on windows server https://github.com/testcontainers/testcontainers-java/issues/2960
     @IgnoreIf({ System.getProperty("os.name").toLowerCase().contains("windows") })
     def "Check docker simple execution"() {

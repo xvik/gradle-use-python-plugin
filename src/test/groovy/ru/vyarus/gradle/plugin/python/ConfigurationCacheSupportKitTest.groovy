@@ -53,10 +53,11 @@ task                                        started         duration
 :checkPython                                11:11:11:111    11ms                python3 -c exec("import sys;ver=sys.version_info;print(str(ver.major)+'.'+str(ver.minor)+'.'+str(ver.micro));print(sys.prefix);print(sys.executable)")
 :checkPython                                11:11:11:111    11ms                python3 -m pip --version
 :pipInstall                                 11:11:11:111    11ms                python3 -m pip freeze
+:pipInstall                                 11:11:11:111    11ms                python3 -m pip install extract-msg==0.28.0 --user
 :pipInstall                                 11:11:11:111    11ms                python3 -m pip list --format=columns --user
 :sample                                     11:11:11:111    11ms                python3 -c exec("print('samplee')")
 
-    Executed 6 commands in 11ms (overall)""")
+    Executed 7 commands in 11ms (overall)""")
 
 
         when: "run from cache"

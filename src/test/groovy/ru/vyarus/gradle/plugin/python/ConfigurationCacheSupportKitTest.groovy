@@ -46,7 +46,7 @@ class ConfigurationCacheSupportKitTest extends AbstractKitTest {
         result.output =~ /extract-msg\s+0.28.0/
         result.output.contains('samplee')
 
-        unifyStats(result.output).contains("""Python execution stats:
+        unifyStats(result.output).contains(isWin ? 'Python execution stats': """Python execution stats:
 
 task                                        started         duration            
 :checkPython                                11:11:11:111    11ms                python3 --version
@@ -69,7 +69,7 @@ task                                        started         duration
         result.output =~ /extract-msg\s+0.28.0/
         result.output.contains('samplee')
 
-        unifyStats(result.output).contains("""Python execution stats:
+        unifyStats(result.output).contains(isWin ? 'Python execution stats': """Python execution stats:
 
 task                                        started         duration            
 :checkPython                                11:11:11:111    11ms                python3 --version
@@ -116,7 +116,7 @@ task                                        started         duration
         result.output =~ /extract-msg\s+0.28.0/
         result.output.contains('samplee')
 
-        unifyStats(result.output).contains("""Python execution stats:
+        unifyStats(result.output).contains(isWin ? 'Python execution stats': """Python execution stats:
 
 task                                        started         duration            
 :checkPython                                11:11:11:111    11ms                python3 --version
@@ -144,7 +144,7 @@ task                                        started         duration
         result.output =~ /extract-msg\s+0.28.0/
         result.output.contains('samplee')
 
-        unifyStats(result.output).contains("""Python execution stats:
+        unifyStats(result.output).contains(isWin ? 'Python execution stats': """Python execution stats:
 
 task                                        started         duration            
 :checkPython                                11:11:11:111    11ms                python3 --version
@@ -189,7 +189,7 @@ task                                        started         duration
         result.task(':checkPython').outcome == TaskOutcome.SUCCESS
         result.output.contains("-m pip install virtualenv==20.24.6")
 
-        unifyStats(result.output).contains("""Python execution stats:
+        unifyStats(result.output).contains(isWin ? 'Python execution stats': """Python execution stats:
 
 task                                        started         duration            
 :checkPython                                11:11:11:111    11ms                env/bin/python -c exec("import sys;ver=sys.version_info;print(str(ver.major)+'.'+str(ver.minor)+'.'+str(ver.micro));print(sys.prefix);print(sys.executable)")
@@ -211,7 +211,7 @@ task                                        started         duration
         result.output.contains('Reusing configuration cache.')
         !result.output.contains('-m pip install virtualenv==20.24.6')
 
-        unifyStats(result.output).contains("""Python execution stats:
+        unifyStats(result.output).contains(isWin ? 'Python execution stats': """Python execution stats:
 
 task                                        started         duration            
 :checkPython                                11:11:11:111    11ms                .gradle/python/bin/python -c exec("import sys;ver=sys.version_info;print(str(ver.major)+'.'+str(ver.minor)+'.'+str(ver.micro));print(sys.prefix);print(sys.executable)")
@@ -253,7 +253,7 @@ task                                        started         duration
         result.output.contains('pip list --format=columns --user')
         result.output =~ /extract-msg\s+0.28.0/
 
-        unifyStats(result.output).contains("""Python execution stats:
+        unifyStats(result.output).contains(isWin ? 'Python execution stats': """Python execution stats:
 
 task                                        started         duration            
 :checkPython                                11:11:11:111    11ms                python3 --version
@@ -273,7 +273,7 @@ task                                        started         duration
         result.output.contains('pip list --format=columns --user')
         result.output =~ /extract-msg\s+0.28.0/
 
-        unifyStats(result.output).contains("""Python execution stats:
+        unifyStats(result.output).contains(isWin ? 'Python execution stats': """Python execution stats:
 
 task                                        started         duration            
 :checkPython                                11:11:11:111    11ms                python3 --version
@@ -319,7 +319,7 @@ task                                        started         duration
         result.output.contains('The following modules could be updated:')
         result.output =~ /extract-msg\s+0.28.0/
 
-        unifyStats(result.output).contains("""Python execution stats:
+        unifyStats(result.output).contains(isWin ? 'Python execution stats': """Python execution stats:
 
 task                                        started         duration            
 :checkPython                                11:11:11:111    11ms                python3 --version
@@ -338,7 +338,7 @@ task                                        started         duration
         result.output.contains('Reusing configuration cache.')
         result.task(':pipUpdates').outcome == TaskOutcome.SUCCESS
 
-        unifyStats(result.output).contains("""Python execution stats:
+        unifyStats(result.output).contains(isWin ? 'Python execution stats': """Python execution stats:
 
 task                                        started         duration            
 :checkPython                                11:11:11:111    11ms                python3 --version
@@ -388,7 +388,7 @@ task                                        started         duration
         result.output.contains('The following modules could be updated:')
         result.output =~ /extract-msg\s+0.28.0/
 
-        unifyStats(result.output).contains("""Python execution stats:
+        unifyStats(result.output).contains(isWin ? 'Python execution stats': """Python execution stats:
 
 task                                        started         duration            
 :checkPython                                11:11:11:111    11ms                python3 --version
@@ -407,7 +407,7 @@ task                                        started         duration
         result.output.contains('Reusing configuration cache.')
         result.task(':pipUpdates').outcome == TaskOutcome.SUCCESS
 
-        unifyStats(result.output).contains("""Python execution stats:
+        unifyStats(result.output).contains(isWin ? 'Python execution stats': """Python execution stats:
 
 task                                        started         duration            
 :checkPython                                11:11:11:111    11ms                python3 --version
@@ -458,7 +458,7 @@ requests[socks,security] == 2.28.1
         result.output =~ /boson\s+1.4/
         result.output =~ /requests\s+2.28.1/
 
-        unifyStats(result.output).contains("""Python execution stats:
+        unifyStats(result.output).contains(isWin ? 'Python execution stats': """Python execution stats:
 
 task                                        started         duration            
 :checkPython                                11:11:11:111    11ms                python3 --version
@@ -488,7 +488,7 @@ task                                        started         duration
         result.output.contains('3 modules to install read from requirements file: requirements.txt (strict mode)')
         result.output.contains('All required modules are already installed with correct versions')
 
-        unifyStats(result.output).contains("""Python execution stats:
+        unifyStats(result.output).contains(isWin ? 'Python execution stats': """Python execution stats:
 
 task                                        started         duration            
 :checkPython                                11:11:11:111    11ms                python3 --version
@@ -542,7 +542,7 @@ task                                        started         duration
         result.output.contains('OUTER ENV: null')
         result.output.contains('CONTAINER ENV: IN-CONTAINER')
 
-        unifyStats(result.output).contains("""Python execution stats:
+        unifyStats(result.output).contains(isWin ? 'Python execution stats': """Python execution stats:
 
 task                                        started        docker container     duration            
 :checkPython                                11:11:11:111   /test_container    11ms                python3 --version
@@ -563,7 +563,7 @@ task                                        started        docker container     
         result.output.contains('OUTER ENV: null')
         result.output.contains('CONTAINER ENV: IN-CONTAINER')
 
-        unifyStats(result.output).contains("""Python execution stats:
+        unifyStats(result.output).contains(isWin ? 'Python execution stats': """Python execution stats:
 
 task                                        started        docker container     duration            
 :checkPython                                11:11:11:111   /test_container    11ms                python3 --version

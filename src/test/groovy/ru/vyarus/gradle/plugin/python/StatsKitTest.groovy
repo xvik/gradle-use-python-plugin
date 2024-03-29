@@ -3,12 +3,16 @@ package ru.vyarus.gradle.plugin.python
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.TaskOutcome
 import ru.vyarus.gradle.plugin.python.cmd.Pip
+import spock.lang.IgnoreIf
 
 /**
  * @author Vyacheslav Rusakov
  * @since 28.03.2024
  */
+@IgnoreIf({ System.getProperty("os.name").toLowerCase().contains("windows") })
 class StatsKitTest extends AbstractKitTest {
+
+    // IMPORTANT synchronize changes with StatsWinKitTest!
 
     def "Check env plugin execution"() {
         setup:

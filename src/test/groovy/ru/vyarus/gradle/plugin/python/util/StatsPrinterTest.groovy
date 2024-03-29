@@ -1,14 +1,14 @@
 package ru.vyarus.gradle.plugin.python.util
 
+import ru.vyarus.gradle.plugin.python.AbstractKitTest
 import ru.vyarus.gradle.plugin.python.service.stat.PythonStat
 import ru.vyarus.gradle.plugin.python.service.stat.StatsPrinter
-import spock.lang.Specification
 
 /**
  * @author Vyacheslav Rusakov
  * @since 28.03.2024
  */
-class StatsPrinterTest extends Specification {
+class StatsPrinterTest extends AbstractKitTest {
 
     def "Print simple stats"() {
         List<PythonStat> stats = []
@@ -34,14 +34,14 @@ class StatsPrinterTest extends Specification {
         println res
 
         then: "ok"
-        res == """
+        unifyStats(res) == """
 Python execution stats:
 
 task                                        started         duration            
-:gg                                         07:00:00:100    10ms                something
-:hh                                         07:00:00:120    10ms                something-else
+:gg                                         11:11:11:111    11ms                something
+:hh                                         11:11:11:111    11ms                something-else
 
-    Executed 2 commands in 20ms (overall)
+    Executed 2 commands in 11ms (overall)
 """
 
     }
@@ -80,15 +80,15 @@ task                                        started         duration
         println res
 
         then: "ok"
-        res == """
+        unifyStats(res) == """
 Python execution stats:
 
 task                                        started        docker container     duration            
-:gg                                         07:00:00:100   python12             10ms                something
-:hh                                         07:00:00:120                        10ms                something-else
-:tt                                         07:00:00:130   python13             10ms                other
+:gg                                         11:11:11:111   python12             11ms                something
+:hh                                         11:11:11:111                        11ms                something-else
+:tt                                         11:11:11:111   python13             11ms                other
 
-    Executed 3 commands in 30ms (overall)
+    Executed 3 commands in 11ms (overall)
 """
 
     }
@@ -117,14 +117,14 @@ task                                        started        docker container     
         println res
 
         then: "ok"
-        res == """
+        unifyStats(res) == """
 Python execution stats:
 
 task                                        started         duration            
-:gg                                         07:00:00:100    10ms                something
-:hh                                         07:00:00:120    10ms       FAILED   something-else
+:gg                                         11:11:11:111    11ms                something
+:hh                                         11:11:11:111    11ms                FAILED   something-else
 
-    Executed 2 commands in 20ms (overall)
+    Executed 2 commands in 11ms (overall)
 """
     }
 
@@ -160,15 +160,15 @@ task                                        started         duration
         println res
 
         then: "ok"
-        res == """
+        unifyStats(res) == """
 Python execution stats:
 
 task                                        started         duration            
-:gg                                         07:00:00:100    10ms                something
-:hh                                      || 07:00:00:120    10ms                something-else
-:tt                                      || 07:00:00:125    10ms                other
+:gg                                         11:11:11:111    11ms                something
+:hh                                      || 11:11:11:111    11ms                something-else
+:tt                                      || 11:11:11:111    11ms                other
 
-    Executed 3 commands in 30ms (overall)
+    Executed 3 commands in 11ms (overall)
 """
     }
 
@@ -212,16 +212,16 @@ task                                        started         duration
         println res
 
         then: "ok"
-        res == """
+        unifyStats(res) == """
 Python execution stats:
 
 task                                        started         duration            
-:gg                                         07:00:00:100    10ms                something
-:hh                                         07:00:00:120    10ms                something
-:tt                                         07:00:00:130    10ms                other
-:pp                                         07:00:00:140    10ms                other
+:gg                                         11:11:11:111    11ms                something
+:hh                                         11:11:11:111    11ms                something
+:tt                                         11:11:11:111    11ms                other
+:pp                                         11:11:11:111    11ms                other
 
-    Executed 4 commands in 40ms (overall)
+    Executed 4 commands in 11ms (overall)
 
     Duplicate executions:
 

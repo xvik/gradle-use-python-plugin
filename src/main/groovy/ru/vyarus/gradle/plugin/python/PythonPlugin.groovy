@@ -4,6 +4,7 @@ import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.logging.LogLevel
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Delete
 import org.gradle.api.tasks.TaskProvider
@@ -106,28 +107,20 @@ abstract class PythonPlugin implements Plugin<Project> {
     private void createTasks(Project project, PythonExtension extension, Provider<EnvService> envService) {
         // validate installed python
         TaskProvider<CheckPythonTask> checkTask = project.tasks.register('checkPython', CheckPythonTask) {
-            it.with {
-                description = 'Validate python environment'
-            }
+            it.description = 'Validate python environment'
         }
 
         // default pip install task
         TaskProvider<PipInstallTask> installTask = project.tasks.register('pipInstall', PipInstallTask) {
-            it.with {
-                description = 'Install pip modules'
-            }
+            it.description = 'Install pip modules'
         }
 
         project.tasks.register('pipUpdates', PipUpdatesTask) {
-            it.with {
-                description = 'Check if new versions available for declared pip modules'
-            }
+            it.description = 'Check if new versions available for declared pip modules'
         }
 
         project.tasks.register('pipList', PipListTask) {
-            it.with {
-                description = 'Show all installed modules'
-            }
+            it.description = 'Show all installed modules'
         }
 
         project.tasks.register('cleanPython', Delete) {
@@ -160,16 +153,18 @@ abstract class PythonPlugin implements Plugin<Project> {
                 gradleEnv.printCacheState()
             }
 
-            task.conventionMapping.with {
-                // setting default value from extension to all tasks, but tasks would actually check
-                // service for actual pythonPath before python instance creation
-                // Only checkPython task will always use this default to initialize service value
-                pythonPath = { extension.pythonPath }
-                pythonBinary = { extension.pythonBinary }
-                validateSystemBinary = { extension.validateSystemBinary }
-                // important to copy map because each task must have independent instance
-                environment = { extension.environment ? new HashMap<>(extension.environment) : null }
-            }
+            // setting default value from extension to all tasks, but tasks would actually check
+            // service for actual pythonPath before python instance creation
+            // Only checkPython task will always use this default to initialize service value
+            task.pythonPath.convention(extension.pythonPath)
+            task.useCustomPython.convention(false)
+            task.pythonBinary.convention(extension.pythonBinary)
+            task.validateSystemBinary.convention(extension.validateSystemBinary)
+            task.pythonArgs.convention([])
+            // important to copy map because each task must have independent instance
+            // use set instead of convention to preserve global environment variables when custom vars added to task
+            task.environment.set(extension.environment ? new HashMap<>(extension.environment) : [:])
+            task.logLevel.convention(LogLevel.LIFECYCLE)
 
             // can't be implemented with convention mapping, only with properties
             configureDockerInTask(project, extension.docker, task)
@@ -181,45 +176,51 @@ abstract class PythonPlugin implements Plugin<Project> {
         }
 
         project.tasks.withType(PythonTask).configureEach { task ->
+            task.createWorkDir.convention(true)
+            task.outputPrefix.convention('\t')
+            task.extraArgs.convention([])
             // by default all python tasks must be executed after dependencies init
             task.dependsOn installTask
         }
 
         // apply defaults for pip tasks
         project.tasks.withType(BasePipTask).configureEach { task ->
-            task.conventionMapping.with {
-                modules = { extension.modules }
-                // in case of virtualenv checkPython will manually disable it
-                userScope = { extension.scope != PythonExtension.Scope.GLOBAL }
-                useCache = { extension.usePipCache }
-                breakSystemPackages = { extension.breakSystemPackages }
-                trustedHosts = { extension.trustedHosts }
-                extraIndexUrls = { extension.extraIndexUrls }
-                requirements = { RequirementsReader.find(task.gradleEnv.get(), extension.requirements) }
-                strictRequirements = { extension.requirements.strict }
-            }
+            task.modules.convention(extension.modules)
+            // in case of virtualenv checkPython will manually disable it
+            task.userScope.convention(extension.scope != PythonExtension.Scope.GLOBAL)
+            task.useCache.convention(extension.usePipCache)
+            task.breakSystemPackages.convention(extension.breakSystemPackages)
+            task.trustedHosts.convention(extension.trustedHosts)
+            task.extraIndexUrls.convention(extension.extraIndexUrls)
+            task.requirements.convention(RequirementsReader.find(task.gradleEnv.get(), extension.requirements))
+            task.strictRequirements.convention(extension.requirements.strict)
         }
 
         // apply defaults for all pip install tasks (custom pip installs may be used)
         project.tasks.withType(PipInstallTask).configureEach { task ->
-            task.conventionMapping.with {
-                showInstalledVersions = { extension.showInstalledVersions }
-                alwaysInstallModules = { extension.alwaysInstallModules }
-                envPath = { extension.envPath }
-            }
+            task.showInstalledVersions.convention(extension.showInstalledVersions)
+            task.alwaysInstallModules.convention(extension.alwaysInstallModules)
+            task.options.convention([])
+            task.envPath.convention(extension.envPath)
+        }
+
+        project.tasks.withType(PipListTask).configureEach { task ->
+            task.all.convention(false)
+        }
+
+        project.tasks.withType(PipUpdatesTask).configureEach { task ->
+            task.all.convention(false)
         }
 
         project.tasks.withType(CheckPythonTask).configureEach { task ->
-            task.conventionMapping.with {
-                scope = { extension.scope }
-                envPath = { extension.envPath }
-                minPythonVersion = { extension.minPythonVersion }
-                minPipVersion = { extension.minPipVersion }
-                installVirtualenv = { extension.installVirtualenv }
-                virtualenvVersion = { extension.virtualenvVersion }
-                minVirtualenvVersion = { extension.minVirtualenvVersion }
-                envCopy = { extension.envCopy }
-            }
+            task.scope.convention(extension.scope)
+            task.envPath.convention(extension.envPath)
+            task.minPythonVersion.convention(extension.minPythonVersion)
+            task.minPipVersion.convention(extension.minPipVersion)
+            task.installVirtualenv.convention(extension.installVirtualenv)
+            task.virtualenvVersion.convention(extension.virtualenvVersion)
+            task.minVirtualenvVersion.convention(extension.minVirtualenvVersion)
+            task.envCopy.convention(extension.envCopy)
         }
     }
 }

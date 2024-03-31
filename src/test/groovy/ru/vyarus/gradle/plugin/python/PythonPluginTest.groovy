@@ -3,6 +3,10 @@ package ru.vyarus.gradle.plugin.python
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.tasks.Delete
+import ru.vyarus.gradle.plugin.python.task.PythonTask
+import ru.vyarus.gradle.plugin.python.task.pip.PipInstallTask
+import ru.vyarus.gradle.plugin.python.task.pip.PipListTask
+import ru.vyarus.gradle.plugin.python.task.pip.PipUpdatesTask
 import ru.vyarus.gradle.plugin.python.task.pip.module.VcsPipModule
 
 /**
@@ -47,33 +51,33 @@ class PythonPluginTest extends AbstractTest {
         }
 
         then: "pip install task configured"
-        def pipTask = project.tasks.getByName('pipInstall');
-        pipTask.pythonPath == 'foo/bar'
-        pipTask.pythonBinary == 'py'
-        !pipTask.userScope
-        pipTask.modules == ['sample:1', 'foo:2']
-        !pipTask.showInstalledVersions
-        pipTask.alwaysInstallModules
+        PipInstallTask pipTask = project.tasks.getByName('pipInstall');
+        pipTask.pythonPath.get() == 'foo/bar'
+        pipTask.pythonBinary.get() == 'py'
+        !pipTask.userScope.get()
+        pipTask.modules.get() == ['sample:1', 'foo:2']
+        !pipTask.showInstalledVersions.get()
+        pipTask.alwaysInstallModules.get()
 
         then: "python task configured"
-        def pyTask = project.tasks.getByName('pyt');
-        pyTask.pythonPath == 'foo/bar'
-        pyTask.pythonBinary == 'py'
+        PythonTask pyTask = project.tasks.getByName('pyt');
+        pyTask.pythonPath.get() == 'foo/bar'
+        pyTask.pythonBinary.get() == 'py'
         pyTask.dependsOn.collect {it.name}.contains('pipInstall')
 
         then: "pip updates task configured"
-        def pipUpdates = project.tasks.getByName('pipUpdates');
-        pipUpdates.pythonPath == 'foo/bar'
-        pipUpdates.pythonBinary == 'py'
-        !pipUpdates.userScope
-        pipUpdates.modules == ['sample:1', 'foo:2']
+        PipUpdatesTask pipUpdates = project.tasks.getByName('pipUpdates');
+        pipUpdates.pythonPath.get() == 'foo/bar'
+        pipUpdates.pythonBinary.get() == 'py'
+        !pipUpdates.userScope.get()
+        pipUpdates.modules.get() == ['sample:1', 'foo:2']
 
         then: "pip list task configured"
-        def pipList = project.tasks.getByName('pipList');
-        pipList.pythonPath == 'foo/bar'
-        pipList.pythonBinary == 'py'
-        !pipList.userScope
-        pipList.modules == ['sample:1', 'foo:2']
+        PipListTask pipList = project.tasks.getByName('pipList');
+        pipList.pythonPath.get() == 'foo/bar'
+        pipList.pythonBinary.get() == 'py'
+        !pipList.userScope.get()
+        pipList.modules.get() == ['sample:1', 'foo:2']
 
         then: "clean task configured"
         Delete clean = project.tasks.getByName('cleanPython')

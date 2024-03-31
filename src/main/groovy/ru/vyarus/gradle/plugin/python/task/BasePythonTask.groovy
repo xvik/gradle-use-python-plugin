@@ -6,6 +6,8 @@ import org.gradle.api.Action
 import org.gradle.api.GradleException
 import org.gradle.api.internal.ConventionTask
 import org.gradle.api.logging.LogLevel
+import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
@@ -41,19 +43,19 @@ abstract class BasePythonTask extends ConventionTask {
      * <p>
      * NOTE: Normally, this property would be ignored and python resolved by checkPython task would be used.
      * In order to force this setting (e.g. to use global python for exact python task) set
-     * {@link #useCustomPython} to true.
+     * {@link #getUseCustomPython()} to true.
      */
     @Input
     @Optional
-    String pythonPath
+    abstract Property<String> getPythonPath()
 
     /**
-     * By default, {@link #pythonPath} property is ignored and used python resolved by checkPython task. This option
-     * must be enabled in order to force manually configured python path usage instead of global python settings
+     * By default, {@link #getPythonPath()} property is ignored and used python resolved by checkPython task. This
+     * option must be enabled in order to force manually configured python path usage instead of global python settings
      * (in most cases, virtual environment, selected by checkPython task).
      */
     @Input
-    Boolean useCustomPython = false
+    abstract Property<Boolean> getUseCustomPython()
 
     /**
      * Python binary name. When empty: use python3 or python for linux and python for windows.
@@ -64,17 +66,17 @@ abstract class BasePythonTask extends ConventionTask {
      */
     @Input
     @Optional
-    String pythonBinary
+    abstract Property<String> getPythonBinary()
 
     /**
-     * Manual search for global python binary (declared in {@link #pythonBinary} in system paths (PATH variable)).
+     * Manual search for global python binary (declared in {@link #getPythonBinary()} in system paths (PATH variable)).
      * Used to quickly reveal problems with process PATH (not the same as in user shell).
-     * Validation is performed only when {@link #pythonPath} is not declared (because otherwise it does not make sense).
-     * Automatically set from {@link ru.vyarus.gradle.plugin.python.PythonExtension#validateSystemBinary}, but could
-     * be overridden manually.
+     * Validation is performed only when {@link #getPythonPath()} is not declared (because otherwise it does not make
+     * sense). Automatically set from {@link ru.vyarus.gradle.plugin.python.PythonExtension#validateSystemBinary}, but
+     * could be overridden manually.
      */
     @Input
-    boolean validateSystemBinary
+    abstract Property<Boolean> getValidateSystemBinary()
 
     /**
      * Python arguments applied to all executed commands. Arguments applied before called command
@@ -84,24 +86,25 @@ abstract class BasePythonTask extends ConventionTask {
      */
     @Input
     @Optional
-    List<String> pythonArgs = []
+    abstract ListProperty<String> getPythonArgs()
 
     /**
      * Environment variables for executed python process (variables specified in gradle's
      * {@link org.gradle.process.ExecSpec#environment(java.util.Map)} during python process execution).
+     * <p>
+     * By default, initialized with global variables from extension and could be overridden only with
+     * direct property assignment. Otherwise this method appends values).
      */
     @Input
     @Optional
-    // note: environment may be initialized with global variables from extension (by mapping)
-    // but not if task property configured directly (task.environment = ...)
-    Map<String, Object> environment
+    abstract MapProperty<String, Object> getEnvironment()
 
     /**
      * Working directory. Not required, but could be useful for some modules (e.g. generators).
      */
     @Input
     @Optional
-    String workDir
+    abstract Property<String> getWorkDir()
 
     /**
      * Python logs output level. By default it's {@link org.gradle.api.logging.LogLevel@LIFECYCLE}
@@ -109,7 +112,7 @@ abstract class BasePythonTask extends ConventionTask {
      */
     @Input
     @Optional
-    LogLevel logLevel = LogLevel.LIFECYCLE
+    abstract Property<LogLevel> getLogLevel()
 
     @Nested
     DockerEnv docker = project.objects.newInstance(DockerEnv)
@@ -139,7 +142,7 @@ abstract class BasePythonTask extends ConventionTask {
     @SuppressWarnings('ConfusingMethodName')
     void pythonArgs(String... args) {
         if (args) {
-            getPythonArgs().addAll(args)
+            pythonArgs.addAll(args)
         }
     }
 
@@ -164,10 +167,7 @@ abstract class BasePythonTask extends ConventionTask {
     @SuppressWarnings('ConfusingMethodName')
     void environment(Map<String, Object> vars) {
         if (vars) {
-            Map<String, Object> envs = getEnvironment() ?: [:]
-            envs.putAll(vars)
-            // do like this to workaround convention mapping mechanism which will treat empty map as incorrect value
-            setEnvironment(envs)
+            environment.putAll(vars)
         }
     }
 
@@ -248,9 +248,9 @@ abstract class BasePythonTask extends ConventionTask {
     @Internal
     protected Python getPython() {
         // use service to resolve pythonPath instead of property (but only when custom path not forced)
-        String path = getUseCustomPython() ? getPythonPath()
+        String path = useCustomPython.get() ? pythonPath.orNull
                 : envService.get().getPythonPath(gradleEnv.get().projectPath)
-        buildPython(path, getPythonBinary())
+        buildPython(path, pythonBinary.orNull)
     }
 
     /**
@@ -289,7 +289,7 @@ abstract class BasePythonTask extends ConventionTask {
         // it would be pre-started container (used in checkPython)
         ContainerManager manager = DockerFactory.getContainer(getDocker().toConfig(), gradleEnv.get())
         // restart container if task parameters differ
-        manager.restartIfRequired(getDocker().toConfig(), getWorkDir(), getEnvironment())
+        manager.restartIfRequired(getDocker().toConfig(), workDir.orNull, environment.get())
         // rewrite paths from host to docker fs
         manager.convertCommand(args)
         logger.lifecycle('[docker] {}', args.join(' '))
@@ -301,11 +301,11 @@ abstract class BasePythonTask extends ConventionTask {
     private Python buildPython(String pythonPath, String pythonBinary) {
         if (pythonCache == null) {
             pythonCache = new Python(gradleEnv.get(), pythonPath, pythonBinary)
-                    .logLevel(getLogLevel())
-                    .workDir(getWorkDir())
-                    .pythonArgs(getPythonArgs())
-                    .environment(getEnvironment())
-                    .validateSystemBinary(getValidateSystemBinary())
+                    .logLevel(logLevel.get())
+                    .workDir(workDir.orNull)
+                    .pythonArgs(pythonArgs.get())
+                    .environment(environment.get())
+                    .validateSystemBinary(validateSystemBinary.get())
                     .withDocker(getDocker().toConfig())
                     .validate()
         }

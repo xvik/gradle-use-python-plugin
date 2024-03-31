@@ -1,6 +1,8 @@
 package ru.vyarus.gradle.plugin.python.task.pip
 
 import groovy.transform.CompileStatic
+import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
 import ru.vyarus.gradle.plugin.python.util.RequirementsReader
@@ -30,7 +32,7 @@ abstract class PipInstallTask extends BasePipTask {
      * By default use {@link ru.vyarus.gradle.plugin.python.PythonExtension#showInstalledVersions} value.
      */
     @Console
-    boolean showInstalledVersions
+    abstract Property<Boolean> getShowInstalledVersions()
 
     /**
      * True to always call 'pip install' for configured modules, otherwise pip install called only
@@ -39,7 +41,7 @@ abstract class PipInstallTask extends BasePipTask {
      * By default use {@link ru.vyarus.gradle.plugin.python.PythonExtension#alwaysInstallModules} value.
      */
     @Input
-    boolean alwaysInstallModules
+    abstract Property<Boolean> getAlwaysInstallModules()
 
     /**
      * Extra {@code pip install} arguments not covered directly by api.
@@ -47,13 +49,13 @@ abstract class PipInstallTask extends BasePipTask {
      */
     @Input
     @Optional
-    List<String> options = []
+    abstract ListProperty<String> getOptions()
 
     /**
      * Virtual environment path. Required to perform chown inside docker container.
      */
     @Input
-    String envPath
+    abstract Property<String> getEnvPath()
 
     private List<String> modulesToInstallCache
 
@@ -75,9 +77,9 @@ abstract class PipInstallTask extends BasePipTask {
     @TaskAction
     @SuppressWarnings('UnnecessaryGetter')
     void run() {
-        pip.python.extraArgs(getOptions())
-        File file = getRequirements()
-        boolean directReqsInstallRequired = !getStrictRequirements() && file && file.exists()
+        pip.python.extraArgs(options.get())
+        File file = getRequirements().orNull
+        boolean directReqsInstallRequired = !getStrictRequirements().get() && file && file.exists()
         // sync is required for multi-module projects with parallel execution enabled to avoid concurrent
         // installation into THE SAME environment
         synchronized (getSync(pip.python.binaryDir)) {
@@ -98,10 +100,10 @@ abstract class PipInstallTask extends BasePipTask {
             logger.lifecycle('All required modules are already installed with correct versions')
         } else {
             // chown created files so user could remove them on host (unroot)
-            dockerChown(getEnvPath())
+            dockerChown(envPath.get())
         }
 
-        if (isShowInstalledVersions()) {
+        if (showInstalledVersions.get()) {
             // show all installed modules versions (to help problems resolution)
             // note: if some modules are already installed in global scope and user scope is used,
             // then global modules will not be shown
@@ -117,7 +119,7 @@ abstract class PipInstallTask extends BasePipTask {
     @SuppressWarnings('ConfusingMethodName')
     void options(String... args) {
         if (args) {
-            getOptions().addAll(args)
+            options.addAll(args)
         }
     }
 
@@ -142,7 +144,7 @@ abstract class PipInstallTask extends BasePipTask {
             if (!modulesList.empty) {
                 // use list of installed modules to check if 'pip install' is required for module
                 // have to always use global list (even if user scope used) to avoid redundant installation attempts
-                List<String> installed = (isAlwaysInstallModules() ? ''
+                List<String> installed = (alwaysInstallModules.get() ? ''
                         : pip.inGlobalScope { pip.readOutput('freeze') } as String).toLowerCase().readLines()
                 // install modules
                 modulesList.each { PipModule mod ->

@@ -1,6 +1,7 @@
 package ru.vyarus.gradle.plugin.python.task.pip
 
 import groovy.transform.CompileStatic
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 
@@ -21,12 +22,12 @@ abstract class PipListTask extends BasePipTask {
      * Note that option will not take effect if global scope is configured or virtualenv is used.
      */
     @Input
-    boolean all
+    abstract Property<Boolean> getAll()
 
     @TaskAction
     void run() {
         Closure action = { pip.exec('list --format=columns') }
-        if (getAll()) {
+        if (all.get()) {
             // show global scope
             pip.inGlobalScope action
         } else {

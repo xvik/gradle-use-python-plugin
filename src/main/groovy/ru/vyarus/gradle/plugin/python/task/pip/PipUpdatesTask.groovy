@@ -1,6 +1,7 @@
 package ru.vyarus.gradle.plugin.python.task.pip
 
 import groovy.transform.CompileStatic
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 
@@ -17,12 +18,12 @@ abstract class PipUpdatesTask extends BasePipTask {
      * True to show all available updates. By default (false): show only updates for configured modules.
      */
     @Input
-    boolean all
+    abstract Property<Boolean> getAll()
 
     @TaskAction
     @SuppressWarnings('DuplicateNumberLiteral')
     void run() {
-        boolean showAll = getAll()
+        boolean showAll = all.get()
         if (!showAll && modulesList.empty) {
             logger.lifecycle('No modules declared')
         } else {

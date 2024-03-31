@@ -2,6 +2,8 @@ package ru.vyarus.gradle.plugin.python.task
 
 import groovy.transform.CompileStatic
 import org.gradle.api.GradleException
+import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
@@ -25,7 +27,7 @@ abstract class PythonTask extends BasePythonTask {
      * Create work directory if it doesn't exist. Enabled by default.
      */
     @Input
-    boolean createWorkDir = true
+    abstract Property<Boolean> getCreateWorkDir()
 
     /**
      * Module name. If specified, "-m module " will be prepended to specified command (if command not specified then
@@ -33,7 +35,7 @@ abstract class PythonTask extends BasePythonTask {
      */
     @Input
     @Optional
-    String module
+    abstract Property<String> getModule()
 
     /**
      * Python command to execute. If module name set then it will be module specific command.
@@ -47,14 +49,14 @@ abstract class PythonTask extends BasePythonTask {
      */
     @Input
     @Optional
-    Object command
+    abstract Property<Object> getCommand()
 
     /**
      * Prefix each line of python output. By default it's '\t' to indicate command output.
      */
     @Input
     @Optional
-    String outputPrefix = '\t'
+    abstract Property<String> getOutputPrefix()
 
     /**
      * Extra arguments to append to every called command.
@@ -68,20 +70,20 @@ abstract class PythonTask extends BasePythonTask {
      */
     @Input
     @Optional
-    List<String> extraArgs = []
+    abstract ListProperty<String> getExtraArgs()
 
     @TaskAction
     void run() {
-        String mod = getModule()
-        Object cmd = getCommand()
+        String mod = module.orNull
+        Object cmd = command.orNull
         if (!mod && !cmd) {
             throw new GradleException('Module or command to execute must be defined')
         }
         initWorkDirIfRequired()
 
         Python python = python
-                .outputPrefix(getOutputPrefix())
-                .extraArgs(getExtraArgs())
+                .outputPrefix(outputPrefix.get())
+                .extraArgs(extraArgs.get())
 
         // task-specific logger required for exclusive docker usage, because otherwise project logger would
         // show output below previous task (in exclusive mode logs would come from separate thread)
@@ -100,14 +102,14 @@ abstract class PythonTask extends BasePythonTask {
     @SuppressWarnings('ConfusingMethodName')
     void extraArgs(String... args) {
         if (args) {
-            getExtraArgs().addAll(args)
+            extraArgs.addAll(args)
         }
     }
 
     @SuppressWarnings('UnnecessaryGetter')
     private void initWorkDirIfRequired() {
-        String dir = getWorkDir()
-        if (dir && isCreateWorkDir()) {
+        String dir = getWorkDir().orNull
+        if (dir && createWorkDir.get()) {
             File wrkd = gradleEnv.get().file(dir)
             if (!wrkd.exists()) {
                 wrkd.mkdirs()

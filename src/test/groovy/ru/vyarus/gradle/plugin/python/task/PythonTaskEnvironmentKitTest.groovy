@@ -87,7 +87,7 @@ class PythonTaskEnvironmentKitTest extends AbstractKitTest {
         result.output.contains('variables: foo')
     }
 
-    def "Check composition with blobal vars"() {
+    def "Check composition with global vars"() {
         setup:
         build """
             plugins {

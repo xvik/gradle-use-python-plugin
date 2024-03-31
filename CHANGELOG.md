@@ -1,5 +1,6 @@
-* (BREAKING) Drop gradle 5 and 6 support
-* (BREAKING) All plugin tasks become abstract, so any custom task types should be abstract too
+* (breaking) Drop gradle 5 and 6 support
+* (breaking) All plugin tasks become abstract, so any custom task types should be abstract too
+* (breaking) All tasks use lazy properties instead of convention mapping (affects custom tasks)
 * Fix `alwaysInstallModules = true` not triggers pipInstall for non-strict requirements file (#94)
   (required for case when requirements file links other files, which changes are not tracked) 
 * Add requirements file references (-r file) support under strict mode (#94) 

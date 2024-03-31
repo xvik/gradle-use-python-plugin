@@ -1,6 +1,8 @@
 package ru.vyarus.gradle.plugin.python.task.pip
 
 import groovy.transform.CompileStatic
+import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Internal
@@ -22,11 +24,11 @@ abstract class BasePipTask extends BasePythonTask {
      * List of modules to install. Module declaration format: 'name:version'.
      * For default pipInstall task modules are configured in
      * {@link ru.vyarus.gradle.plugin.python.PythonExtension#modules}.
-     * Also, modules could be declared in {@link #requirements} file.
+     * Also, modules could be declared in {@link #getRequirements()} file.
      */
     @Input
     @Optional
-    List<String> modules = []
+    abstract ListProperty<String> getModules()
 
     /**
      * Work with packages in user scope (--user pip option). When false - work with global scope.
@@ -35,7 +37,7 @@ abstract class BasePipTask extends BasePythonTask {
      * Enabled by default (see {@link ru.vyarus.gradle.plugin.python.PythonExtension#scope})
      */
     @Input
-    boolean userScope
+    abstract Property<Boolean> getUserScope()
 
     /**
      * Affects only {@code pip install} by applying {@code --no-cache-dir}. Disables cache during package resolution.
@@ -45,7 +47,7 @@ abstract class BasePipTask extends BasePythonTask {
      * Enabled by default (see {@link ru.vyarus.gradle.plugin.python.PythonExtension#usePipCache})
      */
     @Input
-    boolean useCache = true
+    abstract Property<Boolean> getUseCache()
 
     /**
      * Allow to install system packages with pip for no-default python installation (on linux)
@@ -55,7 +57,7 @@ abstract class BasePipTask extends BasePythonTask {
      * Disabled by default because it is a security measure (should be disable with caution)
      */
     @Input
-    boolean breakSystemPackages = false
+    abstract Property<Boolean> getBreakSystemPackages()
 
     /**
      * Affects only {@code pip install} by applying {@code --trusted-host} (other pip commands does not support
@@ -66,7 +68,7 @@ abstract class BasePipTask extends BasePythonTask {
      */
     @Input
     @Optional
-    List<String> trustedHosts = []
+    abstract ListProperty<String> getTrustedHosts()
 
     /**
      * Affects only {@code pip install}, {@code pip download}, {@code pip list} and {@code pip wheel} by applying
@@ -77,7 +79,7 @@ abstract class BasePipTask extends BasePythonTask {
      */
     @Input
     @Optional
-    List<String> extraIndexUrls = []
+    abstract ListProperty<String> getExtraIndexUrls()
 
     /**
      * Requirements file to use (for default value see
@@ -85,7 +87,7 @@ abstract class BasePipTask extends BasePythonTask {
      */
     @InputFile
     @Optional
-    File requirements
+    abstract Property<File> getRequirements()
 
     /**
      * Strict mode: requirements file read by plugin and all declarations used the same way as if they were
@@ -96,7 +98,7 @@ abstract class BasePipTask extends BasePythonTask {
      * version ranges).
      */
     @Input
-    boolean strictRequirements
+    abstract Property<Boolean> getStrictRequirements()
 
     private List<String> requirementModulesCache
     private List<PipModule> modulesListCache
@@ -118,7 +120,7 @@ abstract class BasePipTask extends BasePythonTask {
      * @param modules modules to install
      */
     void pip(Iterable<String> modules) {
-        getModules().addAll(modules)
+        this.modules.addAll(modules)
     }
 
     /**
@@ -132,10 +134,10 @@ abstract class BasePipTask extends BasePythonTask {
         if (reqs) {
             List<String> res = []
             res.addAll(reqs)
-            res.addAll(getModules())
+            res.addAll(modules.get())
             return res
         }
-        return getModules()
+        return modules.get()
     }
 
     /**
@@ -159,7 +161,8 @@ abstract class BasePipTask extends BasePythonTask {
     @Internal
     @SuppressWarnings('UnnecessaryGetter')
     protected boolean isModulesInstallationRequired() {
-        return !getAllModules().empty || (!getStrictRequirements() && getRequirements() && getRequirements().exists())
+        return !getAllModules().empty || (!strictRequirements.get() && getRequirements().isPresent()
+                && getRequirements().get().exists())
     }
 
     /**
@@ -183,8 +186,8 @@ abstract class BasePipTask extends BasePythonTask {
     @SuppressWarnings('UnnecessaryGetter')
     private List<String> getRequirementsModules() {
         if (requirementModulesCache == null) {
-            if (getStrictRequirements()) {
-                File file = getRequirements()
+            if (strictRequirements.get()) {
+                File file = requirements.orNull
                 List<String> res = RequirementsReader.read(file)
                 if (!res.isEmpty()) {
                     logger.warn('{} modules to install read from requirements file: {} (strict mode)',
@@ -217,11 +220,11 @@ abstract class BasePipTask extends BasePythonTask {
     private Pip buildPip() {
         if (pipCache == null) {
             pipCache = new Pip(python)
-                    .userScope(getUserScope())
-                    .useCache(getUseCache())
-                    .breakSystemPackages(getBreakSystemPackages())
-                    .trustedHosts(getTrustedHosts())
-                    .extraIndexUrls(getExtraIndexUrls())
+                    .userScope(userScope.get())
+                    .useCache(useCache.get())
+                    .breakSystemPackages(breakSystemPackages.get())
+                    .trustedHosts(trustedHosts.get())
+                    .extraIndexUrls(extraIndexUrls.get())
         }
         return pipCache
     }

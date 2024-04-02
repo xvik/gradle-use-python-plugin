@@ -205,6 +205,7 @@ class DockerRunKitTest extends AbstractKitTest {
             python {   
                 docker.use = true             
                 pip 'extract-msg:0.28.1'
+                useVenv = false
             }            
         """
 
@@ -230,6 +231,45 @@ class DockerRunKitTest extends AbstractKitTest {
         then: "created"
         result.task(':checkPython').outcome == TaskOutcome.SUCCESS
         result.output.contains('-m virtualenv .gradle/python')
+        file('.gradle/python').exists()
+    }
+
+    def "Check docker venv cleanup"() {
+        setup:
+        build """
+            plugins {
+                id 'ru.vyarus.use-python'
+            }
+
+            python {   
+                docker.use = true             
+                pip 'extract-msg:0.28.1'
+                useVenv = true
+            }            
+        """
+
+        when: "create env"
+        BuildResult result = run('checkPython')
+
+        then: "created"
+        result.task(':checkPython').outcome == TaskOutcome.SUCCESS
+        result.output.contains('-m venv .gradle/python')
+        file('.gradle/python').exists()
+
+        when: "cleanup env"
+        debug()
+        result = run('cleanPython')
+
+        then: "cleared"
+        result.task(':cleanPython').outcome == TaskOutcome.SUCCESS
+        !file('.gradle/python').exists()
+
+        when: "create env again"
+        result = run('checkPython')
+
+        then: "created"
+        result.task(':checkPython').outcome == TaskOutcome.SUCCESS
+        result.output.contains('-m venv .gradle/python')
         file('.gradle/python').exists()
     }
 

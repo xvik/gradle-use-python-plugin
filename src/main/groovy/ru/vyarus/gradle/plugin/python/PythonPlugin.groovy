@@ -217,6 +217,7 @@ abstract class PythonPlugin implements Plugin<Project> {
             task.envPath.convention(extension.envPath)
             task.minPythonVersion.convention(extension.minPythonVersion)
             task.minPipVersion.convention(extension.minPipVersion)
+            task.useVenv.convention(extension.useVenv)
             task.installVirtualenv.convention(extension.installVirtualenv)
             task.virtualenvVersion.convention(extension.virtualenvVersion)
             task.minVirtualenvVersion.convention(extension.minVirtualenvVersion)

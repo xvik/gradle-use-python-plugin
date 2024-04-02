@@ -131,9 +131,23 @@ class PythonExtension {
      */
     Scope scope = Scope.VIRTUALENV_OR_USER
     /**
+     * Use venv instead of virtualenv (because it does not need to be installed for python 3). Note that already
+     * existing environment, created with virtualenv, would still be completely working (the same is true for venv
+     * environment), so it is safe to put any value.
+     * <p>
+     * Note that on some linux distributions, venv must be installed with python3-venv package. Plugin would
+     * not attempt to install it automatically - instead it would fall back to virtualenv usage.
+     * <p>
+     * Also note that in case of venv, pip version would be different from globally installed pip (because venv
+     * install custom pip inside environment, whereas virtualenv links global).
+     */
+    boolean useVenv = true
+    /**
      * Automatically install virtualenv (if pip modules used). Will install for current user only (--user).
      * Installed virtualenv will not be modified later, so you will need to manually update it in case of problems.
      * When disabled, plugin will still check if virtualenv is available, but will not try to install it if not.
+     * <p>
+     * Ignored for venv ({@link #useVenv)
      */
     boolean installVirtualenv = true
     /**
@@ -146,6 +160,8 @@ class PythonExtension {
      * Property not used at all if virtualenv is already installed (no warning on version mismatch): if you installed
      * it manually then you know what you are doing, otherwise "known to be working" version should be installed to
      * avoid problems.
+     * <p>
+     * Ignored for venv ({@link #useVenv)
      */
     String virtualenvVersion = '20.25.1'
     /**
@@ -158,6 +174,8 @@ class PythonExtension {
      * (https://github.com/pypa/virtualenv/issues/1709)). Older virtualenvs could also be used!
      * <p>
      * Specified version could actually have any precision: '20', '20.1', etc.
+     * <p>
+     * Ignored for venv ({@link #useVenv)
      */
     String minVirtualenvVersion = '16'
     /**

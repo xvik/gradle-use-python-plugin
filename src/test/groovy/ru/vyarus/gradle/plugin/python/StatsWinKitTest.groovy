@@ -24,6 +24,7 @@ class StatsWinKitTest extends AbstractKitTest {
             python {
                 scope = VIRTUALENV
                 pip 'extract-msg:0.28.0'
+                useVenv = false
                 
                 printStats = true
             }
@@ -48,6 +49,51 @@ class StatsWinKitTest extends AbstractKitTest {
 :checkPython                                11:11:11:111    11ms                python -m pip show virtualenv
 :checkPython                                11:11:11:111    11ms                python -m virtualenv --version
 :checkPython                                11:11:11:111    11ms                python -m virtualenv .gradle/python
+:checkPython                                11:11:11:111    11ms                cmd /c .gradle/python/Scripts/python.exe -c "import sys;ver=sys.version_info;print(str(ver.major)+'.'+str(ver.minor)+'.'+str(ver.micro));print(sys.prefix);print(sys.executable)"
+:checkPython                                11:11:11:111    11ms                cmd /c .gradle/python/Scripts/python.exe -m pip --version
+:pipInstall                                 11:11:11:111    11ms                cmd /c .gradle/python/Scripts/python.exe -m pip freeze
+:pipInstall                                 11:11:11:111    11ms                cmd /c .gradle/python/Scripts/python.exe -m pip install extract-msg==0.28.0
+:pipInstall                                 11:11:11:111    11ms                cmd /c .gradle/python/Scripts/python.exe -m pip list --format=columns
+:sample                                     11:11:11:111    11ms                cmd /c .gradle/python/Scripts/python.exe -c print('samplee')
+
+    Executed 11 commands in 11ms (overall)
+""")
+    }
+
+    def "Check venv plugin execution"() {
+        setup:
+        build """
+            plugins {
+                id 'ru.vyarus.use-python'
+            }
+
+            python {
+                scope = VIRTUALENV
+                pip 'extract-msg:0.28.0'
+                useVenv = true
+                
+                printStats = true
+            }
+            
+            tasks.register('sample', PythonTask) {
+                command = '-c print(\\'samplee\\')'
+            }
+
+        """
+
+        when: "run task"
+        BuildResult result = run('sample')
+
+        then: "task successful"
+        result.task(':sample').outcome == TaskOutcome.SUCCESS
+        result.output =~ /extract-msg\s+0.28.0/
+        result.output.contains('samplee')
+
+        unifyStats(result.output).contains("""task                                        started         duration            
+:checkPython                                11:11:11:111    11ms                python -c "import sys;ver=sys.version_info;print(str(ver.major)+'.'+str(ver.minor)+'.'+str(ver.micro));print(sys.prefix);print(sys.executable)"
+:checkPython                                11:11:11:111    11ms                python -m pip --version
+:checkPython                                11:11:11:111    11ms                python -m venv -h
+:checkPython                                11:11:11:111    11ms                python -m venv .gradle/python
 :checkPython                                11:11:11:111    11ms                cmd /c .gradle/python/Scripts/python.exe -c "import sys;ver=sys.version_info;print(str(ver.major)+'.'+str(ver.minor)+'.'+str(ver.micro));print(sys.prefix);print(sys.executable)"
 :checkPython                                11:11:11:111    11ms                cmd /c .gradle/python/Scripts/python.exe -m pip --version
 :pipInstall                                 11:11:11:111    11ms                cmd /c .gradle/python/Scripts/python.exe -m pip freeze

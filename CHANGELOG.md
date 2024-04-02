@@ -15,6 +15,10 @@
      Works only on linux. When enabled, all container ports automatically exposed on host 
      and configured port mappings ignored 
   - printStats: show all executed python commands (including plugin internal) at the end of the build (with timings)
+  - useVenv: use venv instead of virtualenv (enabled by default)
+    Venv is installed by defualt since python 3.3 which removes requirement to install virtualenv. 
+    Fallback to virtualenv when venv not found. All current environments created with virtualenv
+    will still be working correctly.
 * To use different python for PythonTask useCustomPython = true must be declared now
   (otherwise, pythonPath select by checkPython task would be used (and task's pythonPath ignored))
 

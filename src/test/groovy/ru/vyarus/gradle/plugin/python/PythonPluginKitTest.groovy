@@ -98,6 +98,7 @@ class PythonPluginKitTest extends AbstractKitTest {
                 scope = VIRTUALENV
                 pythonPath = "${env.pythonPath.replace('\\', '\\\\')}"
                 virtualenvVersion = "20.24.6"
+                useVenv = false
                 
                 pip 'extract-msg:0.28.0'
             }            
@@ -125,6 +126,7 @@ class PythonPluginKitTest extends AbstractKitTest {
                 pip 'extract-msg:0.28.0'
                 pythonPath = "${env.pythonPath.replace('\\', '\\\\')}"
                 virtualenvVersion = ""
+                useVenv = false
             }            
         """
 
@@ -147,6 +149,7 @@ class PythonPluginKitTest extends AbstractKitTest {
             python {                
                 minVirtualenvVersion '1000'
                 pip 'extract-msg:0.28.1'
+                useVenv = false
             }            
         """
 
@@ -174,7 +177,7 @@ class PythonPluginKitTest extends AbstractKitTest {
 
         then: "created"
         result.task(':checkPython').outcome == TaskOutcome.SUCCESS
-        result.output.contains('-m virtualenv .gradle/python'.replace('/', File.separator))
+        result.output.contains('-m venv .gradle/python'.replace('/', File.separator))
         file('.gradle/python').exists()
 
         when: "cleanup env"
@@ -189,7 +192,7 @@ class PythonPluginKitTest extends AbstractKitTest {
 
         then: "created"
         result.task(':checkPython').outcome == TaskOutcome.SUCCESS
-        result.output.contains('-m virtualenv .gradle/python'.replace('/', File.separator))
+        result.output.contains('-m venv .gradle/python'.replace('/', File.separator))
         file('.gradle/python').exists()
     }
 

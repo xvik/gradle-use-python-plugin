@@ -2,6 +2,7 @@ package ru.vyarus.gradle.plugin.python
 
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.TaskOutcome
+import ru.vyarus.gradle.plugin.python.cmd.Venv
 import ru.vyarus.gradle.plugin.python.cmd.Virtualenv
 
 /**
@@ -10,7 +11,7 @@ import ru.vyarus.gradle.plugin.python.cmd.Virtualenv
  */
 class GlobalVirtualenvTest extends AbstractKitTest {
 
-    def "Check env plugin execution"() {
+    def "Check venv from virtualenv creation"() {
         setup:
         // create virtualenv and use it as "global" python
         // without extra detection, plugin will try to use --user flag for virtualenv installation and fail
@@ -26,6 +27,73 @@ class GlobalVirtualenvTest extends AbstractKitTest {
                 pythonPath = '${env.pythonPath.replace('\\', '\\\\')}'
                 scope = VIRTUALENV
                 pip 'extract-msg:0.34.3'
+            }
+            
+            tasks.register('sample', PythonTask) {
+                command = '-c print(\\'samplee\\')'
+            }
+
+        """
+
+        when: "run task"
+        BuildResult result = run('sample')
+
+        then: "task successful"
+        result.task(':sample').outcome == TaskOutcome.SUCCESS
+        result.output =~ /extract-msg\s+0.34.3/
+        result.output.contains('samplee')
+    }
+
+    def "Check venv from venv creation"() {
+        setup:
+        // create virtualenv and use it as "global" python
+        // without extra detection, plugin will try to use --user flag for virtualenv installation and fail
+        Venv env = venv('env')
+        env.create(false)
+
+        build """
+            plugins {
+                id 'ru.vyarus.use-python'
+            }
+
+            python {
+                pythonPath = '${env.pythonPath.replace('\\', '\\\\')}'
+                scope = VIRTUALENV
+                pip 'extract-msg:0.34.3'
+            }
+            
+            tasks.register('sample', PythonTask) {
+                command = '-c print(\\'samplee\\')'
+            }
+
+        """
+
+        when: "run task"
+        BuildResult result = run('sample')
+
+        then: "task successful"
+        result.task(':sample').outcome == TaskOutcome.SUCCESS
+        result.output =~ /extract-msg\s+0.34.3/
+        result.output.contains('samplee')
+    }
+
+    def "Check virtualenv from venv creation"() {
+        setup:
+        // create virtualenv and use it as "global" python
+        // without extra detection, plugin will try to use --user flag for virtualenv installation and fail
+        Venv env = venv('env')
+        env.create(false)
+
+        build """
+            plugins {
+                id 'ru.vyarus.use-python'
+            }
+
+            python {
+                pythonPath = '${env.pythonPath.replace('\\', '\\\\')}'
+                scope = VIRTUALENV
+                pip 'extract-msg:0.34.3'
+                useVenv = false
             }
             
             tasks.register('sample', PythonTask) {

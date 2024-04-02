@@ -1,35 +1,26 @@
 package ru.vyarus.gradle.plugin.python.cmd
 
 import groovy.transform.CompileStatic
-import org.gradle.api.logging.LogLevel
-import ru.vyarus.gradle.plugin.python.cmd.docker.DockerConfig
 import ru.vyarus.gradle.plugin.python.cmd.env.Environment
-import ru.vyarus.gradle.plugin.python.util.CliUtils
 
-import java.nio.file.Paths
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 /**
- * Pip commands execution utility. Use {@link Python} internally.
+ * Virtualenv commands execution utility. Use {@link Python} internally.
  *
  * @author Vyacheslav Rusakov
  * @since 13.12.2017
  */
 @CompileStatic
-class Virtualenv {
+class Virtualenv extends VirtualTool<Virtualenv> {
 
     private static final Pattern VERSION = Pattern.compile('virtualenv ([\\d.]+)')
 
     public static final String PIP_NAME = 'virtualenv'
 
-    private final Environment env
-    private final Python python
-
     // module name
     final String name = PIP_NAME
-    final String path
-    final File location
 
     Virtualenv(Environment environment, String path) {
         this(environment, null, null, path)
@@ -41,73 +32,10 @@ class Virtualenv {
      * @param environment gradle api access object
      * @param pythonPath python path (null to use global)
      * @param binary python binary name (null to use default python3 or python)
-     * @param validateSystemBinary validate global python binary
      * @param path environment path (relative to project or absolute)
      */
     Virtualenv(Environment environment, String pythonPath, String binary, String path) {
-        this.env = environment
-        python = new Python(environment, pythonPath, binary).logLevel(LogLevel.LIFECYCLE)
-        this.path = path
-        if (!path) {
-            throw new IllegalArgumentException('Virtualenv path not set')
-        }
-        location = environment.file(path)
-    }
-
-    /**
-     * System binary search is performed only for global python (when pythonPath is not specified). Enabled by default.
-     *
-     * @param validate true to search python binary in system path and fail if not found
-     * @return cli instance for chained calls
-     */
-    Virtualenv validateSystemBinary(boolean validate) {
-        this.python.validateSystemBinary(validate)
-        return this
-    }
-
-    /**
-     * Enable docker support: all python commands would be executed under docker container.
-     *
-     * @param docker docker configuration (may be null)
-     * @return cli instance for chained calls
-     */
-    Virtualenv withDocker(DockerConfig docker) {
-        this.python.withDocker(docker)
-        return this
-    }
-
-    /**
-     * Shortcut for {@link Python#workDir(java.lang.String)}.
-     *
-     * @param workDir python working directory
-     * @return virtualenv instance for chained calls
-     */
-    Virtualenv workDir(String workDir) {
-        python.workDir(workDir)
-        return this
-    }
-
-    /**
-     * Shortcut for {@link Python#environment(java.util.Map)}.
-     *
-     * @param env environment map
-     * @return pip instance for chained calls
-     */
-    Virtualenv environment(Map<String, Object> env) {
-        python.environment(env)
-        return this
-    }
-
-    /**
-     * Perform pre-initialization and, if required, validate global python binary correctness. Calling this method is
-     * NOT REQUIRED: initialization will be performed automatically before first execution. But it might be called
-     * in order to throw possible initialization error before some other logic (related to exception handling).
-     *
-     * @return virtualenv instance for chained calls
-     */
-    Virtualenv validate() {
-        python.validate()
-        return this
+        super(environment, pythonPath, binary, path)
     }
 
     /**
@@ -146,17 +74,11 @@ class Virtualenv {
     }
 
     /**
-     * @return true if virtualenv exists
-     */
-    boolean exists() {
-        return location.exists() && location.list().size() > 0
-    }
-
-    /**
      * Create virtualenv with setuptools and pip. Do nothing if already exists.
      * To copy environment instead of symlinking, use {@code copy (true)} otherwise don't specify parameter.
      */
     @SuppressWarnings('BuilderMethodWithSideEffects')
+    @Override
     void create(boolean copy = false) {
         create(true, true, copy)
     }
@@ -194,28 +116,6 @@ class Virtualenv {
             cmd += ' --no-pip --no-wheel'
         }
         python.callModule(name, cmd)
-    }
-
-    /**
-     * @return python path to use for environment
-     */
-    String getPythonPath() {
-        return python.getOrCompute('virtualenv.python.path') {
-            String res = CliUtils.pythonBinPath(location.absolutePath, python.windows)
-            return Paths.get(path).absolute ? res
-                    // use shorter relative path
-                    : env.relativePath(res)
-        }
-    }
-
-    /**
-     * May be used to apply additional virtualenv ({@link Python#extraArgs(java.lang.Object)}) or python
-     * ({@link Python#pythonArgs(java.lang.Object)}) arguments.
-     *
-     * @return python cli instance used to execute commands
-     */
-    Python getPython() {
-        return python
     }
 
     @Override

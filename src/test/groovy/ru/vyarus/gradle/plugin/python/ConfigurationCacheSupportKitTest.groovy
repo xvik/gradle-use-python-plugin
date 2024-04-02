@@ -92,6 +92,7 @@ task                                        started         duration
             python {
                 scope = VIRTUALENV
                 pip 'extract-msg:0.28.0'
+                useVenv = false
                 
                 printStats = true
                 debug = true
@@ -157,6 +158,81 @@ task                                        started         duration
     Executed 6 commands in 11ms (overall)""")
     }
 
+
+    def "Check venv plugin execution"() {
+        setup:
+        build """
+            plugins {
+                id 'ru.vyarus.use-python'
+            }
+
+            python {
+                scope = VIRTUALENV
+                pip 'extract-msg:0.28.0'
+                
+                printStats = true
+                debug = true
+            }
+            
+            tasks.register('sample', PythonTask) {
+                command = '-c print(\\'samplee\\')'
+            }
+
+        """
+
+        when: "run task"
+        BuildResult result = run('--configuration-cache', '--configuration-cache-problems=warn', 'sample')
+
+        then: "no configuration cache incompatibilities"
+        result.output.contains("1 problem was found storing the configuration cache")
+        result.output.contains('Gradle runtime: support for using a Java agent with TestKit')
+        result.output.contains('Calculating task graph as no cached configuration is available for tasks:')
+
+        then: "task successful"
+        result.task(':sample').outcome == TaskOutcome.SUCCESS
+        result.output =~ /extract-msg\s+0.28.0/
+        result.output.contains('samplee')
+
+        unifyStats(result.output).contains(isWin ? 'Python execution stats': """Python execution stats:
+
+task                                        started         duration            
+:checkPython                                11:11:11:111    11ms                python3 --version
+:checkPython                                11:11:11:111    11ms                python3 -c exec("import sys;ver=sys.version_info;print(str(ver.major)+'.'+str(ver.minor)+'.'+str(ver.micro));print(sys.prefix);print(sys.executable)")
+:checkPython                                11:11:11:111    11ms                python3 -m pip --version
+:checkPython                                11:11:11:111    11ms                python3 -m venv -h
+:checkPython                                11:11:11:111    11ms                python3 -m venv .gradle/python
+:checkPython                                11:11:11:111    11ms                .gradle/python/bin/python -c exec("import sys;ver=sys.version_info;print(str(ver.major)+'.'+str(ver.minor)+'.'+str(ver.micro));print(sys.prefix);print(sys.executable)")
+:checkPython                                11:11:11:111    11ms                .gradle/python/bin/python -m pip --version
+:pipInstall                                 11:11:11:111    11ms                .gradle/python/bin/python -m pip freeze
+:pipInstall                                 11:11:11:111    11ms                .gradle/python/bin/python -m pip install extract-msg==0.28.0
+:pipInstall                                 11:11:11:111    11ms                .gradle/python/bin/python -m pip list --format=columns
+:sample                                     11:11:11:111    11ms                .gradle/python/bin/python -c exec("print('samplee')")
+
+    Executed 11 commands in 11ms (overall)""")
+
+
+        when: "run from cache"
+        println '\n\n------------------- FROM CACHE ----------------------------------------'
+        result = run('--configuration-cache', '--configuration-cache-problems=warn', 'sample')
+
+        then: "cache used"
+        result.output.contains('Reusing configuration cache.')
+        result.output =~ /extract-msg\s+0.28.0/
+        result.output.contains('samplee')
+
+        unifyStats(result.output).contains(isWin ? 'Python execution stats': """Python execution stats:
+
+task                                        started         duration            
+:checkPython                                11:11:11:111    11ms                python3 --version
+:checkPython                                11:11:11:111    11ms                .gradle/python/bin/python -c exec("import sys;ver=sys.version_info;print(str(ver.major)+'.'+str(ver.minor)+'.'+str(ver.micro));print(sys.prefix);print(sys.executable)")
+:checkPython                                11:11:11:111    11ms                .gradle/python/bin/python -m pip --version
+:pipInstall                                 11:11:11:111    11ms                .gradle/python/bin/python -m pip freeze
+:pipInstall                                 11:11:11:111    11ms                .gradle/python/bin/python -m pip list --format=columns
+:sample                                     11:11:11:111    11ms                .gradle/python/bin/python -c exec("print('samplee')")
+
+    Executed 6 commands in 11ms (overall)""")
+    }
+
     def "Check exact virtualenv version installation"() {
         setup:
         Virtualenv env = env('env')
@@ -171,6 +247,7 @@ task                                        started         duration
                 pip 'extract-msg:0.28.0'
                 pythonPath = "${env.pythonPath.replace('\\', '\\\\')}"
                 virtualenvVersion = "20.24.6"
+                useVenv = false
                 
                 printStats = true
                 debug = true
@@ -453,7 +530,7 @@ requests[socks,security] == 2.28.1
 
         then: "task successful"
         result.task(':pipInstall').outcome == TaskOutcome.SUCCESS
-        result.output.contains('-m virtualenv .gradle/python'.replace('/', File.separator))
+        result.output.contains('-m venv .gradle/python'.replace('/', File.separator))
         result.output =~ /extract-msg\s+0.34.3/
         result.output =~ /boson\s+1.4/
         result.output =~ /requests\s+2.28.1/
@@ -464,9 +541,8 @@ task                                        started         duration
 :checkPython                                11:11:11:111    11ms                python3 --version
 :checkPython                                11:11:11:111    11ms                python3 -c exec("import sys;ver=sys.version_info;print(str(ver.major)+'.'+str(ver.minor)+'.'+str(ver.micro));print(sys.prefix);print(sys.executable)")
 :checkPython                                11:11:11:111    11ms                python3 -m pip --version
-:checkPython                                11:11:11:111    11ms                python3 -m pip show virtualenv
-:checkPython                                11:11:11:111    11ms                python3 -m virtualenv --version
-:checkPython                                11:11:11:111    11ms                python3 -m virtualenv .gradle/python
+:checkPython                                11:11:11:111    11ms                python3 -m venv -h
+:checkPython                                11:11:11:111    11ms                python3 -m venv .gradle/python
 :checkPython                                11:11:11:111    11ms                .gradle/python/bin/python -c exec("import sys;ver=sys.version_info;print(str(ver.major)+'.'+str(ver.minor)+'.'+str(ver.micro));print(sys.prefix);print(sys.executable)")
 :checkPython                                11:11:11:111    11ms                .gradle/python/bin/python -m pip --version
 :pipInstall                                 11:11:11:111    11ms                .gradle/python/bin/python -m pip freeze
@@ -475,7 +551,7 @@ task                                        started         duration
 :pipInstall                                 11:11:11:111    11ms                .gradle/python/bin/python -m pip install requests[socks,security]==2.28.1
 :pipInstall                                 11:11:11:111    11ms                .gradle/python/bin/python -m pip list --format=columns
 
-    Executed 13 commands in 11ms (overall)""")
+    Executed 12 commands in 11ms (overall)""")
 
 
         when: "run from cache"

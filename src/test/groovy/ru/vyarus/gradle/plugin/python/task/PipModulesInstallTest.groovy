@@ -21,6 +21,7 @@ class PipModulesInstallTest extends AbstractKitTest {
             python {
                 pip 'git+https://github.com/ictxiangxin/boson/@b52727f7170acbedc5a1b4e1df03972bd9bb85e3#egg=boson-0.9'
                 usePipCache = false
+                useVenv = false
             }
 
         """
@@ -40,6 +41,41 @@ class PipModulesInstallTest extends AbstractKitTest {
         result.task(':checkPython').outcome == TaskOutcome.SUCCESS
         result.task(':pipInstall').outcome == TaskOutcome.SUCCESS // up to date check removed
         !result.output.contains('Successfully built boson')
+        !result.output.contains('boson-0.9')
+    }
+
+
+    def "Check vcs install venv"() {
+
+        setup:
+        build """
+            plugins {
+                id 'ru.vyarus.use-python'
+            }
+
+            python {
+                pip 'git+https://github.com/ictxiangxin/boson/@b52727f7170acbedc5a1b4e1df03972bd9bb85e3#egg=boson-0.9'
+                usePipCache = false
+                useVenv = true
+            }
+
+        """
+
+        when: "run task"
+        BuildResult result = run('pipInstall')
+
+        then: "package install called"
+        result.task(':checkPython').outcome == TaskOutcome.SUCCESS
+        result.task(':pipInstall').outcome == TaskOutcome.SUCCESS
+        result.output.contains('Running setup.py install for boson: finished with status \'done\'')
+        result.output.contains('boson-0.9')
+
+        when: "second install"
+        result = run('pipInstall')
+        then: "package not installed"
+        result.task(':checkPython').outcome == TaskOutcome.SUCCESS
+        result.task(':pipInstall').outcome == TaskOutcome.SUCCESS // up to date check removed
+        !result.output.contains('Running setup.py install for boson: finished with status \'done\'')
         !result.output.contains('boson-0.9')
     }
 

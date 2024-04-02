@@ -2,6 +2,7 @@ package ru.vyarus.gradle.plugin.python
 
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.TaskOutcome
+import ru.vyarus.gradle.plugin.python.cmd.Venv
 import ru.vyarus.gradle.plugin.python.cmd.Virtualenv
 
 /**
@@ -123,6 +124,7 @@ class WorkflowKitTest extends AbstractKitTest {
             }
                      
             python.envCopy = true
+            python.useVenv = false
             python.pip 'extract-msg:0.28.0'
         """
 
@@ -132,6 +134,29 @@ class WorkflowKitTest extends AbstractKitTest {
         then: "env created, but not symlinked"
         result.task(':checkPython').outcome == TaskOutcome.SUCCESS
         result.output.contains('--always-copy')
+        env.exists()
+    }
+
+    def "Check copy venv"() {
+
+        setup:
+        Venv env = venv()
+        build """
+            plugins {
+                id 'ru.vyarus.use-python'
+            }
+                     
+            python.envCopy = true
+            python.useVenv = true
+            python.pip 'extract-msg:0.28.0'
+        """
+
+        when: "run task"
+        BuildResult result = run('checkPython')
+
+        then: "env created, but not symlinked"
+        result.task(':checkPython').outcome == TaskOutcome.SUCCESS
+        result.output.contains('--copies')
         env.exists()
     }
 
@@ -145,7 +170,8 @@ class WorkflowKitTest extends AbstractKitTest {
                 id 'ru.vyarus.use-python'
             }
                         
-            python.pythonPath = '${env.pythonPath.replace("\\", "\\\\")}'            
+            python.pythonPath = '${env.pythonPath.replace("\\", "\\\\")}'
+            python.useVenv = false            
             python.pip 'extract-msg:0.28.0'
         """
 
@@ -191,6 +217,7 @@ class WorkflowKitTest extends AbstractKitTest {
                 installVirtualenv = false
                 scope = VIRTUALENV             
                 pip 'extract-msg:0.28.0'
+                useVenv = false
             }
         """
 

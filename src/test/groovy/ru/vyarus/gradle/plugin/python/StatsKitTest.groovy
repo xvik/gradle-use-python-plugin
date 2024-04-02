@@ -24,6 +24,7 @@ class StatsKitTest extends AbstractKitTest {
             python {
                 scope = VIRTUALENV
                 pip 'extract-msg:0.28.0'
+                useVenv = false
                 
                 printStats = true
             }
@@ -57,6 +58,52 @@ class StatsKitTest extends AbstractKitTest {
 :sample                                     11:11:11:111    11ms                .gradle/python/bin/python -c exec("print('samplee')")
 
     Executed 12 commands in 11ms (overall)
+""")
+    }
+
+    def "Check venv plugin execution"() {
+        setup:
+        build """
+            plugins {
+                id 'ru.vyarus.use-python'
+            }
+
+            python {
+                scope = VIRTUALENV
+                pip 'extract-msg:0.28.0'
+                useVenv = true
+                
+                printStats = true
+            }
+            
+            tasks.register('sample', PythonTask) {
+                command = '-c print(\\'samplee\\')'
+            }
+
+        """
+
+        when: "run task"
+        BuildResult result = run('sample')
+
+        then: "task successful"
+        result.task(':sample').outcome == TaskOutcome.SUCCESS
+        result.output =~ /extract-msg\s+0.28.0/
+        result.output.contains('samplee')
+
+        unifyStats(result.output).contains("""task                                        started         duration            
+:checkPython                                11:11:11:111    11ms                python3 --version
+:checkPython                                11:11:11:111    11ms                python3 -c exec("import sys;ver=sys.version_info;print(str(ver.major)+'.'+str(ver.minor)+'.'+str(ver.micro));print(sys.prefix);print(sys.executable)")
+:checkPython                                11:11:11:111    11ms                python3 -m pip --version
+:checkPython                                11:11:11:111    11ms                python3 -m venv -h
+:checkPython                                11:11:11:111    11ms                python3 -m venv .gradle/python
+:checkPython                                11:11:11:111    11ms                .gradle/python/bin/python -c exec("import sys;ver=sys.version_info;print(str(ver.major)+'.'+str(ver.minor)+'.'+str(ver.micro));print(sys.prefix);print(sys.executable)")
+:checkPython                                11:11:11:111    11ms                .gradle/python/bin/python -m pip --version
+:pipInstall                                 11:11:11:111    11ms                .gradle/python/bin/python -m pip freeze
+:pipInstall                                 11:11:11:111    11ms                .gradle/python/bin/python -m pip install extract-msg==0.28.0
+:pipInstall                                 11:11:11:111    11ms                .gradle/python/bin/python -m pip list --format=columns
+:sample                                     11:11:11:111    11ms                .gradle/python/bin/python -c exec("print('samplee')")
+
+    Executed 11 commands in 11ms (overall)
 """)
     }
 

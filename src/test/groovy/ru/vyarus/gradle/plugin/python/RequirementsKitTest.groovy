@@ -33,7 +33,7 @@ requests[socks,security] == 2.28.1
 
         then: "task successful"
         result.task(':pipInstall').outcome == TaskOutcome.SUCCESS
-        result.output.contains('-m virtualenv .gradle/python'.replace('/', File.separator))
+        result.output.contains('-m venv .gradle/python'.replace('/', File.separator))
         result.output =~ /extract-msg\s+0.34.3/
         result.output =~ /boson\s+1.4/
         result.output =~ /requests\s+2.28.1/
@@ -65,7 +65,7 @@ requests[socks,security] == 2.28.1
 
         then: "task successful"
         result.task(':pipInstall').outcome == TaskOutcome.SUCCESS
-        result.output.contains('-m virtualenv .gradle/python'.replace('/', File.separator))
+        result.output.contains('-m venv .gradle/python'.replace('/', File.separator))
         result.output.contains('-m pip install -r requirements.txt')
         result.output =~ /extract-msg\s+0.34.3/
         result.output =~ /boson\s+1.4/
@@ -118,7 +118,7 @@ requests[socks,security] == 2.28.1
 
         then: "task successful"
         result.task(':pipInstall').outcome == TaskOutcome.SUCCESS
-        result.output.contains('-m virtualenv .gradle/python'.replace('/', File.separator))
+        result.output.contains('-m venv .gradle/python'.replace('/', File.separator))
         result.output =~ /extract-msg\s+0.34.3/
         result.output =~ /boson\s+1.4/
         result.output =~ /requests\s+2.28.1/
@@ -170,7 +170,7 @@ requests[socks,security] == 2.28.1
 
         then: "task successful"
         result.task(':pipInstall').outcome == TaskOutcome.SUCCESS
-        result.output.contains('-m virtualenv .gradle/python'.replace('/', File.separator))
+        result.output.contains('-m venv .gradle/python'.replace('/', File.separator))
         result.output.contains('-m pip install -r requirements.txt')
         result.output =~ /extract-msg\s+0.34.3/
         result.output =~ /boson\s+1.4/
@@ -264,7 +264,7 @@ extract-msg == 0.34.3
 
         then: "task successful"
         result.task(':pipInstall').outcome == TaskOutcome.SUCCESS
-        result.output.contains('-m virtualenv .gradle/python'.replace('/', File.separator))
+        result.output.contains('-m venv .gradle/python'.replace('/', File.separator))
         result.output =~ /extract-msg\s+0.34.3/
         result.output =~ /requests\s+2.28.1/
     }
@@ -289,7 +289,7 @@ extract-msg==0.28.0
 
         then: "task successful"
         result.task(':pipInstall').outcome == TaskOutcome.SUCCESS
-        result.output.contains('-m virtualenv .gradle/python'.replace('/', File.separator))
+        result.output.contains('-m venv .gradle/python'.replace('/', File.separator))
         !result.output.contains('0.28.0')
         result.output =~ /extract-msg\s+0.34.3/
     }
@@ -318,7 +318,7 @@ extract-msg == 0.34.3
 
         then: "task successful"
         result.task(':pipInstall').outcome == TaskOutcome.SUCCESS
-        result.output.contains('-m virtualenv .gradle/python'.replace('/', File.separator))
+        result.output.contains('-m venv .gradle/python'.replace('/', File.separator))
         result.output.contains('-m pip install -r requirements.txt')
         result.output =~ /extract-msg\s+0.34.3/
         result.output =~ /requests\s+2.28.1/
@@ -347,7 +347,7 @@ extract-msg == 0.34.3
 
         then: "task successful"
         result.task(':pipInstall').outcome == TaskOutcome.SUCCESS
-        result.output.contains('-m virtualenv .gradle/python'.replace('/', File.separator))
+        result.output.contains('-m venv .gradle/python'.replace('/', File.separator))
         result.output.contains('-m pip install -r reqs.txt')
         result.output =~ /extract-msg\s+0.34.3/
     }

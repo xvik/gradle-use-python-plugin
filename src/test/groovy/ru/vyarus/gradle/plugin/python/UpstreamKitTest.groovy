@@ -9,7 +9,7 @@ import org.gradle.testkit.runner.TaskOutcome
  */
 class UpstreamKitTest extends AbstractKitTest {
 
-    String GRADLE_VERSION = '8.6'
+    String GRADLE_VERSION = '8.7'
 
     def "Check simple plugin execution"() {
         setup:

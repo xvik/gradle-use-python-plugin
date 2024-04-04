@@ -101,7 +101,7 @@ class StatsWinKitTest extends AbstractKitTest {
 :pipInstall                                 11:11:11:111    11ms                cmd /c .gradle/python/Scripts/python.exe -m pip list --format=columns
 :sample                                     11:11:11:111    11ms                cmd /c .gradle/python/Scripts/python.exe -c print('samplee')
 
-    Executed 11 commands in 11ms (overall)
+    Executed 10 commands in 11ms (overall)
 """)
     }
 

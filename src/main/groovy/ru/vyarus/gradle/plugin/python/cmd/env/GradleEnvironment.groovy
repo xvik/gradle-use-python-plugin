@@ -33,20 +33,20 @@ import java.util.function.Supplier
 @SuppressWarnings(['Println', 'DuplicateStringLiteral'])
 abstract class GradleEnvironment implements Environment {
 
-    private final Logger logger
-    private final File projectDir
-    private final File rootDir
-    private final String rootName
-    private final String projectPath
-    private final String taskName
+    protected final Logger logger
+    protected final File projectDir
+    protected final File rootDir
+    protected final String rootName
+    protected final String projectPath
+    protected final String taskName
 
     // same cache for all projects
-    private final Provider<Map<String, Object>> cacheGlobal
+    protected final Provider<Map<String, Object>> cacheGlobal
     // same cache for all instances within one project
-    private final Provider<Map<String, Object>> cacheProject
+    protected final Provider<Map<String, Object>> cacheProject
     // same list for all projects
-    private final Provider<List<PythonStat>> stats
-    private final Provider<Boolean> debug
+    protected final Provider<List<PythonStat>> stats
+    protected final Provider<Boolean> debug
 
     @SuppressWarnings('SynchronizedMethod')
     static synchronized Environment create(Project project, String taskName,
@@ -88,7 +88,7 @@ abstract class GradleEnvironment implements Environment {
         this.projectPath = projectPath
         this.taskName = taskName
         // note for root project it would be the same maps
-        this.cacheGlobal = globalCache
+        this.cacheGlobal = globalCache == null ? projectCache : globalCache
         this.cacheProject = projectCache
         this.stats = stats
         this.debug = debug

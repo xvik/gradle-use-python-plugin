@@ -4,6 +4,7 @@ import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.TaskOutcome
 import ru.vyarus.gradle.plugin.python.cmd.Pip
 import ru.vyarus.gradle.plugin.python.cmd.Virtualenv
+import ru.vyarus.gradle.plugin.python.cmd.env.SimpleEnvironment
 import spock.lang.IgnoreIf
 
 /**
@@ -11,6 +12,11 @@ import spock.lang.IgnoreIf
  * @since 14.03.2024
  */
 class ConfigurationCacheSupportKitTest extends AbstractKitTest {
+
+    def setupSpec() {
+        // stats check requires real installation
+        new Pip(new SimpleEnvironment()).uninstall("extract-msg")
+    }
 
     def "Check simple plugin execution"() {
         setup:

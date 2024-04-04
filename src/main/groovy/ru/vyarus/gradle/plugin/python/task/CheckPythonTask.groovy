@@ -227,6 +227,7 @@ abstract class CheckPythonTask extends BasePipTask {
                 .withDocker(getDocker().toConfig())
                 .validate()
 
+        gradleEnv.get().debug('Creating environment')
         envCreated = env.create(pip)
         return envCreated
     }

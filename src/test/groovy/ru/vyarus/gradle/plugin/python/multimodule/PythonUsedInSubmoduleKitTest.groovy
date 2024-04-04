@@ -138,6 +138,43 @@ class PythonUsedInSubmoduleKitTest extends AbstractKitTest {
         result.output.contains("${projectName()}${File.separator}.gradle${File.separator}python")
     }
 
+    def "Check all modules use plugin at the same build"() {
+
+        setup:
+        file('settings.gradle') << ' include "sub"'
+        file('sub').mkdir()
+        build """                        
+            plugins {
+                id 'ru.vyarus.use-python' apply false
+            }
+            
+            allprojects {
+               apply plugin: 'ru.vyarus.use-python'
+               
+               tasks.register('sample', PythonTask) {
+                    command = "-c print('samplee\${project.path}')"
+                } 
+            }                        
+            
+            python {
+                pip 'extract-msg:0.28.0'
+            }
+            
+        """
+
+        when: "run root task"
+        BuildResult result = run('sample')
+
+        then: "task successful"
+        result.task(':sample').outcome == TaskOutcome.SUCCESS
+        result.output =~ /extract-msg\s+0.28.0/
+        result.output.contains('samplee:')
+
+        then: "sub task successful"
+        result.task(':sub:sample').outcome == TaskOutcome.SUCCESS
+        result.output.contains('samplee:sub')
+    }
+
 
     def "Check virtualenv relative to submodule"() {
 

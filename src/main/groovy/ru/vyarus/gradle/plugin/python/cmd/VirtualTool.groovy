@@ -1,7 +1,6 @@
 package ru.vyarus.gradle.plugin.python.cmd
 
 import groovy.transform.CompileStatic
-import groovy.transform.Memoized
 import org.gradle.api.logging.LogLevel
 import ru.vyarus.gradle.plugin.python.cmd.docker.DockerConfig
 import ru.vyarus.gradle.plugin.python.cmd.env.Environment
@@ -32,6 +31,7 @@ abstract class VirtualTool<T extends VirtualTool> {
             throw new IllegalArgumentException('Virtual environment path not set')
         }
         this.location = environment.file(path)
+        environment.debug("${getClass().simpleName} environment init for path '${path}' (python path: '${pythonPath}')")
     }
 
     /**
@@ -110,9 +110,8 @@ abstract class VirtualTool<T extends VirtualTool> {
     /**
      * @return python path to use for environment
      */
-    @Memoized
     String getPythonPath() {
-        return python.getOrCompute('env.python.path') {
+        return python.getOrCompute("env.python.path:$env.projectPath") {
             String res = CliUtils.pythonBinPath(location.absolutePath, python.windows)
             return Paths.get(path).absolute ? res
                     // use shorter relative path

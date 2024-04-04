@@ -182,7 +182,7 @@ abstract class GradleEnvironment implements Environment {
         if (debug.get()) {
             // instance important for configuration cache mode where different objects could appear (but shouldn't
             // because ValueSource objects used)
-            println "[CACHE$projectPath$taskName] Project cache update $key=$value (instance: " +
+            println "[CACHE$taskPath] Project cache update $key=$value (instance: " +
                     "${System.identityHashCode(cache)})"
         }
         cache.put(key, value)
@@ -192,7 +192,7 @@ abstract class GradleEnvironment implements Environment {
     void updateGlobalCache(String key, Object value) {
         Map<String, Object> cache = cacheGlobal.get()
         if (debug.get()) {
-            println "[CACHE$projectPath$taskName] Global cache update $key=$value (instance: " +
+            println "[CACHE$taskPath] Global cache update $key=$value (instance: " +
                     "${System.identityHashCode(cache)})"
         }
         cache.put(key, value)
@@ -202,7 +202,7 @@ abstract class GradleEnvironment implements Environment {
     @SuppressWarnings('ConfusingMethodName')
     void debug(String msg) {
         if (debug.get()) {
-            println "[DEBUG$projectPath:$taskName] ".replaceAll('::', ':') + msg
+            println "[DEBUG$taskPath] $msg"
         }
     }
 
@@ -221,7 +221,7 @@ abstract class GradleEnvironment implements Environment {
                     duration: System.currentTimeMillis() - start
             ))
             if (debug.get()) {
-                println "[STATS$projectPath$taskName] Stat registered: stats instance " +
+                println "[STATS$taskPath] Stat registered: stats instance " +
                         "${System.identityHashCode(statList)}, count ${statList.size()}\n\tfor: $cmd"
             }
         }
@@ -263,6 +263,9 @@ abstract class GradleEnvironment implements Environment {
         synchronized (cache) {
             // computeIfAbsent not used here because actions MAY also call cacheable functions, which is not allowed
             T res = cache.get(key) as T
+            if (debug.get() && res != null) {
+                println("[CACHE$taskPath] Use cached value: $key = $value")
+            }
             if (res == null && value != null) {
                 res = value.get()
                 if (global) {
@@ -273,5 +276,9 @@ abstract class GradleEnvironment implements Environment {
             }
             return res
         }
+    }
+
+    private String getTaskPath() {
+        return "$projectPath:$taskName".replaceAll('::', ':')
     }
 }

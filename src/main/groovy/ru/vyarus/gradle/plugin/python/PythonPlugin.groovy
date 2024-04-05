@@ -132,7 +132,7 @@ abstract class PythonPlugin implements Plugin<Project> {
             File dir = project.file(path)
             boolean exists = dir.exists()
             task.delete path
-            task.onlyIf { exists}
+            task.onlyIf { exists }
             task.doLast {
                 if (exists) {
                     task.logger.lifecycle('[python] Environment removed: {}', dir.absolutePath)

@@ -187,6 +187,9 @@ class PythonExtension {
      * <p>
      * If multiple env required (e.g. to use different python versions or to separate pip initialization (e.g.
      * for incompatible modules)) declare env path manually in each module.
+     * <p>
+     * User home directory reference will be automatically resolved in path ("~/somewhere/"). This might be useful
+     * for CI environments where environment directory should be cached, but it can't be located inside project.
      */
     String envPath
     /**

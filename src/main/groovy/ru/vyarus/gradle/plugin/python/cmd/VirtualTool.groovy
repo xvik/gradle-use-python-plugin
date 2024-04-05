@@ -13,7 +13,7 @@ import java.nio.file.Paths
  *
  * @author Vyacheslav Rusakov
  * @since 19.09.2023
- * @param <T>    actual tool type
+ * @param <T>     actual tool type
  */
 @CompileStatic
 abstract class VirtualTool<T extends VirtualTool> {
@@ -26,12 +26,14 @@ abstract class VirtualTool<T extends VirtualTool> {
     protected VirtualTool(Environment environment, String pythonPath, String binary, String path) {
         this.env = environment
         this.python = new Python(environment, pythonPath, binary).logLevel(LogLevel.LIFECYCLE)
-        this.path = path
         if (!path) {
             throw new IllegalArgumentException('Virtual environment path not set')
         }
-        this.location = environment.file(path)
-        environment.debug("${getClass().simpleName} environment init for path '${path}' (python path: '${pythonPath}')")
+        // for direct tool usage support
+        this.path = CliUtils.resolveHomeReference(path)
+        this.location = environment.file(this.path)
+        environment.debug("${getClass().simpleName} environment init for path '${this.path}' " +
+                "(python path: '${pythonPath}')")
     }
 
     /**

@@ -19,6 +19,7 @@ import ru.vyarus.gradle.plugin.python.task.pip.BasePipTask
 import ru.vyarus.gradle.plugin.python.task.pip.PipInstallTask
 import ru.vyarus.gradle.plugin.python.task.pip.PipListTask
 import ru.vyarus.gradle.plugin.python.task.pip.PipUpdatesTask
+import ru.vyarus.gradle.plugin.python.util.CliUtils
 import ru.vyarus.gradle.plugin.python.util.RequirementsReader
 
 import javax.inject.Inject
@@ -123,12 +124,19 @@ abstract class PythonPlugin implements Plugin<Project> {
             it.description = 'Show all installed modules'
         }
 
-        project.tasks.register('cleanPython', Delete) {
-            it.with {
-                group = 'python'
-                description = 'Removes existing python environment (virtualenv)'
-                delete extension.envPath
-                onlyIf { project.file(extension.envPath).exists() }
+        project.tasks.register('cleanPython', Delete) { task ->
+            task.group = 'python'
+            task.description = 'Removes existing python environment (virtualenv)'
+
+            String path = CliUtils.resolveHomeReference(extension.envPath)
+            File dir = project.file(path)
+            boolean exists = dir.exists()
+            task.delete path
+            task.onlyIf { exists}
+            task.doLast {
+                if (exists) {
+                    task.logger.lifecycle('[python] Environment removed: {}', dir.absolutePath)
+                }
             }
         }
 
@@ -201,7 +209,7 @@ abstract class PythonPlugin implements Plugin<Project> {
             task.showInstalledVersions.convention(extension.showInstalledVersions)
             task.alwaysInstallModules.convention(extension.alwaysInstallModules)
             task.options.convention([])
-            task.envPath.convention(extension.envPath)
+            task.envPath.convention(CliUtils.resolveHomeReference(extension.envPath))
         }
 
         project.tasks.withType(PipListTask).configureEach { task ->
@@ -214,7 +222,7 @@ abstract class PythonPlugin implements Plugin<Project> {
 
         project.tasks.withType(CheckPythonTask).configureEach { task ->
             task.scope.convention(extension.scope)
-            task.envPath.convention(extension.envPath)
+            task.envPath.convention(CliUtils.resolveHomeReference(extension.envPath))
             task.minPythonVersion.convention(extension.minPythonVersion)
             task.minPipVersion.convention(extension.minPipVersion)
             task.useVenv.convention(extension.useVenv)

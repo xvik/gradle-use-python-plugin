@@ -28,13 +28,13 @@ class SimpleEnvironment extends GradleEnvironment {
         this(new File(''), false)
     }
 
-    SimpleEnvironment(File projectDir, boolean debug) {
+    SimpleEnvironment(File projectDir, boolean debug = false) {
         this(ProjectBuilder.builder()
                 .withProjectDir(projectDir)
                 .build(), debug)
     }
 
-    SimpleEnvironment(Project project, boolean debug) {
+    SimpleEnvironment(Project project, boolean debug = false) {
         super(project.logger,
                 project.projectDir,
                 project.projectDir,

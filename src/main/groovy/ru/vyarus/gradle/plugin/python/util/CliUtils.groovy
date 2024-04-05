@@ -317,6 +317,20 @@ final class CliUtils {
         return Os.isFamily(Os.FAMILY_UNIX) && !Os.isFamily(Os.FAMILY_MAC)
     }
 
+    /**
+     * Resolve use home reference (~) in path into correct user directory.
+     *
+     * @param path path to resolve
+     * @return resolved path
+     */
+    static String resolveHomeReference(String path) {
+        String res = path
+        if (res.startsWith('~')) {
+            res = System.getProperty('user.home') + res.substring(1)
+        }
+        return res
+    }
+
     private static boolean isPositionMatch(String[] ver, String[] req, int pos) {
         boolean valid = (ver[pos] as Integer) >= (req[pos] as Integer)
         if (valid && ver[pos] == req[pos] && req.length > pos + 1) {

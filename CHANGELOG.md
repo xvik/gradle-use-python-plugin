@@ -19,6 +19,7 @@
     Venv is installed by default since python 3.3 which removes requirement to install virtualenv. (#77) 
     Fallback to virtualenv when venv not found. All current environments created with virtualenv
     will still be working correctly.
+* Add user home dir ("~/") support for the environment path (python.envPath)  
 * To use different python for PythonTask useCustomPython = true must be declared now
   (otherwise, pythonPath select by checkPython task would be used (and task's pythonPath ignored))
 

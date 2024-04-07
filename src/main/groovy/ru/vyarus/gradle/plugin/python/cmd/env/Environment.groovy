@@ -18,37 +18,55 @@ interface Environment {
     Logger getLogger()
 
     /**
+     * Same as {@code project.rootProject.name}.
+     *
      * @return root project name
      */
     String getRootName()
 
     /**
+     * Same as {@code project.path}.
+     *
      * @return current project path (e.g. :mod1:sub1) to uniquely identify project
      */
     String getProjectPath()
 
     /**
+     * Same as {@code project.rootDir}.
+     *
      * @return root project directory
      */
     File getRootDir()
 
     /**
+     * Same as {@code project.projectDir}.
+     *
      * @return current project directory (might be root or sub module)
      */
     File getProjectDir()
 
     /**
+     * Same as {@code project.file()}.
+     *
      * @param path absolute or relative path to file (for current project)
      * @return file, resolved relative to current project
      */
     File file(String path)
 
     /**
+     * Same as {@code project.relativePath}.
+     *
      * @param path absolute path
      * @return path relative for current project
      */
     String relativePath(String path)
 
+    /**
+     * Same as {@code project.relativePath}.
+     *
+     * @param path absolute path
+     * @return path relative for current project
+     */
     String relativePath(File file)
 
     /**
@@ -62,6 +80,7 @@ interface Environment {
 
     /**
      * Execute command (external process).
+     * Same as {@code project.exec}.
      *
      * @param cmd command
      * @param out output stream
@@ -115,7 +134,7 @@ interface Environment {
     void updateGlobalCache(String key, Object value)
 
     /**
-     * Print debug message if debug enabled.
+     * Print debug message if debug enabled. Message would include context project and task.
      *
      * @param msg message
      */

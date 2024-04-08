@@ -1,6 +1,7 @@
 package ru.vyarus.gradle.plugin.python
 
 import groovy.transform.CompileStatic
+import org.gradle.api.Action
 import org.gradle.api.Project
 import ru.vyarus.gradle.plugin.python.task.pip.module.ModuleFactory
 
@@ -147,7 +148,7 @@ class PythonExtension {
      * Installed virtualenv will not be modified later, so you will need to manually update it in case of problems.
      * When disabled, plugin will still check if virtualenv is available, but will not try to install it if not.
      * <p>
-     * Ignored for venv ({@link #useVenv)
+     * Ignored for venv ({@link #useVenv})
      */
     boolean installVirtualenv = true
     /**
@@ -161,7 +162,7 @@ class PythonExtension {
      * it manually then you know what you are doing, otherwise "known to be working" version should be installed to
      * avoid problems.
      * <p>
-     * Ignored for venv ({@link #useVenv)
+     * Ignored for venv ({@link #useVenv})
      */
     String virtualenvVersion = '20.25.1'
     /**
@@ -175,7 +176,7 @@ class PythonExtension {
      * <p>
      * Specified version could actually have any precision: '20', '20.1', etc.
      * <p>
-     * Ignored for venv ({@link #useVenv)
+     * Ignored for venv ({@link #useVenv})
      */
     String minVirtualenvVersion = '16'
     /**
@@ -358,21 +359,21 @@ class PythonExtension {
     }
 
     /**
-     * Utility method to support requirements configuration with closure.
+     * Utility method to support requirements configuration.
      *
-     * @param config configuration closure
+     * @param config configuration action
      */
-    void setRequirements(@DelegatesTo(Requirements) Closure config) {
-        project.configure(requirements, config)
+    void requirements(Action<Requirements> config) {
+        config.execute(this.requirements)
     }
 
     /**
      * Configure docker container.
      *
-     * @param config configuration closure
+     * @param config configuration action
      */
-    void setDocker(@DelegatesTo(Docker) Closure config) {
-        project.configure(docker, config)
+    void docker(Action<Docker> config) {
+        config.execute(this.docker)
     }
 
     /**

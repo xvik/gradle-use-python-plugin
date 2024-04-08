@@ -122,17 +122,17 @@ final class PythonBinary {
      * @return directory under python home containing python binary (always absolute path)
      * @see {@link ru.vyarus.gradle.plugin.python.cmd.Python#getBinaryDir()}
      */
-    String getBinaryDir(Closure<String> sysExecutableProvider, Closure<String> sysPrefixProvider) {
+    String getBinaryDir(Supplier<String> sysExecutableProvider, Supplier<String> sysPrefixProvider) {
         init()
         // use resolved executable to avoid incorrect resolution in case of venv inside venv
-        String path = customBinaryPath ? environment.file(executable).absolutePath : sysExecutableProvider.call()
+        String path = customBinaryPath ? environment.file(executable).absolutePath : sysExecutableProvider.get()
         int idx = path.lastIndexOf(File.separator)
 
         String res
         if (path.empty || idx <= 0) {
             // just guess by home dir (yes, I know, this MIGHT be incorrect in some cases, but should be ok
             // for virtualenvs used in majority of cases)
-            path = sysPrefixProvider.call()
+            path = sysPrefixProvider.get()
             res = CliUtils.pythonBinPath(path, windows)
         } else {
             // cut off binary

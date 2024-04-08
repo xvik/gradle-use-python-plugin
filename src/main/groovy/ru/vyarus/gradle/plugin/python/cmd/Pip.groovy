@@ -8,6 +8,7 @@ import ru.vyarus.gradle.plugin.python.cmd.env.Environment
 import ru.vyarus.gradle.plugin.python.util.CliUtils
 import ru.vyarus.gradle.plugin.python.util.PythonExecutionFailed
 
+import java.util.function.Supplier
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
@@ -280,16 +281,16 @@ class Pip {
     }
 
     /**
-     * Execute pip methods within closure in global scope (no matter if user scope configured).
+     * Execute pip methods within action in global scope (no matter if user scope configured).
      *
-     * @param closure closure with pip actions to be executed in global scope
-     * @return closure result
+     * @param action  pip action to be executed in global scope
+     * @return action result
      */
-    public <T> T inGlobalScope(Closure closure) {
+    public <T> T inGlobalScope(Supplier<T> action) {
         boolean isUserScope = this.userScope
         this.userScope = false
         try {
-            return (T) closure.call()
+            return (T) action.get()
         } finally {
             this.userScope = isUserScope
         }

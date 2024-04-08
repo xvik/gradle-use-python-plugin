@@ -453,13 +453,14 @@ class Python {
     /**
      * Used to call python instance methods with hidden (not visible in gradle console) log (set to INFO).
      *
-     * @param closure closure with python commands to execute
+     * @param action action with python commands to execute
+     * @return action result
      */
-    public <T> T withHiddenLog(Closure closure) {
+    public <T> T withHiddenLog(Supplier<T> action) {
         LogLevel level = logLevel
         logLevel(LogLevel.INFO)
         try {
-            return (T) closure.call()
+            return action.get()
         } finally {
             logLevel(level)
         }

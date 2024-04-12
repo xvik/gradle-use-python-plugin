@@ -126,3 +126,13 @@ project(':mod2') {
 ```
 
 Here `mod1` will cerate wirtualenv inside `/mod1/python` from python 2 and `mod2` will use its own environment created from python 3. 
+
+## Problems resolution
+
+Use python commands statistics report could help detect problems (enabled in root module):
+
+```groovy
+python.printStats = true 
+```
+
+[Report](stats.md#duplicates-detection) would show all executed commands and mark commands executed in parallel.

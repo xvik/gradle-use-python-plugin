@@ -328,7 +328,7 @@ Using pip 24.0 from /usr/local/lib/python3.11/site-packages/pip (python 3.11)
 
 It may appear, for example, due to enabled VPN on host.
 
-For **linux** (not mac!), the simplest workaround is to use host network directly:
+For **linux** (not mac!), the simplest workaround is to use [host network](https://docs.docker.com/network/drivers/host/) directly:
 
 ```groovy
 python {

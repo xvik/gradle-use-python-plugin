@@ -86,3 +86,25 @@ System variables will be available even after declaring custom variables (of cou
 !!! note 
     Environment variable could also be declared in extension to apply for all python commands:
     `python.environment 'some', 1` (if environments declared both globally (through extension) and directly on task, they would be merged)
+
+### Non-default python
+
+Python task would use python selected by `checkPython` task (global or detected virtualenv).
+If you need to use completely different python for some task, then it should be explicitly stated
+with `useCustomPython` property.
+
+For example, suppose we use virtual environment, but need to use global python
+in one task:
+
+```groovy
+tasks.register('script', PythonTask) {
+    // global python (it would select python3 automatically on linux)
+    pythonPath = null
+    // force custom python for task
+    useCustomPython = true
+    command = ['path/to/script.py', '1', '2'] 
+}
+```
+
+Additional property (useCustomPython) is required because normally task's `pythonPath` is ignored
+(an actual path is selected by `checkPython` task)

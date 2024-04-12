@@ -33,14 +33,18 @@ configured with `python.envPath`).
 
 Behaviour matrix for possible `scope` and `installVirtualenv` configurations:
 
-scope | installVirtualenv | Behaviour | default
-------|-----|------ |-----
-GLOBAL | ignored | packages installed in global scope (`pip install name`)|
-USER | ignored | packages installed in user scope (`pip install name --user`)|
-VIRTUALENV_OR_USER | true | if virtualenv not installed, install it in user scope; create project specific virtualenv and use it | default
+scope | installVirtualenv | Behaviour                                                                                                                                               | default
+------|-----|---------------------------------------------------------------------------------------------------------------------------------------------------------|-----
+GLOBAL | ignored | packages installed in global scope (`pip install name`)                                                                                                 |
+USER | ignored | packages installed in user scope (`pip install name --user`)                                                                                            |
+VIRTUALENV_OR_USER | true | if virtualenv not installed, install it in user scope; create project specific virtualenv and use it                         | default
 VIRTUALENV_OR_USER | false | when virtualenv is not installed install packages in user scope (same as USER); when virtualenv installed create project specific virtualenv and use it |
-VIRTUALENV | true | if virtualenv not installed, install it in user scope; create project specific virtualenv and use it |
-VIRTUALENV | false | throw error when virtualenv not installed 
+VIRTUALENV | true | if virtualenv not installed, install it in user scope; create project specific virtualenv and use it                                                    |
+VIRTUALENV | false | throw error when virtualenv not installed                                                                                                               
+
+!!! note
+    By default, plugin tries to use venv instead of virtualenv, which is usually installed
+    by default with python (so no additional installations required)
 
 Note that `VIRTUALENV + true` and `VIRTUALENV_OR_USER + true` behaviours are the same. Different scope
 name here describes behavior for unexpected `installVirtualenv=false` change (to fail or fallback to user scope).
@@ -190,6 +194,9 @@ To specify different file location:
 python.requirements.file = 'path/to/file' // relative to project root
 ```
 
+!!! tip
+    Requirements file could reference other files with '-r' (`-r other-file.txt`)
+
 To switch off requirements support:
 
 ```groovy
@@ -215,6 +222,7 @@ By default, restricted file syntax assumed:
   - [VCS modules](#vcs-pip-modules) with extended syntax (including version)
     * This syntax might not be parsed correctly by python tools,
       but it is required by plugin in order to know installed version (and properly perform up-to-date check).
+  - All referenced files (-r) are also processed (and must comply)
 * All commented or empty lines are skipped
 
 !!! note "Motivation"
@@ -241,6 +249,21 @@ In this mode requirements file read by plugin itself and registered in gradle mo
 !!! important
     Module declarations in gradle script override requirements declaration. So if, for example,
     requirements contains `foo==1.1` and in gradle script `python.pip 'foo:1.0'` then version 1.0 would be used.
+
+Example reference:
+
+Example file:
+
+```
+# simple module (exact version)
+extract-msg == 0.34.3
+
+# features
+requests[socks,security] == 2.28.1
+
+# extra deps in other file
+-r prod.txt
+```
 
 ### Native behaviour
 

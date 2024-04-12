@@ -105,6 +105,7 @@ nav:
       - Usage: guide/usage.md
       - Multi-module: guide/multimodule.md
       - Configuration: guide/configuration.md
+      - Stats: guide/stats.md
       - CI: guide/ci.md
       - Plugin development: guide/plugindev.md
   - About:

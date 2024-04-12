@@ -56,8 +56,20 @@ python {
 
 ## Virtualenv
 
-When you declare any pip modules, plugin will try to use [virtualenv](https://virtualenv.pypa.io/en/stable/)
-in order to install required modules locally (for current project only).
+When you declare any pip modules, plugin will try to use [venv](https://docs.python.org/3/library/venv.html) or 
+[virtualenv](https://virtualenv.pypa.io/en/stable/) to install required modules locally (for current project only).
+
+By default, plugin would use [venv](https://docs.python.org/3/library/venv.html), usually bundled with python (since 3.3). 
+Only if venv is not detected, plugin would fall back to [virtualenv](https://virtualenv.pypa.io/en/stable/).
+
+If, for some reason, you don't want to use venv at all and prefer virtualenv:
+
+```groovy
+python.useVenv = false
+```
+
+!!! note
+    All virtualenv-related options are ignored when venv is detected (and not disabled to use).
 
 If virtualenv is not installed - it will be installed automatically in `--user` scope. If you don't want automatic
 installation then disable it:
@@ -66,7 +78,7 @@ installation then disable it:
 python.installVirtualenv = false
 ```
 
-Plugin installs exact pip version declared in `python.virtualenvVersion` (by default, 16.7.9).
+Plugin installs exact pip version declared in `python.virtualenvVersion` (by default, 20.25.1).
 This way, plugin will always install only known to be working version and avoid side effects of "just released"
 versions (note that pip 20 is a major rewrite and may still contain side effects).
 
@@ -85,6 +97,10 @@ If you already use virtualenv in your project (have created manually environment
 python.envPath = 'path/to/your/env'
 ```
 
+!!! tip
+    envPath value might contain user home reference like `envPath = '~/.myproject`.
+    This might be useful for CI where created environment should be cached. 
+
 It will automatically change `pythonPath` configuration accordingly.
 
 !!! note 
@@ -97,7 +113,8 @@ It will automatically change `pythonPath` configuration accordingly.
     later used *instead* of global python. If you want to change used python version in the environment,
     then manually remove `.gradle/python` so it could be created again (from global python).
 
-To copy environment instead of symlinking (default) set ([--always-copy](https://virtualenv.pypa.io/en/stable/reference/#cmdoption-always-copy)):
+To copy environment instead of symlinking (default) set ([--always-copy](https://virtualenv.pypa.io/en/stable/reference/#cmdoption-always-copy) (virtualenv) 
+or [--copies](https://docs.python.org/3/library/venv.html) (venv)):
 
 ```groovy
 python.envCopy = true
@@ -165,14 +182,18 @@ python {
    alwaysInstallModules = false
    // may be used to disable pip cache (--no-cache-dir option)
    usePipCache = true
+   // required to overcome "error: externally-managed-environment" error on linux (--break-system-packages)
+   breakSystemPackages = false
    // additional pip repositories (--extra-index-url option)
    extraIndexUrls = []
    // trusted hosts for pip install (--trusted-host option)
    trustedHosts = []
 
    
-    // pip modules installation scope (project local, os user dir, global) 
+   // pip modules installation scope (project local, os user dir, global) 
    scope = VIRTUALENV_OR_USER
+   // use venv instead of virtualenv (auto fall back to virtualenv if not found)
+   useVenv = true 
    // automatically install virtualenv module (if pip modules declared and scope allows)   
    installVirtualenv = true
    // if virtualenv not installed (in --user scope), plugin will install exactly this version
@@ -183,8 +204,10 @@ python {
    minVirtualenvVersion = '16'
    // used virtualenv path (if virtualenv used, see 'scope')
    envPath = '.gradle/python'
-   // copy virtualenv instead of symlink (when created)
+   // copy virtualenv instead of symlink when created (venv --copies and virtualenv --always-copy)
    envCopy = false
+   // print stats for all executed python command (including hidden)  
+   printStats = false 
 
    requirements {
        // use requirements.txt file
@@ -203,6 +226,8 @@ python {
       image = '{{ gradle.image }}'
       // windows containers indicator (not supported now, done for the future) 
       windows = false
+      // use host network directly (works only on linux) 
+      useHostNetwork = false 
       // docker ports to expose into host (direct 5000 or mapped '5000:6000')
       ports = [] 
    } 
@@ -216,25 +241,27 @@ even if plugin is activated inside module (see [multi-module setup](multimodule.
 
 PythonTask configuration:
 
-| Property | Description                                                                                                                            |
-|---------|----------------------------------------------------------------------------------------------------------------------------------------|
-| pythonPath | Path to python binary. By default used path declared in global configuration                                                           |
-| pythonBinary | Python binary name. By default, python3 on linux and python otherwise.                                                                 |
-| validateSystemBinary | Search python binary in PATH and fail build to reveal PATH problems                                                                    |
-| workDir | Working directory (important if called script/module do file operations). By default, it's a project root                              |
-| createWorkDir | Automatically create working directory if does not exist. Enabled by default                                                           |
-| module | Module name to call command on (if command not set module called directly). Useful for derived tasks.                                  |
-| command | Python command to execute (string, array, iterable)                                                                                    |
-| logLevel | Logging level for python output. By default is `LIFECYCLE` (visible in console). To hide output use `LogLevel.INFO`                    |
-| pythonArgs | Extra python arguments applied just after python binary. Useful for declaring common python options (-I, -S, etc.)                     |
-| extraArgs | Extra arguments applied at the end of declared command (usually module arguments). Useful for derived tasks to declare default options |
-| outputPrefix | Prefix, applied for each line of python output. By default is '\t' to identify output for called gradle command                        |
-| environment | Process specific environment variables                                                                                                 |
-| docker.use | Enable docker support                                                                                                                  |
-| docker.image | Python image to use                                                                                                                    |
-| docker.windows | Windows image use. Not usefule now as testcontainers can't run on windows containers (imlpemented for the future) |
-| docker.ports | Exposed ports from docker container |
-| docker.exclusive | Enable exclusive container mode (immediate logs for long-running tasks)                                                                |
+| Property              | Description                                                                                                                            |
+|-----------------------|----------------------------------------------------------------------------------------------------------------------------------------|
+| pythonPath            | Path to python binary. By default, property ignored because checkPython task selects correct path                                      |
+| useCustomPath         | Force pythonPath property use instead of path selected by checkPython task (e.g. to use global python instead of environment)          |
+| pythonBinary          | Python binary name. By default, python3 on linux and python otherwise.                                                                 |
+| validateSystemBinary  | Search python binary in PATH and fail build to reveal PATH problems                                                                    |
+| workDir               | Working directory (important if called script/module do file operations). By default, it's a project root                              |
+| createWorkDir         | Automatically create working directory if does not exist. Enabled by default                                                           |
+| module                | Module name to call command on (if command not set module called directly). Useful for derived tasks.                                  |
+| command               | Python command to execute (string, array, iterable)                                                                                    |
+| logLevel              | Logging level for python output. By default is `LIFECYCLE` (visible in console). To hide output use `LogLevel.INFO`                    |
+| pythonArgs            | Extra python arguments applied just after python binary. Useful for declaring common python options (-I, -S, etc.)                     |
+| extraArgs             | Extra arguments applied at the end of declared command (usually module arguments). Useful for derived tasks to declare default options |
+| outputPrefix          | Prefix, applied for each line of python output. By default is '\t' to identify output for called gradle command                        |
+| environment           | Process specific environment variables                                                                                                 |
+| docker.use            | Enable docker support                                                                                                                  |
+| docker.image          | Python image to use                                                                                                                    |
+| docker.windows        | Windows image use. Not usefule now as testcontainers can't run on windows containers (imlpemented for the future)                      |
+| docker.useHostNetwork | Use host network in container (exposed ports ignored in this case). Only for linux (ignored on other platforms)                        |
+| docker.ports          | Exposed ports from docker container                                                                                                    |
+| docker.exclusive      | Enable exclusive container mode (immediate logs for long-running tasks)                                                                |
 
 
 Also, task provide extra methods:
@@ -244,7 +271,7 @@ Also, task provide extra methods:
 * `environment(String var, Object value)` to set custom environment variable (shortcut to append values to environment property)
 * `environment(Map<String, Object> vars)` to set multiple custom environment variables at once (shortcut to append values to environment property)
 * `docker.ports(Object... ports)` to set container ports to expose (direct 5000 or mapped '5000:6000')
-* `dockerChown(Object path)` to [fix root user](docker.md#user-permissions) on paths created inside container for linux
+* `dockerChown(<String or Path> path)` to [fix root user](docker.md#user-permissions) on paths created inside container for linux
 * `dockerExec(Object command)` to [run native command](docker.md#docker-commands) inside container
 
 ### PipInstallTask
@@ -260,23 +287,25 @@ tasks.register('myPipInst', PipInstallTask) {
 
 Configuration:
 
-| Property | Description |
-|----------|-------------|
-| pythonPath | Path to python binary. By default used path declared in global configuration |
-| pythonBinary | Python binary name. By default, python3 on linux and python otherwise. |
-| validateSystemBinary | Search python binary in PATH and fail build to reveal PATH problems                                                                    |
-| pythonArgs | Extra python arguments applied just after python binary. Useful for declaring common python options (-I, -S, etc.) |
-| environment | Process specific environment variables |
-| modules | Modules to install. In most cases configured indirectly with `pip(..)` task methods. By default, modules from global configuration. |
-| userScope | Use current user scope (`--user` flag). Enabled by default to avoid permission problems on *nix (global configuration). |
-| showInstalledVersions | Perform `pip list` after installation. By default use global configuration value |
-| alwaysInstallModules | Call `pip install module` for all declared modules, even if it is already installed with correct version. By default use global configuration value |
-| useCache | Can be used to disable pip cache (--no-cache-dir) |
-| extraIndexUrls | Additional pip repositories (--extra-index-url) |
+| Property                                      | Description                                                                                                                                         |
+|-----------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|
+| pythonPath                                    | Path to python binary. By default, property ignored because checkPython task selects correct path                                                   |
+| useCustomPath                                 | Force pythonPath property use instead of path selected by checkPython task (e.g. to use global python instead of environment)                       |
+| pythonBinary                                  | Python binary name. By default, python3 on linux and python otherwise.                                                                              |
+| validateSystemBinary                          | Search python binary in PATH and fail build to reveal PATH problems                                                                                 |
+| pythonArgs                                    | Extra python arguments applied just after python binary. Useful for declaring common python options (-I, -S, etc.)                                  |
+| environment                                   | Process specific environment variables                                                                                                              |
+| modules                                       | Modules to install. In most cases configured indirectly with `pip(..)` task methods. By default, modules from global configuration.                 |
+| userScope                                     | Use current user scope (`--user` flag). Enabled by default to avoid permission problems on *nix (global configuration).                             |
+| showInstalledVersions                         | Perform `pip list` after installation. By default use global configuration value                                                                    |
+| alwaysInstallModules                          | Call `pip install module` for all declared modules, even if it is already installed with correct version. By default use global configuration value |
+| useCache                                      | Can be used to disable pip cache (--no-cache-dir)                                                                                                   |
+| extraIndexUrls                                | Additional pip repositories (--extra-index-url)                                                                                                     |
 | trustedHosts / trusted hosts (--trusted-host) |
-| options | additional pip install options |
-| requirements | Requirements file to use |
-| strictRequirements | Strict or native requirements file processing mode |
+| options                                       | additional pip install options                                                                                                                      |
+| requirements                                  | Requirements file to use                                                                                                                            |
+| strictRequirements                            | Strict or native requirements file processing mode                                                                                                  |
+| envPath                                       | Virtual environment path (require to chown dir inside docker)                                                                                       | 
 
 And, as shown above, custom methods:
 

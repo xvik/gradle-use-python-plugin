@@ -58,7 +58,7 @@ If you have docker installed, you can use python from [docker container](guide/d
 python.docker.use = true
 ```
 
-In this case global python installation is not required.
+In this case, global python installation is not required.
 
 ## Pip modules
 
@@ -87,10 +87,19 @@ python {
 
 Default behaviour:
 
-* if [`virtualenv`](https://virtualenv.pypa.io/en/stable/) module installed (or [automatically installed](guide/configuration.md#virtualenv)):
+* if [venv](https://docs.python.org/3/library/venv.html) or [`virtualenv`](https://virtualenv.pypa.io/en/stable/) module installed (virtualenv could be [installed automatically](guide/configuration.md#virtualenv)):
   manage pip dependencies per project (env `.gradle/python` created)
 * if no virtualenv - use user scope ([`--user`](https://pip.pypa.io/en/stable/user_guide/#user-installs) pip flag):
   pip modules are installed only for current user (this avoid permission problems on linux)
+  
+!!! tip
+    Venv used by default because it is bundled with python since python 3.3. On linux distibutions,
+    venv might be installed as a separate package (python3-venv), but, usually, it also installed by default.
+    When venv is not found, plugin would try to fall back to virtualenv. 
+
+!!! note
+    It is not a problem if your project environment was created with virtualenv and now, by default, venv would be used.
+    Existing environment is used directly - venv/virtualev used only for environment creation.
 
 To change defaults:
 
@@ -101,11 +110,13 @@ python.scope = VIRTUALENV
 * `GLOBAL` - install modules globally (this may not work on linux due to permissions)
 * `USER` - use `--user` flag to install for current user only
 * `VIRTUALENV_OR_USER` - default
-* `VIRTUALENV` - use `virtualenv` (if module not installed - error thrown)
+* `VIRTUALENV` - use `venv` / `virtualenv` (if module not installed - error thrown)
 
 !!! note
     For multi-module projects, by default, plugin will create virtualenv inside the root project directory
     in order to share the same environment for all modules (but this [could be changed](guide/multimodule.md)).
+
+Venv support could be disabled with `python.useVenv = false` option (virtualenv would be used in this case).
 
 ## Usage
 
@@ -166,3 +177,20 @@ tasks.register('script', PythonTask) {
 ```
 
 called: `python path/to/script.py 1 2` (arguments are optional, just for demo)
+
+
+### Non-default python
+
+Python task would use python selected by `checkPython` task (global or detected virtualenv).
+If you need to use completely different python for some task, then it should be explicitly stated
+with `useCustomPython` property:
+
+```groovy
+tasks.register('script', PythonTask) {
+    // global python (it would select python3 automatically on linux)
+    pythonPath = null
+    // force custom python for task
+    useCustomPython = true
+    command = ['path/to/script.py', '1', '2'] 
+}
+```

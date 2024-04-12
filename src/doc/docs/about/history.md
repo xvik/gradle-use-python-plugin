@@ -1,3 +1,30 @@
+### [4.0.0](http://xvik.github.io/gradle-use-python-plugin/4.0.0) (2024-04-13)
+* (breaking) Drop gradle 5 and 6 support
+* (breaking) All plugin tasks become abstract, so any custom task types should be abstract too
+* (breaking) All tasks use lazy properties instead of convention mapping (affects custom tasks)
+* Fix `alwaysInstallModules = true` not triggers pipInstall for non-strict requirements file (#94)
+  (required for case when requirements file links other files, which changes are not tracked)
+* Add requirements file references (-r file) support under strict mode (#94)
+* Configuration cache compatibility (#89)
+* Changed virtualenv version installed by default (python.virtualenvVersion) from 20.4.2 to 20.25.1
+  (supports python 3.7 - 3.12)
+* Changed default docker image (python.docker.image) from python:3.10.8-alpine3.15 to python:3.11.8-alpine3.19
+* New options (python.):
+  - breakSystemPackages: adds --break-system-packages for pip install
+    May be required on linux to install virtualenv on apt-managed python (e.g. python3.12)
+  - docker.useHostNetwork: use host network for docker
+    Works only on linux. When enabled, all container ports automatically exposed on host
+    and configured port mappings ignored
+  - printStats: show all executed python commands (including plugin internal) at the end of the build (with timings)
+  - useVenv: use venv instead of virtualenv (enabled by default)
+    Venv is installed by default since python 3.3 which removes requirement to install virtualenv. (#77)
+    Fallback to virtualenv when venv not found. All current environments created with virtualenv
+    will still be working correctly.
+* Add user home dir ("~/") support for the environment path (python.envPath)
+* To use different python for PythonTask useCustomPython = true must be declared now
+  (otherwise, pythonPath select by checkPython task would be used (and task's pythonPath ignored))
+
+
 ### [3.0.0](http://xvik.github.io/gradle-use-python-plugin/3.0.0) (2022-10-22)
 * (breaking) Drop gradle 5.0-5.2 support (minimum required gradle is 5.3)
 * Add docker support (python could be started in docker container without local python)

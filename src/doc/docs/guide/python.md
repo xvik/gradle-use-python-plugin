@@ -76,7 +76,7 @@ sudo apt install python3.12
 
 Install python 3.12 accessible with `python3.12` binary, whereas `python3` would be a different python (e.g. 3.9)
 
-To use sych python specify:
+To use such python specify:
 
 ```groovy
 python {

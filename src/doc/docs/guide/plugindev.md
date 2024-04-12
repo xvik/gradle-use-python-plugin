@@ -21,12 +21,11 @@ and declare default pipInstall task).
 The simplest way is to extend `PythonTask`:
 
 ```groovy
-class SomeModuleTask extends PythonTask {
-    
-    @Override
-    String getModule() {
+abstract class SomeModuleTask extends PythonTask {
+
+    SomeModuleTask() {
         // always call specified commands on module
-        return 'somemodule'
+        module.set('somemodule')
     }
     
     @Override
@@ -50,6 +49,23 @@ class SomeModuleTask extends PythonTask {
 }
 ```
 
+!!! important
+    Task must be abstract because some methods in PythonTask's hierarchy are abstract 
+    (implemented dynamically at runtime by gradle).  
+
+If you need to populate some PythonTask property then do it inside your plugin.
+For example, to configure additional args:
+
+```groovy
+SomeModuleExtension extension = project.extensions.getByType(SomeModuleExtension)
+// override default for all your custom tasks
+project.tasks.withType(SomeModuleTask).configureEach { task ->
+    task.pythonArgs.convention(project.provider {
+        extension.someOption ? ['--option'] : []
+    })
+}
+```
+
 Usage:
 
 ```groovy
@@ -62,34 +78,40 @@ tasks.register('modCmd', SomeModuleTask) {
 
 called: `python -m somemodule module arfs --option`
 
-In some cases, you can use `BasePythonTask` which is a super class of `PythonTask` and provides
-only automatic `pythonPath` and `pythonBinary` properties set from global configuration.
-
 ## Completely custom task
 
-Plugin provides `ru.vyarus.gradle.plugin.python.cmd.Python` utility class, which could be used directly in custom task
-(`PythonTask` is a wrapper above the utility).
+In some cases, you can use `BasePythonTask` which is a super class of `PythonTask` and provides
+only automatic `pythonPath` management.
+
+Inside this task you can use `ru.vyarus.gradle.plugin.python.cmd.Python` utility class, directly 
+to implement all required customactions.
+
+!!! note
+    Using `BasePythonTask` is required because `Python` utility requires a subset of
+    gradle `Project` actions which is implemented with `GradleEnvironment` (for configuration cache support).
+    You can avoid `BasePythonTask` (and create environment manually), but it would be simplier to use it,
+    because it would provide you a pre-configured python instance.
 
 Example usage:
 
 ```groovy
-Python python = new Python(project, getPythonPath(), getPythonBinary())
-            .logLevel(getLogLevel())
-            .outputPrefix(getOutputPrefix())
-            .workDir(getWorkDir())
-            .extraArgs(getExtraArgs())
+abstract class MyTask extends BasePythonTask {
 
-// execute and get command output
-String out = python.readOutput(cmd)
+    @TaskAction
+    void run() {
+        Python python = getPython()
 
-// call module (the same as exec() but applies '-m mod' before command)
-python.callModule('mod', cmd)
+        // execute and get command output
+        String out = python.readOutput(cmd)
 
-// direct python call
-python.exec(cmd)
+        // call module (the same as exec() but applies '-m mod' before command)
+        python.callModule('mod', cmd)
+
+        // direct python call
+        python.exec(cmd)
+    }
+}
 ```
-
-This could be used directly in the completely custom task.
 
 Specific utility for target module could be defined, see
 `ru.vyarus.gradle.plugin.python.cmd.Pip` util as an example (simplified):
@@ -99,10 +121,8 @@ class Pip {
 
     private final Python python
 
-    Pip(Project project, String pythonPath, String binary) {
-        // configure custom python execution util 
-        python = new Python(project, pythonPath, binary)
-                .logLevel(LogLevel.LIFECYCLE)
+    Pip(Python python) {
+        this.python = python
     }
     
     // declare module specific commands
@@ -239,3 +259,71 @@ This method will work only on linux host with linux container and if docker enab
 
 !!! note
     Be aware, if you use `doLast` for it that it will be called only after **successful** task execution
+
+## Gradle environment
+
+Gradle does not allow you to use `Project` object directly at runtime. To workaround, it, a special
+object was added `ru.vyarus.gradle.plugin.python.cmd.env.Environment` with a subset of required actions:
+
+* `logger` - used by python utilities for logging
+* `rootName` - root project name
+* `projectPath` - current project path (like ':mod' or ':' for root project)
+* `rootDir` - path to root project directory
+* `projectDir` - path to project directory (for root project same as rootDir)
+* `file(path)` - same as project.file(path)
+* `relativePath(path)` - same as project.relativePath(path)
+* `relativeRootPath(path)` - produce path, relative for root project (or not change for absolute path)
+* `exec(...)` - almost the same as project.exec(...)
+
+Also object provides project-level and global caches (compatible with configuration cache):
+* `<T> T projectCache(String key, Supplier<T> value)`, `void updateProjectCache(String key, Object value)`
+* `<T> T globalCache(String key, Supplier<T> value)`, `void updateGlobalCache(String key, Object value)`
+
+And internal debug logging: `void debug(String msg)`. These logs will only be shown when
+`python.debug = true`.
+
+There is also a `stat` method for counting command execution in `python.printStats = true` report, 
+but you **should not call it manually**. `Python` utility, configured in task, will automatically 
+record all executions (no additional actions required)
+
+## Debugging
+
+For plugin debugging enable:
+
+```groovy
+python {
+    debug = true
+    printStats = true
+}
+```
+
+Debug option prints all cache operations and additional debug logs (including you logs, if you use environment's debug method).
+Print stats option is also useful for improper cache usage detection: in case of
+incorrect cache usage, you'll see many duplicate commands executed.
+
+## Testing
+
+In tests you might need to use Python, Pip, Vevnv or, maybe, your own utilities directly in tests.
+There is a simple `SimpleEnvironment` object for such cases.
+
+For example, create virtual environment in test:
+
+```java
+Venv env = new Venv(new SimpleEnvironment(testProjectDir), ".python")
+env.create(false)
+```
+
+!!! note
+    `testProjectDir` is required only if you will need to work with relative paths:
+    in this case, where `.python` directory would be created.
+
+    But, if absolute path used, it might be omit:
+    ```java
+    Venv env = new Venv(new SimpleEnvironment(), "~/.testuserdir")
+    ```
+
+Another example, removing global pip package before test:
+
+```java
+new Pip(new SimpleEnvironment()).uninstall("extract-msg")
+```

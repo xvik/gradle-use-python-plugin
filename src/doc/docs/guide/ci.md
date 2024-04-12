@@ -22,6 +22,12 @@ jobs:
     strategy:
       matrix:
         java: [8, 11]
+        python: ['3.8', '3.12']
+      
+      # reduce matrix, if required
+      exclude:
+          - java: 8
+            python: '3.12'  
 
     steps:
       - uses: actions/checkout@v3
@@ -31,10 +37,10 @@ jobs:
         with:
           java-version: {{ '${{ matrix.java }}' }}
 
-      - name: Set up Python
+      - name: Set up Python ${{ matrix.python }}
         uses: actions/setup-python@v4
         with:
-          python-version: 3.10
+          python-version: ${{matrix.python}}
 
       - name: Build
         run: |
@@ -54,8 +60,13 @@ To make plugin work on [appveyour](https://www.appveyor.com/) you'll need to add
 ```yaml
 environment:
     matrix:
-        - JAVA_HOME: C:\Program Files\Java\jdk1.8.0
-          PYTHON: "C:\\Python36-x64"
+        - job_name: Java 8, python 3.8
+          JAVA_HOME: C:\Program Files\Java\jdk1.8.0
+          PYTHON: "C:\\Python38-x64"
+        - job_name: Java 17, python 3.12
+          JAVA_HOME: C:\Program Files\Java\jdk17
+          appveyor_build_worker_image: Visual Studio 2019
+          PYTHON: "C:\\Python312-x64"  
 
 install:
   - set PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%
@@ -63,12 +74,6 @@ install:
 ```         
 
 Now plugin would be able to find python binary.
-
-To use python 3.9 you'll need to switch image:
-
-```yaml
-image: Visual Studio 2019
-```
 
 See [available pythons matrix](https://www.appveyor.com/docs/windows-images-software/#python) for more info.
 
@@ -95,3 +100,43 @@ before_install:
 ``` 
 
 It will be python 3.6 by default (for bionic).
+
+## Environment caching
+
+To avoid creating virtual environments on each execution, it makes sense to move
+environment location from the default `.gradle/python` (inside project) outside the project:
+
+```groovy
+python.envPath = '~/.myProjectEnv'
+```
+
+Virtual environment created inside the user directory and so could be easily cached now.
+
+NOTE: Only `envPath` property supports home directory reference (`~/`). If you need it in other places
+then use manual workaround: `'~/mypath/'.replace('~', System.getProperty("user.home"))`
+
+## System packages
+
+On linux distributions, some python packages could be managed with external packages
+(like python3-venv, python3-virtualenv, etc.).
+
+If your build is **not using virtual environment** and still needs to install such packages,
+it would lead to error:
+
+```
+error: externally-managed-environment
+
+× This environment is externally managed
+╰─> To install Python packages system-wide, try apt install
+    python3-xyz, where xyz is the package you are trying to
+    install.
+```
+
+To work around this problem, use [breakSystemPackages](https://pip.pypa.io/en/stable/cli/pip_install/#cmdoption-break-system-packages) option:
+
+
+```groovy
+python {
+    breakSystemPackages = true
+}
+```

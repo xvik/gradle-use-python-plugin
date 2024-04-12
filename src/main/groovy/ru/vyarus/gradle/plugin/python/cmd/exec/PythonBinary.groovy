@@ -346,6 +346,8 @@ final class PythonBinary {
     @CompileStatic(TypeCheckingMode.SKIP)
     @SuppressWarnings('AssignmentToStaticFieldFromInstanceMethod')
     private boolean detectPython3Binary() {
+        // under docker it would be executed twice because docker is not started at this point
+        // so first time key would be stored with null and second time with actual container name
         return environment.globalCache("python3.binary:${docker ? dockerManager.containerName : ''}") {
             // on windows python binary could not be named python3
             return !windows && rawExec([PYTHON3, '--version'] as String[]) != null

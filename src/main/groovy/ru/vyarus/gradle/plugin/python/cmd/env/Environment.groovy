@@ -70,7 +70,7 @@ interface Environment {
     String relativePath(File file)
 
     /**
-     * Rebuild relative or absolute path relative to current to root project. If path not lying inside root project
+     * Rebuild relative or absolute path relative to root project. If path not lying inside root project
      * then path remain absolute.
      *
      * @param path path to convert

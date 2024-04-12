@@ -194,7 +194,7 @@ class PythonExtension {
      */
     String envPath
     /**
-     * Copy virtual environment instead of symlink (see --always-copy virtualenv option).
+     * Copy virtual environment instead of symlink (see --always-copy virtualenv and --copies venv option).
      * By default use default virtualenv behaviour: symlink environment.
      */
     boolean envCopy

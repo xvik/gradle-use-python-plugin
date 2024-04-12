@@ -3,8 +3,8 @@ package ru.vyarus.gradle.plugin.python.task
 import groovy.transform.CompileStatic
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.Action
+import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
-import org.gradle.api.internal.ConventionTask
 import org.gradle.api.logging.LogLevel
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.MapProperty
@@ -34,7 +34,7 @@ import java.nio.file.Path
  * @since 01.12.2017
  */
 @CompileStatic
-abstract class BasePythonTask extends ConventionTask {
+abstract class BasePythonTask extends DefaultTask {
 
     /**
      * Path to directory with python executable. Not required if python installed globally.

@@ -1,3 +1,4 @@
+### 4.0.0 (2024-04-13)
 * (breaking) Drop gradle 5 and 6 support
 * (breaking) All plugin tasks become abstract, so any custom task types should be abstract too
 * (breaking) All tasks use lazy properties instead of convention mapping (affects custom tasks)

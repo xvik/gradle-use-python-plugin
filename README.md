@@ -22,8 +22,9 @@ Features:
 
 * Works with directly installed python or docker container (with python)
 * Creates local (project-specific) virtualenv (project-specific python copy)
-* Installs required pip modules (virtualenv by default, but could be global installation) 
+* Installs required pip modules (venv by default (with fallback to virtualenv), but could be global installation) 
 * Support requirements.txt file (limited by default)
+* Compatible with gradle configuration cache
 * Could be used as basement for building plugins for specific python modules (like 
 [mkdocs plugin](https://github.com/xvik/gradle-mkdocs-plugin))
 
@@ -52,7 +53,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'ru.vyarus:gradle-use-python-plugin:3.0.0'
+        classpath 'ru.vyarus:gradle-use-python-plugin:4.0.0'
     }
 }
 apply plugin: 'ru.vyarus.use-python'
@@ -62,18 +63,20 @@ OR
 
 ```groovy
 plugins {
-    id 'ru.vyarus.use-python' version '3.0.0'
+    id 'ru.vyarus.use-python' version '4.0.0'
 }
 ```  
 
 #### Compatibility
 
-Plugin compiled for java 8, compatible with java 11. Supports python 2 and 3 on windows and linux (macos).
+Plugin compiled for java 8, compatible with java 11, 17. 
+Supports python 2 (not tested anymore, but should work) and 3 on windows and linux (macos)
 
 Gradle | Version
 --------|-------
-5.3-8     | 3.0.0
-5-5.2     | 2.3.0
+7.0     | 4.0.0
+5.3     | [3.0.0](https://xvik.github.io/gradle-use-python-plugin/3.0.0/)
+5-5.2   | [2.3.0](https://xvik.github.io/gradle-use-python-plugin/2.3.0/)
 4.x     | [1.2.0](https://github.com/xvik/gradle-use-python-plugin/tree/1.2.0)
 
 #### Snapshots

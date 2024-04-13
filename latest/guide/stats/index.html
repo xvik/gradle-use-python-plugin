@@ -1,0 +1,988 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Use python modules in gradle build">
+      
+      
+        <meta name="author" content="Vyacheslav Rusakov">
+      
+      
+        <link rel="canonical" href="https://xvik.github.io/gradle-use-python-plugin/4.0.0/guide/stats/">
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.4.1, mkdocs-material-8.5.7">
+    
+    
+      
+        <title>Stats - Gradle use-python plugin</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.20d9efc8.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.cbb835fc.min.css">
+        
+      
+      
+
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="" data-md-color-accent="">
+  
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#stats" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Gradle use-python plugin" class="md-header__button md-logo" aria-label="Gradle use-python plugin" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Gradle use-python plugin
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Stats
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      <form class="md-header__option" data-md-component="palette">
+        
+          
+          
+          <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="" data-md-color-accent=""  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+          
+            <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6zm0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4zM7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+            </label>
+          
+        
+          
+          
+          <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="" data-md-color-accent=""  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_2">
+          
+            <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3Z"/></svg>
+            </label>
+          
+        
+      </form>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/xvik/gradle-use-python-plugin" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    gradle-use-python-plugin
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Gradle use-python plugin" class="md-nav__button md-logo" aria-label="Gradle use-python plugin" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    Gradle use-python plugin
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/xvik/gradle-use-python-plugin" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    gradle-use-python-plugin
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        Home
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/" class="md-nav__link">
+        Getting started
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3">
+          User guide
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="User guide" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          User guide
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../python/" class="md-nav__link">
+        Python install
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../docker/" class="md-nav__link">
+        Docker
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../modules/" class="md-nav__link">
+        Pip modules
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../usage/" class="md-nav__link">
+        Usage
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../multimodule/" class="md-nav__link">
+        Multi-module
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
+        Configuration
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Stats
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Stats
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    Example
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#failed-tasks" class="md-nav__link">
+    Failed tasks
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#docker" class="md-nav__link">
+    Docker
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#multi-module-projects" class="md-nav__link">
+    Multi-module projects
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#duplicates-detection" class="md-nav__link">
+    Duplicates detection
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ci/" class="md-nav__link">
+        CI
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plugindev/" class="md-nav__link">
+        Plugin development
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_4">
+          About
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="About" data-md-level="1">
+        <label class="md-nav__title" for="__nav_4">
+          <span class="md-nav__icon md-icon"></span>
+          About
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../about/history/" class="md-nav__link">
+        Release notes
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../about/compatibility/" class="md-nav__link">
+        Compatibility
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../about/license/" class="md-nav__link">
+        License
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    Example
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#failed-tasks" class="md-nav__link">
+    Failed tasks
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#docker" class="md-nav__link">
+    Docker
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#multi-module-projects" class="md-nav__link">
+    Multi-module projects
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#duplicates-detection" class="md-nav__link">
+    Duplicates detection
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  <a href="https://github.com/xvik/gradle-use-python-plugin/edit/master/src/doc/docs/guide/stats.md" title="Edit this page" class="md-content__button md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
+  </a>
+
+
+<h1 id="stats">Stats<a class="headerlink" href="#stats" title="Permanent link">&para;</a></h1>
+<p>Plugin records all external command executions and could show you report after the build.</p>
+<p>To enable report:</p>
+<div class="highlight"><pre><span></span><code><span class="n">python</span><span class="o">.</span><span class="na">printStats</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="w"></span>
+</code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Report includes <strong>all</strong> external commands, including hidden commands, used by plugin
+for python and other modules detection.</p>
+</div>
+<h2 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h2>
+<p>For example, for a sample project like this:</p>
+<div class="highlight"><pre><span></span><code><span class="n">python</span><span class="w"> </span><span class="o">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">pip</span><span class="w"> </span><span class="s1">&#39;extract-msg:0.28.0&#39;</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">printStats</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span>
+<span class="o">}</span><span class="w"></span>
+
+<span class="n">tasks</span><span class="o">.</span><span class="na">register</span><span class="o">(</span><span class="s1">&#39;sample&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">PythonTask</span><span class="o">)</span><span class="w"> </span><span class="o">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;-c print(\&#39;samplee\&#39;)&#39;</span><span class="w"></span>
+<span class="o">}</span><span class="w"></span>
+</code></pre></div>
+<p>Output would look like this (for <code>sample</code> task execution):</p>
+<div class="highlight"><pre><span></span><code>Python execution stats:
+
+task                                        started         duration            
+:checkPython                                18:18:51:117    59ms                python3 --version
+:checkPython                                18:18:51:193    32ms                python3 -c exec(&quot;import sys;ver=sys.version_info;print(str(ver.major)+&#39;.&#39;+str(ver.minor)+&#39;.&#39;+str(ver.micro));print(sys.prefix);print(sys.executable)&quot;)
+:checkPython                                18:18:51:241    213ms               python3 -m pip --version
+:checkPython                                18:18:51:469    47ms                python3 -m venv -h
+:checkPython                                18:18:51:521    2.34s               python3 -m venv .gradle/python
+:checkPython                                18:18:53:859    9ms                 .gradle/python/bin/python -c exec(&quot;import sys;ver=sys.version_info;print(str(ver.major)+&#39;.&#39;+str(ver.minor)+&#39;.&#39;+str(ver.micro));print(sys.prefix);print(sys.executable)&quot;)
+:checkPython                                18:18:53:870    217ms               .gradle/python/bin/python -m pip --version
+:pipInstall                                 18:18:54:113    300ms               .gradle/python/bin/python -m pip freeze
+:pipInstall                                 18:18:54:417    3.19s               .gradle/python/bin/python -m pip install extract-msg==0.28.0
+:pipInstall                                 18:18:57:612    289ms               .gradle/python/bin/python -m pip list --format=columns
+:sample                                     18:18:57:905    9ms                 .gradle/python/bin/python -c exec(&quot;print(&#39;samplee&#39;)&quot;)
+
+    Executed 11 commands in 6.7s (overall)
+</code></pre></div>
+<h2 id="failed-tasks">Failed tasks<a class="headerlink" href="#failed-tasks" title="Permanent link">&para;</a></h2>
+<p>Failed tasks are also indicated in project.</p>
+<p>For example, for project:</p>
+<div class="highlight"><pre><span></span><code><span class="n">python</span><span class="w"> </span><span class="o">{</span><span class="w">               </span>
+<span class="w">    </span><span class="n">printStats</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="w"></span>
+<span class="o">}</span><span class="w"></span>
+
+<span class="n">tasks</span><span class="o">.</span><span class="na">register</span><span class="o">(</span><span class="s1">&#39;sample&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">PythonTask</span><span class="o">)</span><span class="w"> </span><span class="o">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// ERROR in syntax</span><span class="w"></span>
+<span class="w">    </span><span class="n">command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;-c printt(\&#39;samplee\&#39;)&#39;</span><span class="w"></span>
+<span class="o">}</span><span class="w"></span>
+</code></pre></div>
+<p>Stats would be:</p>
+<div class="highlight"><pre><span></span><code>Python execution stats:
+
+task                                        started         duration            
+:checkPython                                18:22:35:383    50ms                python3 --version
+:checkPython                                18:22:35:445    32ms                python3 -c exec(&quot;import sys;ver=sys.version_info;print(str(ver.major)+&#39;.&#39;+str(ver.minor)+&#39;.&#39;+str(ver.micro));print(sys.prefix);print(sys.executable)&quot;)
+:sample                                     18:22:35:512    37ms       FAILED   python3 -c exec(&quot;printt(&#39;samplee&#39;)&quot;)
+
+    Executed 3 commands in 119ms (overall)
+</code></pre></div>
+<h2 id="docker">Docker<a class="headerlink" href="#docker" title="Permanent link">&para;</a></h2>
+<p>For docker, executions are also tracked: </p>
+<div class="highlight"><pre><span></span><code><span class="n">python</span><span class="w"> </span><span class="o">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">pip</span><span class="w"> </span><span class="s1">&#39;extract-msg:0.28.0&#39;</span><span class="w"></span>
+<span class="w">    </span><span class="n">docker</span><span class="o">.</span><span class="na">use</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="w"></span>
+<span class="w">    </span><span class="n">printStats</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="w"></span>
+<span class="o">}</span><span class="w"></span>
+
+<span class="n">tasks</span><span class="o">.</span><span class="na">register</span><span class="o">(</span><span class="s1">&#39;sample&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">PythonTask</span><span class="o">)</span><span class="w"> </span><span class="o">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;-c print(\&#39;samplee\&#39;)&#39;</span><span class="w"></span>
+<span class="o">}</span><span class="w"></span>
+</code></pre></div>
+<p>Note that docker container name in shown in report:</p>
+<div class="highlight"><pre><span></span><code>Python execution stats:
+
+task                                        started        docker container     duration            
+:checkPython                                18:25:43:159   /cool_noyce          2.08s               python3 --version
+:checkPython                                18:25:45:243   /cool_noyce          33ms                python3 --version
+:checkPython                                18:25:45:288   /cool_noyce          60ms                python3 -c exec(&quot;import sys;ver=sys.version_info;print(str(ver.major)+&#39;.&#39;+str(ver.minor)+&#39;.&#39;+str(ver.micro));print(sys.prefix);print(sys.executable)&quot;)
+:checkPython                                18:25:45:362   /cool_noyce          1.09s               python3 -m pip --version
+:checkPython                                18:25:46:466   /cool_noyce          106ms               python3 -m venv -h
+:checkPython                                18:25:46:576   /cool_noyce          53ms       FAILED   test -f /usr/local/bin/activate &amp;&amp; echo &quot;exists&quot;
+:checkPython                                18:25:46:630   /cool_noyce          2.81s               python3 -m venv .gradle/python
+:checkPython                                18:25:49:443   /cool_noyce          70ms                .gradle/python/bin/python -c exec(&quot;import sys;ver=sys.version_info;print(str(ver.major)+&#39;.&#39;+str(ver.minor)+&#39;.&#39;+str(ver.micro));print(sys.prefix);print(sys.executable)&quot;)
+:checkPython                                18:25:49:516   /cool_noyce          269ms               .gradle/python/bin/python -m pip --version
+:pipInstall                                 18:25:49:886   /cool_noyce          356ms               .gradle/python/bin/python -m pip freeze
+:pipInstall                                 18:25:50:246   /cool_noyce          6s                  .gradle/python/bin/python -m pip install extract-msg==0.28.0
+:pipInstall                                 18:25:56:316   /cool_noyce          351ms               .gradle/python/bin/python -m pip list --format=columns
+:sample                                     18:25:56:674   /cool_noyce          90ms                .gradle/python/bin/python -c exec(&quot;print(&#39;samplee&#39;)&quot;)
+
+    Executed 13 commands in 13.36s (overall)
+</code></pre></div>
+<p>Note that report also includes <code>test -f /usr/local/bin/activate &amp;&amp; echo "exists"</code> command
+which is not python execution, but used for file detection inside container (stats show all executions).</p>
+<h2 id="multi-module-projects">Multi-module projects<a class="headerlink" href="#multi-module-projects" title="Permanent link">&para;</a></h2>
+<p>In multi-module project, report would contain stats for all modules:</p>
+<div class="highlight"><pre><span></span><code>Python execution stats:
+
+task                                        started         duration            
+:checkPython                                18:28:43:049    42ms                python3 --version
+:mod12:checkPython                          18:28:43:101    16ms                ../env/bin/python -c exec(&quot;import sys;ver=sys.version_info;print(str(ver.major)+&#39;.&#39;+str(ver.minor)+&#39;.&#39;+str(ver.micro));print(sys.prefix);print(sys.executable)&quot;)
+:mod12:checkPython                          18:28:43:128    498ms               ../env/bin/python -m pip --version
+:mod12:checkPython                          18:28:43:640    31ms                ../env/bin/python -m venv -h
+:mod12:checkPython                          18:28:43:676    2.23s               ../env/bin/python -m venv ../.gradle/python
+:mod1:checkPython                           18:28:45:908    10ms                ../.gradle/python/bin/python -c exec(&quot;import sys;ver=sys.version_info;print(str(ver.major)+&#39;.&#39;+str(ver.minor)+&#39;.&#39;+str(ver.micro));print(sys.prefix);print(sys.executable)&quot;)
+:mod12:checkPython                          18:28:45:923    238ms               ../.gradle/python/bin/python -m pip --version
+
+    Executed 7 commands in 3.06s (overall)
+</code></pre></div>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>In multi-module project, only root module's extension configuration <code>printStats = true</code>
+would enable stats (simply because stats are global and can't be configured per-project).</p>
+<p>Or it would be the top-most sub-project applying python plugin.</p>
+</div>
+<h2 id="duplicates-detection">Duplicates detection<a class="headerlink" href="#duplicates-detection" title="Permanent link">&para;</a></h2>
+<p>The report also groups duplicate commands automatically.</p>
+<p>For example, if each sub-module initializes its own virtualenv:</p>
+<div class="highlight"><pre><span></span><code><span class="n">subprojects</span><span class="w"> </span><span class="o">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// NOTE each module has its own virtualenv      </span><span class="w"></span>
+<span class="w">    </span><span class="n">python</span><span class="o">.</span><span class="na">envPath</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;envx&#39;</span><span class="w"></span>
+<span class="o">}</span><span class="w"></span>
+</code></pre></div>
+<p>Report would be:</p>
+<div class="highlight"><pre><span></span><code>Python execution stats:
+
+task                                        started         duration            
+:checkPython                                19:15:18:011    50ms                python3 --version
+:mod4:checkPython                           19:15:18:074    16ms                ../env/bin/python -c exec(&quot;import sys;ver=sys.version_info;print(str(ver.major)+&#39;.&#39;+str(ver.minor)+&#39;.&#39;+str(ver.micro));print(sys.prefix);print(sys.executable)&quot;)
+:mod4:checkPython                           19:15:18:103    511ms               ../env/bin/python -m pip --version
+:mod4:checkPython                           19:15:18:629    30ms                ../env/bin/python -m venv -h
+:mod4:checkPython                           19:15:18:664    2.25s               ../env/bin/python -m venv envx
+:checkPython                                19:15:20:912    28ms                python3 -c exec(&quot;import sys;ver=sys.version_info;print(str(ver.major)+&#39;.&#39;+str(ver.minor)+&#39;.&#39;+str(ver.micro));print(sys.prefix);print(sys.executable)&quot;)
+:mod4:checkPython                        || 19:15:20:943    11ms                envx/bin/python -c exec(&quot;import sys;ver=sys.version_info;print(str(ver.major)+&#39;.&#39;+str(ver.minor)+&#39;.&#39;+str(ver.micro));print(sys.prefix);print(sys.executable)&quot;)
+:mod3:checkPython                        || 19:15:20:946    2.34s               ../env/bin/python -m venv envx
+:mod4:checkPython                        || 19:15:20:958    243ms               envx/bin/python -m pip --version
+:mod4:pipInstall                         || 19:15:21:215    276ms               envx/bin/python -m pip freeze
+:mod4:pipInstall                         || 19:15:21:495    1.53s               envx/bin/python -m pip install extract-msg==0.28.0
+:mod4:pipInstall                         || 19:15:23:023    306ms               envx/bin/python -m pip list --format=columns
+:mod3:checkPython                        || 19:15:23:285    11ms                envx/bin/python -c exec(&quot;import sys;ver=sys.version_info;print(str(ver.major)+&#39;.&#39;+str(ver.minor)+&#39;.&#39;+str(ver.micro));print(sys.prefix);print(sys.executable)&quot;)
+:mod1:checkPython                        || 19:15:23:287    2.38s               ../env/bin/python -m venv envx
+:mod3:checkPython                        || 19:15:23:299    241ms               envx/bin/python -m pip --version
+:mod3:pipInstall                         || 19:15:23:547    275ms               envx/bin/python -m pip freeze
+:mod3:pipInstall                         || 19:15:23:824    1.89s               envx/bin/python -m pip install extract-msg==0.28.0
+:mod1:checkPython                        || 19:15:25:666    10ms                envx/bin/python -c exec(&quot;import sys;ver=sys.version_info;print(str(ver.major)+&#39;.&#39;+str(ver.minor)+&#39;.&#39;+str(ver.micro));print(sys.prefix);print(sys.executable)&quot;)
+:mod2:checkPython                        || 19:15:25:669    2.38s               ../env/bin/python -m venv envx
+:mod1:checkPython                        || 19:15:25:678    244ms               envx/bin/python -m pip --version
+:mod3:pipInstall                         || 19:15:25:712    327ms               envx/bin/python -m pip list --format=columns
+:mod1:pipInstall                         || 19:15:25:929    280ms               envx/bin/python -m pip freeze
+:mod1:pipInstall                         || 19:15:26:211    1.58s               envx/bin/python -m pip install extract-msg==0.28.0
+:mod1:pipInstall                         || 19:15:27:793    308ms               envx/bin/python -m pip list --format=columns
+:mod2:checkPython                        || 19:15:28:054    9ms                 envx/bin/python -c exec(&quot;import sys;ver=sys.version_info;print(str(ver.major)+&#39;.&#39;+str(ver.minor)+&#39;.&#39;+str(ver.micro));print(sys.prefix);print(sys.executable)&quot;)
+:mod5:checkPython                        || 19:15:28:056    2.38s               ../env/bin/python -m venv envx
+:mod2:checkPython                        || 19:15:28:065    239ms               envx/bin/python -m pip --version
+:mod2:pipInstall                         || 19:15:28:312    268ms               envx/bin/python -m pip freeze
+:mod2:pipInstall                         || 19:15:28:581    1.57s               envx/bin/python -m pip install extract-msg==0.28.0
+:mod2:pipInstall                         || 19:15:30:155    311ms               envx/bin/python -m pip list --format=columns
+:mod5:checkPython                        || 19:15:30:434    9ms                 envx/bin/python -c exec(&quot;import sys;ver=sys.version_info;print(str(ver.major)+&#39;.&#39;+str(ver.minor)+&#39;.&#39;+str(ver.micro));print(sys.prefix);print(sys.executable)&quot;)
+:mod5:checkPython                        || 19:15:30:445    224ms               envx/bin/python -m pip --version
+:mod5:pipInstall                            19:15:30:675    268ms               envx/bin/python -m pip freeze
+:mod5:pipInstall                            19:15:30:944    1.56s               envx/bin/python -m pip install extract-msg==0.28.0
+:mod5:pipInstall                            19:15:32:505    300ms               envx/bin/python -m pip list --format=columns
+
+    Executed 35 commands in 24.64s (overall)
+
+    Duplicate executions:
+
+        ../env/bin/python -m venv envx (5)
+            :mod4:checkPython   (work dir: mod4)
+            :mod3:checkPython   (work dir: mod3)
+            :mod1:checkPython   (work dir: mod1)
+            :mod2:checkPython   (work dir: mod2)
+            :mod5:checkPython   (work dir: mod5)
+
+        envx/bin/python -c exec(&quot;import sys;ver=sys.version_info;print(str(ver.major)+&#39;.&#39;+str(ver.minor)+&#39;.&#39;+str(ver.micro));print(sys.prefix);print(sys.executable)&quot;) (5)
+            :mod4:checkPython   (work dir: mod4)
+            :mod3:checkPython   (work dir: mod3)
+            :mod1:checkPython   (work dir: mod1)
+            :mod2:checkPython   (work dir: mod2)
+            :mod5:checkPython   (work dir: mod5)
+
+        envx/bin/python -m pip --version (5)
+            :mod4:checkPython   (work dir: mod4)
+            :mod3:checkPython   (work dir: mod3)
+            :mod1:checkPython   (work dir: mod1)
+            :mod2:checkPython   (work dir: mod2)
+            :mod5:checkPython   (work dir: mod5)
+
+        envx/bin/python -m pip freeze (5)
+            :mod4:pipInstall   (work dir: mod4)
+            :mod3:pipInstall   (work dir: mod3)
+            :mod1:pipInstall   (work dir: mod1)
+            :mod2:pipInstall   (work dir: mod2)
+            :mod5:pipInstall   (work dir: mod5)
+
+        envx/bin/python -m pip install extract-msg==0.28.0 (5)
+            :mod4:pipInstall   (work dir: mod4)
+            :mod3:pipInstall   (work dir: mod3)
+            :mod1:pipInstall   (work dir: mod1)
+            :mod2:pipInstall   (work dir: mod2)
+            :mod5:pipInstall   (work dir: mod5)
+
+        envx/bin/python -m pip list --format=columns (5)
+            :mod4:pipInstall   (work dir: mod4)
+            :mod3:pipInstall   (work dir: mod3)
+            :mod1:pipInstall   (work dir: mod1)
+            :mod2:pipInstall   (work dir: mod2)
+            :mod5:pipInstall   (work dir: mod5)
+</code></pre></div>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Pay attention that report does not count execution context for command:
+for example <code>envx/bin/python -m pip --version</code> executed multiple times
+because each module has its own environment, stored at the same directory.
+So, essentially, it is different commands! </p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Note '||' symbol near some commands - it indicates parallel execution with one
+or more other python commands (this build was started with <code>--parallel</code> flag).</p>
+</div>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+          <a href="#" class="md-top md-icon" data-md-component="top" hidden>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
+            Back to top
+          </a>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+    <nav class="md-footer__inner md-grid" aria-label="Footer" >
+      
+        
+        <a href="../configuration/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Configuration" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Configuration
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../ci/" class="md-footer__link md-footer__link--next" aria-label="Next: CI" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              CI
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2017-2022 Vyacheslav Rusakov
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+      
+      
+    
+    <a href="https://github.com/xvik" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+    </a>
+  
+    
+    
+      
+      
+    
+    <a href="https://blog.vyarus.ru" target="_blank" rel="noopener" title="blog.vyarus.ru" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M35.19 171.1c-46.91 46-46.91 122.9 0 169.8L171.1 476.8c46 46.9 122.9 46.9 169.8 0l135.9-135.9c46.9-46.9 46.9-123.8 0-169.8L340.9 35.19c-46.9-46.91-123.8-46.91-169.8 0L35.19 171.1zM315.5 315.5c-32.9 32.8-86.1 32.8-118.9 0-32.9-32.9-32.9-86.1 0-118.9 32.8-32.9 86-32.9 118.9 0 32.8 32.8 32.8 86 0 118.9z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tracking", "navigation.top"], "search": "../../assets/javascripts/workers/search.16e2a7d4.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.8492ddcf.min.js"></script>
+      
+    
+  </body>
+</html>

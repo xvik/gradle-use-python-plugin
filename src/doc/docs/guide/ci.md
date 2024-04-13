@@ -37,10 +37,10 @@ jobs:
         with:
           java-version: {{ '${{ matrix.java }}' }}
 
-      - name: Set up Python ${{ matrix.python }}
+      - name: Set up Python {{ '${{ matrix.python }}' }}
         uses: actions/setup-python@v4
         with:
-          python-version: ${{matrix.python}}
+          python-version: {{ '${{matrix.python}}' }}
 
       - name: Build
         run: |

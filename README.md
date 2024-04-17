@@ -88,36 +88,20 @@ Gradle | Version
 * Select `Commits` section and click `Get it` on commit you want to use 
     or use `master-SNAPSHOT` to use the most recent snapshot
 
-For gradle before 6.0 use `buildscript` block with required commit hash as version:
-
-```groovy
-buildscript {
-    repositories {
-        maven { url 'https://jitpack.io' }
-    }
-    dependencies {
-        classpath 'ru.vyarus:gradle-use-python-plugin:2450c7e881'
-    }
-}
-apply plugin: 'ru.vyarus.use-python'
-```
-
-For gradle 6.0 and above:
-
-* Add to `settings.gradle` (top most!) with required commit hash as version:
+* Add to `settings.gradle` (top most!) (exact commit hash might be used as version):
 
   ```groovy
   pluginManagement {
       resolutionStrategy {
           eachPlugin {
-              if (requested.id.namespace == 'ru.vyarus.use-python') {
-                  useModule('ru.vyarus:gradle-use-python-plugin:2450c7e881')
+              if (requested.id.id == 'ru.vyarus.use-python') {
+                  useModule('ru.vyarus:gradle-use-python-plugin:master-SNAPSHOT')
               }
           }
       }
-      repositories {
-          maven { url 'https://jitpack.io' }
-          gradlePluginPortal()          
+      repositories {                        
+          gradlePluginPortal()
+          maven { url 'https://jitpack.io' }                    
       }
   }    
   ``` 

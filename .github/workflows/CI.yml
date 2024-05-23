@@ -57,9 +57,11 @@ jobs:
         run: ./gradlew check --no-daemon
 
       - name: Build coverage report
+        if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request'
         run: ./gradlew jacocoTestReport --no-daemon
 
       - uses: codecov/codecov-action@v4
+        if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request'
         with:
           files: build/reports/jacoco/test/jacocoTestReport.xml
           flags: LINUX

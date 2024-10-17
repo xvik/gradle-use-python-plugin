@@ -275,6 +275,60 @@ one python command would be executed in container at a time (but commands could 
 This synchronization applied to minimize potential edge cases (simpler to investigate problems, avoid side effects).
 Later this could change (based on feedback).
 
+## Testcontainers configuration
+
+In most cases, additional [testcontainers configuration](https://java.testcontainers.org/features/configuration/) is not required,
+except special cases.
+
+For example, suppose, you need to [disable ryuk container](https://java.testcontainers.org/features/configuration/#disabling-ryuk) usage 
+(image used for proper shutdown and may not be required in CI environment with already properly implemented shutdown).
+
+Either declare environment variable (before running gradle or globally):
+
+```
+export TESTCONTAINERS_RYUK_DISABLED=true
+```
+
+or create `~/.testcontainers.properties` configuration file:
+
+```properties
+ryuk.disabled=true
+```
+
+!!! note
+    Environment variable name is `TESTCONTAINERS_` prefix + uppercased property name with `.` replaced with `_`
+
+See possible options in [testcontainers docs](https://java.testcontainers.org/features/configuration)
+
+### Private docker registry
+
+If you need to use private registry instead of docker hub: 
+[configure testcontainers directly](https://java.testcontainers.org/features/image_name_substitution/#automatically-modifying-docker-hub-image-names).
+
+Either export environment variable (before running gradle):
+
+```bash
+export TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX=registry.mycompany.com/mirror/
+
+./gradlew runSomePythonTask
+```
+
+Or update `~/.testcontainers.properties` configuration file:
+
+```properties
+hub.image.name.prefix=registry.mycompany.com/mirror/
+```
+
+!!! important
+    Slash at the end is required! Testcontainers will simply append this prefix for used containers
+    (but only if container is not declared with a full path). 
+    An example of prefixed path: `registry.mycompany.com/mirror/testcontainers/ryuk:0.6.0`
+
+
+Private registry must contain [required testcontainers images](https://java.testcontainers.org/supported_docker_environment/image_registry_rate_limiting/#which-images-are-used-by-testcontainers)
+(in most cases, just ryuk is required).
+
+
 ## Troubleshooting
 
 ### Testcontainers check docker just once

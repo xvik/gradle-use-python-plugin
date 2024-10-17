@@ -14,8 +14,15 @@
       
         <link rel="canonical" href="https://xvik.github.io/gradle-use-python-plugin/4.0.0/guide/plugindev/">
       
+      
+        <link rel="prev" href="../ci/">
+      
+      
+        <link rel="next" href="../../about/history/">
+      
+      
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.4.1, mkdocs-material-8.5.7">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.17">
     
     
       
@@ -23,15 +30,17 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.20d9efc8.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.bcfcd587.min.css">
       
         
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.cbb835fc.min.css">
-        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
       
       
 
+
     
+    
+      
     
     
       
@@ -60,11 +69,8 @@
     
     
     
-    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="" data-md-color-accent="">
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
   
-    
-    
-      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
@@ -81,14 +87,16 @@
       
     </div>
     
-      <div data-md-component="outdated" hidden>
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
         
       </div>
     
     
       
 
-<header class="md-header" data-md-component="header">
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href="../.." title="Gradle use-python plugin" class="md-header__button md-logo" aria-label="Gradle use-python plugin" data-md-component="logo">
       
@@ -97,6 +105,7 @@
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
+      
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
     </label>
     <div class="md-header__title" data-md-component="header-title">
@@ -116,31 +125,39 @@
       </div>
     </div>
     
-      <form class="md-header__option" data-md-component="palette">
-        
-          
-          
-          <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="" data-md-color-accent=""  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
-          
-            <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6zm0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4zM7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
-            </label>
-          
-        
-          
-          
-          <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="" data-md-color-accent=""  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_2">
-          
-            <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3Z"/></svg>
-            </label>
-          
-        
-      </form>
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6zm0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4zM7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3Z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
     
     
     
       <label class="md-header__button md-icon" for="__search">
+        
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
       </label>
       <div class="md-search" data-md-component="search" role="dialog">
@@ -149,12 +166,15 @@
     <form class="md-search__form" name="search">
       <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
       <label class="md-search__icon md-icon" for="__search">
+        
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
       </label>
       <nav class="md-search__options" aria-label="Search">
         
         <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
         </button>
       </nav>
@@ -166,7 +186,7 @@
           <div class="md-search-result__meta">
             Initializing search
           </div>
-          <ol class="md-search-result__list"></ol>
+          <ol class="md-search-result__list" role="presentation"></ol>
         </div>
       </div>
     </div>
@@ -178,7 +198,7 @@
         <a href="https://github.com/xvik/gradle-use-python-plugin" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
   </div>
   <div class="md-source__repository">
     gradle-use-python-plugin
@@ -208,6 +228,7 @@
                     
 
 
+
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
     <a href="../.." title="Gradle use-python plugin" class="md-nav__button md-logo" aria-label="Gradle use-python plugin" data-md-component="logo">
@@ -223,7 +244,7 @@
       <a href="https://github.com/xvik/gradle-use-python-plugin" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
   </div>
   <div class="md-source__repository">
     gradle-use-python-plugin
@@ -235,14 +256,19 @@
     
       
       
-      
-
+  
   
   
   
     <li class="md-nav__item">
       <a href="../.." class="md-nav__link">
-        Home
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
       </a>
     </li>
   
@@ -250,14 +276,19 @@
     
       
       
-      
-
+  
   
   
   
     <li class="md-nav__item">
       <a href="../../getting-started/" class="md-nav__link">
-        Getting started
+        
+  
+  <span class="md-ellipsis">
+    Getting started
+  </span>
+  
+
       </a>
     </li>
   
@@ -265,168 +296,244 @@
     
       
       
-      
-
   
   
     
   
   
+  
+    
+    
+    
     
     <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
-      
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" checked>
-      
-      
-      
-      
-        <label class="md-nav__link" for="__nav_3">
-          User guide
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <nav class="md-nav" aria-label="User guide" data-md-level="1">
-        <label class="md-nav__title" for="__nav_3">
-          <span class="md-nav__icon md-icon"></span>
-          User guide
-        </label>
-        <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
           
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    User guide
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            User guide
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
             
               
+                
+  
   
   
   
     <li class="md-nav__item">
       <a href="../python/" class="md-nav__link">
-        Python install
+        
+  
+  <span class="md-ellipsis">
+    Python install
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
     <li class="md-nav__item">
       <a href="../docker/" class="md-nav__link">
-        Docker
+        
+  
+  <span class="md-ellipsis">
+    Docker
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
     <li class="md-nav__item">
       <a href="../modules/" class="md-nav__link">
-        Pip modules
+        
+  
+  <span class="md-ellipsis">
+    Pip modules
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
     <li class="md-nav__item">
       <a href="../usage/" class="md-nav__link">
-        Usage
+        
+  
+  <span class="md-ellipsis">
+    Usage
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
     <li class="md-nav__item">
       <a href="../multimodule/" class="md-nav__link">
-        Multi-module
+        
+  
+  <span class="md-ellipsis">
+    Multi-module
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
     <li class="md-nav__item">
       <a href="../configuration/" class="md-nav__link">
-        Configuration
+        
+  
+  <span class="md-ellipsis">
+    Configuration
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
     <li class="md-nav__item">
       <a href="../stats/" class="md-nav__link">
-        Stats
+        
+  
+  <span class="md-ellipsis">
+    Stats
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
     <li class="md-nav__item">
       <a href="../ci/" class="md-nav__link">
-        CI
+        
+  
+  <span class="md-ellipsis">
+    CI
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
   
   
     
   
   
+  
     <li class="md-nav__item md-nav__item--active">
       
-      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
         
       
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
-          Plugin development
+          
+  
+  <span class="md-ellipsis">
+    Plugin development
+  </span>
+  
+
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <a href="./" class="md-nav__link md-nav__link--active">
-        Plugin development
+        
+  
+  <span class="md-ellipsis">
+    Plugin development
+  </span>
+  
+
       </a>
       
         
@@ -446,35 +553,45 @@
       
         <li class="md-nav__item">
   <a href="#extended-task" class="md-nav__link">
-    Extended task
+    <span class="md-ellipsis">
+      Extended task
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#completely-custom-task" class="md-nav__link">
-    Completely custom task
+    <span class="md-ellipsis">
+      Completely custom task
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#apply-default-modules" class="md-nav__link">
-    Apply default modules
+    <span class="md-ellipsis">
+      Apply default modules
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#hide-sensitive-data-in-logged-command" class="md-nav__link">
-    Hide sensitive data in logged command
+    <span class="md-ellipsis">
+      Hide sensitive data in logged command
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#docker" class="md-nav__link">
-    Docker
+    <span class="md-ellipsis">
+      Docker
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="Docker">
@@ -482,14 +599,18 @@
         
           <li class="md-nav__item">
   <a href="#call-docker-in-task" class="md-nav__link">
-    Call docker in task
+    <span class="md-ellipsis">
+      Call docker in task
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#chown" class="md-nav__link">
-    Chown
+    <span class="md-ellipsis">
+      Chown
+    </span>
   </a>
   
 </li>
@@ -501,21 +622,27 @@
       
         <li class="md-nav__item">
   <a href="#gradle-environment" class="md-nav__link">
-    Gradle environment
+    <span class="md-ellipsis">
+      Gradle environment
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#debugging" class="md-nav__link">
-    Debugging
+    <span class="md-ellipsis">
+      Debugging
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#testing" class="md-nav__link">
-    Testing
+    <span class="md-ellipsis">
+      Testing
+    </span>
   </a>
   
 </li>
@@ -527,86 +654,116 @@
     </li>
   
 
+              
             
-          
-        </ul>
-      </nav>
+          </ul>
+        </nav>
+      
     </li>
   
 
     
       
       
-      
-
+  
   
   
   
     
+    
+    
+    
     <li class="md-nav__item md-nav__item--nested">
       
-      
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" >
-      
-      
-      
-      
-        <label class="md-nav__link" for="__nav_4">
-          About
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <nav class="md-nav" aria-label="About" data-md-level="1">
-        <label class="md-nav__title" for="__nav_4">
-          <span class="md-nav__icon md-icon"></span>
-          About
-        </label>
-        <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
           
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    About
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            About
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
             
               
+                
+  
   
   
   
     <li class="md-nav__item">
       <a href="../../about/history/" class="md-nav__link">
-        Release notes
+        
+  
+  <span class="md-ellipsis">
+    Release notes
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
     <li class="md-nav__item">
       <a href="../../about/compatibility/" class="md-nav__link">
-        Compatibility
+        
+  
+  <span class="md-ellipsis">
+    Compatibility
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
     <li class="md-nav__item">
       <a href="../../about/license/" class="md-nav__link">
-        License
+        
+  
+  <span class="md-ellipsis">
+    License
+  </span>
+  
+
       </a>
     </li>
   
 
+              
             
-          
-        </ul>
-      </nav>
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -639,35 +796,45 @@
       
         <li class="md-nav__item">
   <a href="#extended-task" class="md-nav__link">
-    Extended task
+    <span class="md-ellipsis">
+      Extended task
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#completely-custom-task" class="md-nav__link">
-    Completely custom task
+    <span class="md-ellipsis">
+      Completely custom task
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#apply-default-modules" class="md-nav__link">
-    Apply default modules
+    <span class="md-ellipsis">
+      Apply default modules
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#hide-sensitive-data-in-logged-command" class="md-nav__link">
-    Hide sensitive data in logged command
+    <span class="md-ellipsis">
+      Hide sensitive data in logged command
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#docker" class="md-nav__link">
-    Docker
+    <span class="md-ellipsis">
+      Docker
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="Docker">
@@ -675,14 +842,18 @@
         
           <li class="md-nav__item">
   <a href="#call-docker-in-task" class="md-nav__link">
-    Call docker in task
+    <span class="md-ellipsis">
+      Call docker in task
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#chown" class="md-nav__link">
-    Chown
+    <span class="md-ellipsis">
+      Chown
+    </span>
   </a>
   
 </li>
@@ -694,21 +865,27 @@
       
         <li class="md-nav__item">
   <a href="#gradle-environment" class="md-nav__link">
-    Gradle environment
+    <span class="md-ellipsis">
+      Gradle environment
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#debugging" class="md-nav__link">
-    Debugging
+    <span class="md-ellipsis">
+      Debugging
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#testing" class="md-nav__link">
-    Testing
+    <span class="md-ellipsis">
+      Testing
+    </span>
   </a>
   
 </li>
@@ -727,10 +904,8 @@
                 
                   
 
-  <a href="https://github.com/xvik/gradle-use-python-plugin/edit/master/src/doc/docs/guide/plugindev.md" title="Edit this page" class="md-content__button md-icon">
-    
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
-  </a>
+  
+  
 
 
 <h1 id="plugins-development">Plugins development<a class="headerlink" href="#plugins-development" title="Permanent link">&para;</a></h1>
@@ -738,40 +913,40 @@
 to implement modules installation and could use provided abstractions to call python.</p>
 <p>Example usage: <a href="https://github.com/xvik/gradle-mkdocs-plugin">gradle-mkdocs-plugin</a>.</p>
 <p>In your plugin, add plugin as dependency:</p>
-<div class="highlight"><pre><span></span><code><span class="n">dependencies</span><span class="w"> </span><span class="o">{</span><span class="w"></span>
-<span class="w">    </span><span class="n">implementation</span><span class="w"> </span><span class="s1">&#39;ru.vyarus:gradle-use-python-plugin:4.0.0&#39;</span><span class="w"></span>
-<span class="o">}</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="n">dependencies</span><span class="w"> </span><span class="o">{</span>
+<span class="w">    </span><span class="n">implementation</span><span class="w"> </span><span class="s1">&#39;ru.vyarus:gradle-use-python-plugin:4.0.0&#39;</span>
+<span class="o">}</span>
 </code></pre></div>
 <p>And apply plugin: <code>project.plugins.apply(PythonPlugin)</code> (required to register <code>python</code> extension
 and declare default pipInstall task).</p>
 <h2 id="extended-task">Extended task<a class="headerlink" href="#extended-task" title="Permanent link">&para;</a></h2>
 <p>The simplest way is to extend <code>PythonTask</code>:</p>
-<div class="highlight"><pre><span></span><code><span class="kd">abstract</span><span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">SomeModuleTask</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">PythonTask</span><span class="w"> </span><span class="o">{</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="kd">abstract</span><span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">SomeModuleTask</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">PythonTask</span><span class="w"> </span><span class="o">{</span>
 
-<span class="w">    </span><span class="n">SomeModuleTask</span><span class="o">()</span><span class="w"> </span><span class="o">{</span><span class="w"></span>
-<span class="w">        </span><span class="c1">// always call specified commands on module</span><span class="w"></span>
-<span class="w">        </span><span class="n">module</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="s1">&#39;somemodule&#39;</span><span class="o">)</span><span class="w"></span>
-<span class="w">    </span><span class="o">}</span><span class="w"></span>
+<span class="w">    </span><span class="n">SomeModuleTask</span><span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<span class="w">        </span><span class="c1">// always call specified commands on module</span>
+<span class="w">        </span><span class="n">module</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="s1">&#39;somemodule&#39;</span><span class="o">)</span>
+<span class="w">    </span><span class="o">}</span>
 
-<span class="w">    </span><span class="nd">@Override</span><span class="w"></span>
-<span class="w">    </span><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">getExtraArgs</span><span class="o">()</span><span class="w"> </span><span class="o">{</span><span class="w"></span>
-<span class="w">        </span><span class="c1">// example of module options configuration with custom extension </span><span class="w"></span>
-<span class="w">        </span><span class="kt">def</span><span class="w"> </span><span class="n">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[]</span><span class="w"></span>
-<span class="w">        </span><span class="n">SomeModuleExtension</span><span class="w"> </span><span class="n">ext</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">project</span><span class="o">.</span><span class="na">extensions</span><span class="o">.</span><span class="na">getByType</span><span class="o">(</span><span class="n">SomeModuleExtension</span><span class="o">)</span><span class="w"></span>
-<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="o">(</span><span class="n">ext</span><span class="o">.</span><span class="na">somOption</span><span class="o">)</span><span class="w"> </span><span class="o">{</span><span class="w"></span>
-<span class="w">            </span><span class="n">res</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s1">&#39;--option&#39;</span><span class="w"></span>
-<span class="w">        </span><span class="o">}</span><span class="w"></span>
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">res</span><span class="w"></span>
-<span class="w">    </span><span class="o">}</span><span class="w"></span>
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">getExtraArgs</span><span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<span class="w">        </span><span class="c1">// example of module options configuration with custom extension </span>
+<span class="w">        </span><span class="kt">def</span><span class="w"> </span><span class="n">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[]</span>
+<span class="w">        </span><span class="n">SomeModuleExtension</span><span class="w"> </span><span class="n">ext</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">project</span><span class="o">.</span><span class="na">extensions</span><span class="o">.</span><span class="na">getByType</span><span class="o">(</span><span class="n">SomeModuleExtension</span><span class="o">)</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="o">(</span><span class="n">ext</span><span class="o">.</span><span class="na">somOption</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
+<span class="w">            </span><span class="n">res</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s1">&#39;--option&#39;</span>
+<span class="w">        </span><span class="o">}</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">res</span>
+<span class="w">    </span><span class="o">}</span>
 
-<span class="w">    </span><span class="c1">// optionally apply extra behaviour</span><span class="w"></span>
-<span class="w">    </span><span class="nd">@Override</span><span class="w"></span>
-<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="n">run</span><span class="o">()</span><span class="w"> </span><span class="o">{</span><span class="w"></span>
-<span class="w">        </span><span class="c1">// before python call               </span><span class="w"></span>
-<span class="w">        </span><span class="kd">super</span><span class="o">.</span><span class="na">run</span><span class="o">()</span><span class="w"></span>
-<span class="w">        </span><span class="c1">// after python call</span><span class="w"></span>
-<span class="w">    </span><span class="o">}</span><span class="w"></span>
-<span class="o">}</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// optionally apply extra behaviour</span>
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="n">run</span><span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<span class="w">        </span><span class="c1">// before python call               </span>
+<span class="w">        </span><span class="kd">super</span><span class="o">.</span><span class="na">run</span><span class="o">()</span>
+<span class="w">        </span><span class="c1">// after python call</span>
+<span class="w">    </span><span class="o">}</span>
+<span class="o">}</span>
 </code></pre></div>
 <div class="admonition important">
 <p class="admonition-title">Important</p>
@@ -780,20 +955,20 @@ and declare default pipInstall task).</p>
 </div>
 <p>If you need to populate some PythonTask property then do it inside your plugin.
 For example, to configure additional args:</p>
-<div class="highlight"><pre><span></span><code><span class="n">SomeModuleExtension</span><span class="w"> </span><span class="n">extension</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">project</span><span class="o">.</span><span class="na">extensions</span><span class="o">.</span><span class="na">getByType</span><span class="o">(</span><span class="n">SomeModuleExtension</span><span class="o">)</span><span class="w"></span>
-<span class="c1">// override default for all your custom tasks</span><span class="w"></span>
-<span class="n">project</span><span class="o">.</span><span class="na">tasks</span><span class="o">.</span><span class="na">withType</span><span class="o">(</span><span class="n">SomeModuleTask</span><span class="o">).</span><span class="na">configureEach</span><span class="w"> </span><span class="o">{</span><span class="w"> </span><span class="n">task</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"></span>
-<span class="w">    </span><span class="n">task</span><span class="o">.</span><span class="na">pythonArgs</span><span class="o">.</span><span class="na">convention</span><span class="o">(</span><span class="n">project</span><span class="o">.</span><span class="na">provider</span><span class="w"> </span><span class="o">{</span><span class="w"></span>
-<span class="w">        </span><span class="n">extension</span><span class="o">.</span><span class="na">someOption</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="o">[</span><span class="s1">&#39;--option&#39;</span><span class="o">]</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="o">[]</span><span class="w"></span>
-<span class="w">    </span><span class="o">})</span><span class="w"></span>
-<span class="o">}</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="n">SomeModuleExtension</span><span class="w"> </span><span class="n">extension</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">project</span><span class="o">.</span><span class="na">extensions</span><span class="o">.</span><span class="na">getByType</span><span class="o">(</span><span class="n">SomeModuleExtension</span><span class="o">)</span>
+<span class="c1">// override default for all your custom tasks</span>
+<span class="n">project</span><span class="o">.</span><span class="na">tasks</span><span class="o">.</span><span class="na">withType</span><span class="o">(</span><span class="n">SomeModuleTask</span><span class="o">).</span><span class="na">configureEach</span><span class="w"> </span><span class="o">{</span><span class="w"> </span><span class="n">task</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">    </span><span class="n">task</span><span class="o">.</span><span class="na">pythonArgs</span><span class="o">.</span><span class="na">convention</span><span class="o">(</span><span class="n">project</span><span class="o">.</span><span class="na">provider</span><span class="w"> </span><span class="o">{</span>
+<span class="w">        </span><span class="n">extension</span><span class="o">.</span><span class="na">someOption</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="o">[</span><span class="s1">&#39;--option&#39;</span><span class="o">]</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="o">[]</span>
+<span class="w">    </span><span class="o">})</span>
+<span class="o">}</span>
 </code></pre></div>
 <p>Usage:</p>
-<div class="highlight"><pre><span></span><code><span class="n">pyton</span><span class="o">.</span><span class="na">pip</span><span class="w"> </span><span class="s1">&#39;sommemodule:1&#39;</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="n">pyton</span><span class="o">.</span><span class="na">pip</span><span class="w"> </span><span class="s1">&#39;sommemodule:1&#39;</span>
 
-<span class="n">tasks</span><span class="o">.</span><span class="na">register</span><span class="o">(</span><span class="s1">&#39;modCmd&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">SomeModuleTask</span><span class="o">)</span><span class="w"> </span><span class="o">{</span><span class="w"></span>
-<span class="w">    </span><span class="n">command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;module args&#39;</span><span class="w"></span>
-<span class="o">}</span><span class="w"></span>
+<span class="n">tasks</span><span class="o">.</span><span class="na">register</span><span class="o">(</span><span class="s1">&#39;modCmd&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">SomeModuleTask</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
+<span class="w">    </span><span class="n">command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;module args&#39;</span>
+<span class="o">}</span>
 </code></pre></div>
 <p>called: <code>python -m somemodule module arfs --option</code></p>
 <h2 id="completely-custom-task">Completely custom task<a class="headerlink" href="#completely-custom-task" title="Permanent link">&para;</a></h2>
@@ -809,39 +984,39 @@ You can avoid <code>BasePythonTask</code> (and create environment manually), but
 because it would provide you a pre-configured python instance.</p>
 </div>
 <p>Example usage:</p>
-<div class="highlight"><pre><span></span><code><span class="kd">abstract</span><span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">MyTask</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">BasePythonTask</span><span class="w"> </span><span class="o">{</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="kd">abstract</span><span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">MyTask</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">BasePythonTask</span><span class="w"> </span><span class="o">{</span>
 
-<span class="w">    </span><span class="nd">@TaskAction</span><span class="w"></span>
-<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="n">run</span><span class="o">()</span><span class="w"> </span><span class="o">{</span><span class="w"></span>
-<span class="w">        </span><span class="n">Python</span><span class="w"> </span><span class="n">python</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">getPython</span><span class="o">()</span><span class="w"></span>
+<span class="w">    </span><span class="nd">@TaskAction</span>
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="n">run</span><span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<span class="w">        </span><span class="n">Python</span><span class="w"> </span><span class="n">python</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">getPython</span><span class="o">()</span>
 
-<span class="w">        </span><span class="c1">// execute and get command output</span><span class="w"></span>
-<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">out</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">python</span><span class="o">.</span><span class="na">readOutput</span><span class="o">(</span><span class="n">cmd</span><span class="o">)</span><span class="w"></span>
+<span class="w">        </span><span class="c1">// execute and get command output</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">out</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">python</span><span class="o">.</span><span class="na">readOutput</span><span class="o">(</span><span class="n">cmd</span><span class="o">)</span>
 
-<span class="w">        </span><span class="c1">// call module (the same as exec() but applies &#39;-m mod&#39; before command)</span><span class="w"></span>
-<span class="w">        </span><span class="n">python</span><span class="o">.</span><span class="na">callModule</span><span class="o">(</span><span class="s1">&#39;mod&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">cmd</span><span class="o">)</span><span class="w"></span>
+<span class="w">        </span><span class="c1">// call module (the same as exec() but applies &#39;-m mod&#39; before command)</span>
+<span class="w">        </span><span class="n">python</span><span class="o">.</span><span class="na">callModule</span><span class="o">(</span><span class="s1">&#39;mod&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">cmd</span><span class="o">)</span>
 
-<span class="w">        </span><span class="c1">// direct python call</span><span class="w"></span>
-<span class="w">        </span><span class="n">python</span><span class="o">.</span><span class="na">exec</span><span class="o">(</span><span class="n">cmd</span><span class="o">)</span><span class="w"></span>
-<span class="w">    </span><span class="o">}</span><span class="w"></span>
-<span class="o">}</span><span class="w"></span>
+<span class="w">        </span><span class="c1">// direct python call</span>
+<span class="w">        </span><span class="n">python</span><span class="o">.</span><span class="na">exec</span><span class="o">(</span><span class="n">cmd</span><span class="o">)</span>
+<span class="w">    </span><span class="o">}</span>
+<span class="o">}</span>
 </code></pre></div>
 <p>Specific utility for target module could be defined, see
 <code>ru.vyarus.gradle.plugin.python.cmd.Pip</code> util as an example (simplified):</p>
-<div class="highlight"><pre><span></span><code><span class="kd">class</span><span class="w"> </span><span class="nc">Pip</span><span class="w"> </span><span class="o">{</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="kd">class</span><span class="w"> </span><span class="nc">Pip</span><span class="w"> </span><span class="o">{</span>
 
-<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">Python</span><span class="w"> </span><span class="n">python</span><span class="w"></span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">Python</span><span class="w"> </span><span class="n">python</span>
 
-<span class="w">    </span><span class="nf">Pip</span><span class="o">(</span><span class="n">Python</span><span class="w"> </span><span class="n">python</span><span class="o">)</span><span class="w"> </span><span class="o">{</span><span class="w"></span>
-<span class="w">        </span><span class="k">this</span><span class="o">.</span><span class="na">python</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">python</span><span class="w"></span>
-<span class="w">    </span><span class="o">}</span><span class="w"></span>
+<span class="w">    </span><span class="nf">Pip</span><span class="o">(</span><span class="n">Python</span><span class="w"> </span><span class="n">python</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
+<span class="w">        </span><span class="k">this</span><span class="o">.</span><span class="na">python</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">python</span>
+<span class="w">    </span><span class="o">}</span>
 
-<span class="w">    </span><span class="c1">// declare module specific commands</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// declare module specific commands</span>
 
-<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="nf">install</span><span class="o">(</span><span class="n">String</span><span class="w"> </span><span class="n">module</span><span class="o">)</span><span class="w"> </span><span class="o">{</span><span class="w"></span>
-<span class="w">        </span><span class="n">python</span><span class="o">.</span><span class="na">callModule</span><span class="o">(</span><span class="s1">&#39;pip&#39;</span><span class="o">,</span><span class="w"> </span><span class="s2">&quot;install $module&quot;</span><span class="o">)</span><span class="w"></span>
-<span class="w">    </span><span class="o">}</span><span class="w"></span>
-<span class="o">}</span><span class="w"></span>
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="nf">install</span><span class="o">(</span><span class="n">String</span><span class="w"> </span><span class="n">module</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
+<span class="w">        </span><span class="n">python</span><span class="o">.</span><span class="na">callModule</span><span class="o">(</span><span class="s1">&#39;pip&#39;</span><span class="o">,</span><span class="w"> </span><span class="s2">&quot;install $module&quot;</span><span class="o">)</span>
+<span class="w">    </span><span class="o">}</span>
+<span class="o">}</span>
 </code></pre></div>
 <div class="admonition important">
 <p class="admonition-title">Important</p>
@@ -853,20 +1028,20 @@ It is often required to separate initialization and execution errors and so ther
 </div>
 <h2 id="apply-default-modules">Apply default modules<a class="headerlink" href="#apply-default-modules" title="Permanent link">&para;</a></h2>
 <p>In your plugin you could apply default modules like this:</p>
-<div class="highlight"><pre><span></span><code><span class="n">afterEvaluate</span><span class="w"> </span><span class="o">{</span><span class="w"></span>
-<span class="w">    </span><span class="n">PythonExtension</span><span class="w"> </span><span class="n">ext</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">project</span><span class="o">.</span><span class="na">extensions</span><span class="o">.</span><span class="na">getByType</span><span class="o">(</span><span class="n">PythonExtension</span><span class="o">)</span><span class="w"></span>
-<span class="w">    </span><span class="c1">// delayed default module(s) declaration based on user configuration</span><span class="w"></span>
-<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">(!</span><span class="n">ext</span><span class="o">.</span><span class="na">isModuleDeclared</span><span class="o">(</span><span class="s1">&#39;somemodule&#39;</span><span class="o">))</span><span class="w"> </span><span class="o">{</span><span class="w"></span>
-<span class="w">        </span><span class="n">ext</span><span class="o">.</span><span class="na">pip</span><span class="w"> </span><span class="s1">&#39;sommemodule:1&#39;</span><span class="w"></span>
-<span class="w">    </span><span class="o">}</span><span class="w"></span>
-<span class="o">}</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="n">afterEvaluate</span><span class="w"> </span><span class="o">{</span>
+<span class="w">    </span><span class="n">PythonExtension</span><span class="w"> </span><span class="n">ext</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">project</span><span class="o">.</span><span class="na">extensions</span><span class="o">.</span><span class="na">getByType</span><span class="o">(</span><span class="n">PythonExtension</span><span class="o">)</span>
+<span class="w">    </span><span class="c1">// delayed default module(s) declaration based on user configuration</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">(!</span><span class="n">ext</span><span class="o">.</span><span class="na">isModuleDeclared</span><span class="o">(</span><span class="s1">&#39;somemodule&#39;</span><span class="o">))</span><span class="w"> </span><span class="o">{</span>
+<span class="w">        </span><span class="n">ext</span><span class="o">.</span><span class="na">pip</span><span class="w"> </span><span class="s1">&#39;sommemodule:1&#39;</span>
+<span class="w">    </span><span class="o">}</span>
+<span class="o">}</span>
 </code></pre></div>
 <p>Or always declare default modules (before configuration):</p>
-<div class="highlight"><pre><span></span><code><span class="n">PythonExtension</span><span class="w"> </span><span class="n">ext</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">project</span><span class="o">.</span><span class="na">extensions</span><span class="o">.</span><span class="na">getByType</span><span class="o">(</span><span class="n">PythonExtension</span><span class="o">)</span><span class="w"></span>
-<span class="n">ext</span><span class="o">.</span><span class="na">pip</span><span class="w"> </span><span class="s1">&#39;sommeodule:1&#39;</span><span class="o">,</span><span class="w"> </span><span class="s1">&#39;othermodule:2&#39;</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="n">PythonExtension</span><span class="w"> </span><span class="n">ext</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">project</span><span class="o">.</span><span class="na">extensions</span><span class="o">.</span><span class="na">getByType</span><span class="o">(</span><span class="n">PythonExtension</span><span class="o">)</span>
+<span class="n">ext</span><span class="o">.</span><span class="na">pip</span><span class="w"> </span><span class="s1">&#39;sommeodule:1&#39;</span><span class="o">,</span><span class="w"> </span><span class="s1">&#39;othermodule:2&#39;</span>
 </code></pre></div>
 <p>User will be able to override default versions by direct module declaration (even downgrade version):</p>
-<div class="highlight"><pre><span></span><code><span class="n">python</span><span class="o">.</span><span class="na">pip</span><span class="w"> </span><span class="s1">&#39;sommodule:0.9&#39;</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="n">python</span><span class="o">.</span><span class="na">pip</span><span class="w"> </span><span class="s1">&#39;sommodule:0.9&#39;</span>
 </code></pre></div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -881,15 +1056,15 @@ contain sensitive data (like passwords).</p>
 </code></pre></div>
 <p>In logged command password should be replaced with *****.</p>
 <p>To deal with such cases, Python object supports registration of <code>LoggedCommandCleaner</code> object:</p>
-<div class="highlight"><pre><span></span><code><span class="n">python</span><span class="p">.</span><span class="na">logCommandCleaner</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">CleanerInstance</span><span class="p">)</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="n">python</span><span class="p">.</span><span class="na">logCommandCleaner</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">CleanerInstance</span><span class="p">)</span>
 </code></pre></div>
 <p>As an example see Pip object, which register special cleaner for extra index passwords right in its constructor:</p>
-<div class="highlight"><pre><span></span><code><span class="n">Pip</span><span class="p">(</span><span class="n">Python</span><span class="w"> </span><span class="n">python</span><span class="p">,</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="n">userScope</span><span class="p">,</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="n">useCache</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">      </span><span class="p">...</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="n">Pip</span><span class="p">(</span><span class="n">Python</span><span class="w"> </span><span class="n">python</span><span class="p">,</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="n">userScope</span><span class="p">,</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="n">useCache</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="p">...</span>
 
-<span class="w">      </span><span class="c1">// do not show passwords when external indexes used with credentials</span><span class="w"></span>
-<span class="w">      </span><span class="n">python</span><span class="p">.</span><span class="na">logCommandCleaner</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">CliUtils</span><span class="p">.</span><span class="na">hidePipCredentials</span><span class="p">(</span><span class="n">it</span><span class="p">)</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
-<span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="w">      </span><span class="c1">// do not show passwords when external indexes used with credentials</span>
+<span class="w">      </span><span class="n">python</span><span class="p">.</span><span class="na">logCommandCleaner</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">CliUtils</span><span class="p">.</span><span class="na">hidePipCredentials</span><span class="p">(</span><span class="n">it</span><span class="p">)</span><span class="w"> </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
 </code></pre></div>
 <p>See <code>CliUtils.hidePipCredentials</code> for an implementation example (using regexps).
 Most likely, implementation would be the same in your case. </p>
@@ -910,20 +1085,20 @@ but plugin implements this support <em>for the future</em>. </p>
 For this, <code>BasePythonTask</code> contains <code>dockerExec</code> method.</p>
 <p>For example, during development there was a <code>CleanPython</code> task which used it to run deletion inside docker container
 (later it was replaced by chown calls, but still a good example):</p>
-<div class="highlight"><pre><span></span><code><span class="nd">@TaskAction</span><span class="w"></span>
-<span class="kt">void</span><span class="w"> </span><span class="nf">run</span><span class="o">()</span><span class="w"> </span><span class="o">{</span><span class="w"></span>
-<span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">project</span><span class="o">.</span><span class="na">file</span><span class="o">(</span><span class="n">getEnvPath</span><span class="o">()).</span><span class="na">absolutePath</span><span class="w"></span>
-<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">(</span><span class="n">dockerUsed</span><span class="o">)</span><span class="w"> </span><span class="o">{</span><span class="w"></span>
-<span class="w">        </span><span class="c1">// with docker, environment would be created with a root user and so it would not be possible</span><span class="w"></span>
-<span class="w">        </span><span class="c1">// to simply remove folder: so removing within docker</span><span class="w"></span>
-<span class="w">        </span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">cmd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">windows</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="o">[</span><span class="s1">&#39;rd&#39;</span><span class="o">,</span><span class="w"> </span><span class="s1">&#39;/s&#39;</span><span class="o">,</span><span class="w"> </span><span class="s1">&#39;/q&#39;</span><span class="o">,</span><span class="w"> </span><span class="s2">&quot;\&quot;$path\&quot;&quot;</span><span class="o">]</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="o">[</span><span class="s1">&#39;rm&#39;</span><span class="o">,</span><span class="w"> </span><span class="s1">&#39;-rf&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">path</span><span class="o">]</span><span class="w"></span>
-<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="o">(</span><span class="n">dockerExec</span><span class="o">(</span><span class="n">cmd</span><span class="o">)</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="o">)</span><span class="w"> </span><span class="o">{</span><span class="w"></span>
-<span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">GradleException</span><span class="o">(</span><span class="s1">&#39;Python environment cleanup failed&#39;</span><span class="o">)</span><span class="w"></span>
-<span class="w">        </span><span class="o">}</span><span class="w"></span>
-<span class="w">    </span><span class="o">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="o">{</span><span class="w"></span>
-<span class="w">        </span><span class="n">project</span><span class="o">.</span><span class="na">delete</span><span class="o">(</span><span class="n">path</span><span class="o">)</span><span class="w"></span>
-<span class="w">    </span><span class="o">}</span><span class="w"></span>
-<span class="o">}</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="nd">@TaskAction</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">run</span><span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">project</span><span class="o">.</span><span class="na">file</span><span class="o">(</span><span class="n">getEnvPath</span><span class="o">()).</span><span class="na">absolutePath</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">(</span><span class="n">dockerUsed</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
+<span class="w">        </span><span class="c1">// with docker, environment would be created with a root user and so it would not be possible</span>
+<span class="w">        </span><span class="c1">// to simply remove folder: so removing within docker</span>
+<span class="w">        </span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">cmd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">windows</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="o">[</span><span class="s1">&#39;rd&#39;</span><span class="o">,</span><span class="w"> </span><span class="s1">&#39;/s&#39;</span><span class="o">,</span><span class="w"> </span><span class="s1">&#39;/q&#39;</span><span class="o">,</span><span class="w"> </span><span class="s2">&quot;\&quot;$path\&quot;&quot;</span><span class="o">]</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="o">[</span><span class="s1">&#39;rm&#39;</span><span class="o">,</span><span class="w"> </span><span class="s1">&#39;-rf&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">path</span><span class="o">]</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="o">(</span><span class="n">dockerExec</span><span class="o">(</span><span class="n">cmd</span><span class="o">)</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
+<span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">GradleException</span><span class="o">(</span><span class="s1">&#39;Python environment cleanup failed&#39;</span><span class="o">)</span>
+<span class="w">        </span><span class="o">}</span>
+<span class="w">    </span><span class="o">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="o">{</span>
+<span class="w">        </span><span class="n">project</span><span class="o">.</span><span class="na">delete</span><span class="o">(</span><span class="n">path</span><span class="o">)</span>
+<span class="w">    </span><span class="o">}</span>
+<span class="o">}</span>
 </code></pre></div>
 <p><code>isDockerUsed()</code>, <code>isWindows()</code> and <code>dockerExec(cmd)</code> are all provided by <code>BasePythonTask</code></p>
 <h3 id="chown">Chown<a class="headerlink" href="#chown" title="Permanent link">&para;</a></h3>
@@ -963,10 +1138,10 @@ but you <strong>should not call it manually</strong>. <code>Python</code> utilit
 record all executions (no additional actions required)</p>
 <h2 id="debugging">Debugging<a class="headerlink" href="#debugging" title="Permanent link">&para;</a></h2>
 <p>For plugin debugging enable:</p>
-<div class="highlight"><pre><span></span><code><span class="n">python</span><span class="w"> </span><span class="o">{</span><span class="w"></span>
-<span class="w">    </span><span class="n">debug</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="w"></span>
-<span class="w">    </span><span class="n">printStats</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="w"></span>
-<span class="o">}</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="n">python</span><span class="w"> </span><span class="o">{</span>
+<span class="w">    </span><span class="n">debug</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">    </span><span class="n">printStats</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="o">}</span>
 </code></pre></div>
 <p>Debug option prints all cache operations and additional debug logs (including you logs, if you use environment's debug method).
 Print stats option is also useful for improper cache usage detection: in case of
@@ -975,20 +1150,27 @@ incorrect cache usage, you'll see many duplicate commands executed.</p>
 <p>In tests you might need to use Python, Pip, Vevnv or, maybe, your own utilities directly in tests.
 There is a simple <code>SimpleEnvironment</code> object for such cases.</p>
 <p>For example, create virtual environment in test:</p>
-<div class="highlight"><pre><span></span><code><span class="n">Venv</span><span class="w"> </span><span class="n">env</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Venv</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">SimpleEnvironment</span><span class="p">(</span><span class="n">testProjectDir</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;.python&quot;</span><span class="p">)</span><span class="w"></span>
-<span class="n">env</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="kc">false</span><span class="p">)</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="n">Venv</span><span class="w"> </span><span class="n">env</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Venv</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">SimpleEnvironment</span><span class="p">(</span><span class="n">testProjectDir</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;.python&quot;</span><span class="p">)</span>
+<span class="n">env</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="kc">false</span><span class="p">)</span>
 </code></pre></div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p><code>testProjectDir</code> is required only if you will need to work with relative paths:
 in this case, where <code>.python</code> directory would be created.</p>
 <p>But, if absolute path used, it might be omit:
-<div class="highlight"><pre><span></span><code><span class="n">Venv</span><span class="w"> </span><span class="n">env</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Venv</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">SimpleEnvironment</span><span class="p">(),</span><span class="w"> </span><span class="s">&quot;~/.testuserdir&quot;</span><span class="p">)</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="n">Venv</span><span class="w"> </span><span class="n">env</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Venv</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">SimpleEnvironment</span><span class="p">(),</span><span class="w"> </span><span class="s">&quot;~/.testuserdir&quot;</span><span class="p">)</span>
 </code></pre></div></p>
 </div>
 <p>Another example, removing global pip package before test:</p>
-<div class="highlight"><pre><span></span><code><span class="k">new</span><span class="w"> </span><span class="n">Pip</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">SimpleEnvironment</span><span class="p">()).</span><span class="na">uninstall</span><span class="p">(</span><span class="s">&quot;extract-msg&quot;</span><span class="p">)</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="k">new</span><span class="w"> </span><span class="n">Pip</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">SimpleEnvironment</span><span class="p">()).</span><span class="na">uninstall</span><span class="p">(</span><span class="s">&quot;extract-msg&quot;</span><span class="p">)</span>
 </code></pre></div>
+
+
+
+
+
+
+
 
 
 
@@ -999,59 +1181,25 @@ in this case, where <code>.python</code> directory would be created.</p>
             </div>
           
           
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
         </div>
         
-          <a href="#" class="md-top md-icon" data-md-component="top" hidden>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
-            Back to top
-          </a>
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
+  Back to top
+</button>
         
       </main>
       
         <footer class="md-footer">
-  
-    
-    <nav class="md-footer__inner md-grid" aria-label="Footer" >
-      
-        
-        <a href="../ci/" class="md-footer__link md-footer__link--prev" aria-label="Previous: CI" rel="prev">
-          <div class="md-footer__button md-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
-          </div>
-          <div class="md-footer__title">
-            <div class="md-ellipsis">
-              <span class="md-footer__direction">
-                Previous
-              </span>
-              CI
-            </div>
-          </div>
-        </a>
-      
-      
-        
-        <a href="../../about/history/" class="md-footer__link md-footer__link--next" aria-label="Next: Release notes" rel="next">
-          <div class="md-footer__title">
-            <div class="md-ellipsis">
-              <span class="md-footer__direction">
-                Next
-              </span>
-              Release notes
-            </div>
-          </div>
-          <div class="md-footer__button md-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
-          </div>
-        </a>
-      
-    </nav>
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
       <div class="md-copyright">
   
     <div class="md-copyright__highlight">
-      Copyright &copy; 2017-2022 Vyacheslav Rusakov
+      Copyright &copy; 2017-2024 Vyacheslav Rusakov
     </div>
   
   
@@ -1066,20 +1214,24 @@ in this case, where <code>.python</code> directory would be created.</p>
   
     
     
+    
+    
       
       
     
     <a href="https://github.com/xvik" target="_blank" rel="noopener" title="github.com" class="md-social__link">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
     </a>
   
+    
+    
     
     
       
       
     
     <a href="https://blog.vyarus.ru" target="_blank" rel="noopener" title="blog.vyarus.ru" class="md-social__link">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M35.19 171.1c-46.91 46-46.91 122.9 0 169.8L171.1 476.8c46 46.9 122.9 46.9 169.8 0l135.9-135.9c46.9-46.9 46.9-123.8 0-169.8L340.9 35.19c-46.9-46.91-123.8-46.91-169.8 0L35.19 171.1zM315.5 315.5c-32.9 32.8-86.1 32.8-118.9 0-32.9-32.9-32.9-86.1 0-118.9 32.8-32.9 86-32.9 118.9 0 32.8 32.8 32.8 86 0 118.9z"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M35.19 171.1c-46.91 46-46.91 122.9 0 169.8L171.1 476.8c46 46.9 122.9 46.9 169.8 0l135.9-135.9c46.9-46.9 46.9-123.8 0-169.8L340.9 35.19c-46.9-46.91-123.8-46.91-169.8 0L35.19 171.1zM315.5 315.5c-32.9 32.8-86.1 32.8-118.9 0-32.9-32.9-32.9-86.1 0-118.9 32.8-32.9 86-32.9 118.9 0 32.8 32.8 32.8 86 0 118.9z"/></svg>
     </a>
   
 </div>
@@ -1093,10 +1245,11 @@ in this case, where <code>.python</code> directory would be created.</p>
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tracking", "navigation.top"], "search": "../../assets/javascripts/workers/search.16e2a7d4.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tracking", "navigation.top"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.8492ddcf.min.js"></script>
+      <script src="../../assets/javascripts/bundle.1e8ae164.min.js"></script>
       
     
   </body>

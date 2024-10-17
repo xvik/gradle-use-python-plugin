@@ -67,7 +67,7 @@ class PipModulesInstallTest extends AbstractKitTest {
         then: "package install called"
         result.task(':checkPython').outcome == TaskOutcome.SUCCESS
         result.task(':pipInstall').outcome == TaskOutcome.SUCCESS
-        result.output.contains('Successfully installed MarkupSafe-2.1.5 boson-0.9')
+        result.output.contains('Successfully installed MarkupSafe-3.0.1 boson-0.9')
         result.output.contains('boson-0.9')
 
         when: "second install"
@@ -75,7 +75,7 @@ class PipModulesInstallTest extends AbstractKitTest {
         then: "package not installed"
         result.task(':checkPython').outcome == TaskOutcome.SUCCESS
         result.task(':pipInstall').outcome == TaskOutcome.SUCCESS // up to date check removed
-        !result.output.contains('Successfully installed MarkupSafe-2.1.5 boson-0.9')
+        !result.output.contains('Successfully installed MarkupSafe-3.0.1 boson-0.9')
         !result.output.contains('boson-0.9')
     }
 

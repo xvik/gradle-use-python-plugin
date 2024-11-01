@@ -30,7 +30,7 @@ dependencies {
     testImplementation('org.spockframework:spock-core:2.3-groovy-3.0') {
         exclude group: 'org.codehaus.groovy'
     }
-    testImplementation 'net.bytebuddy:byte-buddy:1.15.7'
+    testImplementation 'net.bytebuddy:byte-buddy:1.15.8'
     testImplementation 'org.objenesis:objenesis:3.4'
 }
 

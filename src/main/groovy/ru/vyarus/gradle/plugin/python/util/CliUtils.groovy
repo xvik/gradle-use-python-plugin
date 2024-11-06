@@ -22,7 +22,7 @@ final class CliUtils {
     private static final String SPACE = ' '
     private static final String VERSION_SPLIT = '\\.'
     private static final String BACKSLASH = '\\'
-    private static final Pattern PIP_CREDENTIALS = Pattern.compile(' --extra-index-url +https?://[^:]+:([^@]+)@')
+    private static final Pattern PIP_CREDENTIALS = Pattern.compile(' --(?>extra-)?index-url +https?://[^:]+:([^@]+)@')
 
     private CliUtils() {
     }
@@ -291,7 +291,7 @@ final class CliUtils {
      * @return string with cleared passwords
      */
     static String hidePipCredentials(String cmd) {
-        if (!cmd.contains(' --extra-index-url ')) {
+        if (!cmd.contains(' --extra-index-url ') && !cmd.contains(' --index-url ')) {
             return cmd
         }
         int lastIndex = 0

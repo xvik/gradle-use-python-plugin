@@ -184,6 +184,8 @@ python {
    usePipCache = true
    // required to overcome "error: externally-managed-environment" error on linux (--break-system-packages)
    breakSystemPackages = false
+   // override default pip repository (--index-url option) 
+   indexUrl = null
    // additional pip repositories (--extra-index-url option)
    extraIndexUrls = []
    // trusted hosts for pip install (--trusted-host option)
@@ -287,25 +289,26 @@ tasks.register('myPipInst', PipInstallTask) {
 
 Configuration:
 
-| Property                                      | Description                                                                                                                                         |
-|-----------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|
-| pythonPath                                    | Path to python binary. By default, property ignored because checkPython task selects correct path                                                   |
-| useCustomPath                                 | Force pythonPath property use instead of path selected by checkPython task (e.g. to use global python instead of environment)                       |
-| pythonBinary                                  | Python binary name. By default, python3 on linux and python otherwise.                                                                              |
-| validateSystemBinary                          | Search python binary in PATH and fail build to reveal PATH problems                                                                                 |
-| pythonArgs                                    | Extra python arguments applied just after python binary. Useful for declaring common python options (-I, -S, etc.)                                  |
-| environment                                   | Process specific environment variables                                                                                                              |
-| modules                                       | Modules to install. In most cases configured indirectly with `pip(..)` task methods. By default, modules from global configuration.                 |
-| userScope                                     | Use current user scope (`--user` flag). Enabled by default to avoid permission problems on *nix (global configuration).                             |
-| showInstalledVersions                         | Perform `pip list` after installation. By default use global configuration value                                                                    |
-| alwaysInstallModules                          | Call `pip install module` for all declared modules, even if it is already installed with correct version. By default use global configuration value |
-| useCache                                      | Can be used to disable pip cache (--no-cache-dir)                                                                                                   |
-| extraIndexUrls                                | Additional pip repositories (--extra-index-url)                                                                                                     |
+| Property                                     | Description                                                                                                                                    |
+|----------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|
+| pythonPath                                   | Path to python binary. By default, property ignored because checkPython task selects correct path                                              |
+| useCustomPath                                | Force pythonPath property use instead of path selected by checkPython task (e.g. to use global python instead of environment)                  |
+| pythonBinary                                 | Python binary name. By default, python3 on linux and python otherwise.                                                                         |
+| validateSystemBinary                         | Search python binary in PATH and fail build to reveal PATH problems                                                                            |
+| pythonArgs                                   | Extra python arguments applied just after python binary. Useful for declaring common python options (-I, -S, etc.)                             |
+| environment                                  | Process specific environment variables                                                                                                         |
+| modules                                      | Modules to install. In most cases configured indirectly with `pip(..)` task methods. By default, modules from global configuration.            |
+| userScope                                    | Use current user scope (`--user` flag). Enabled by default to avoid permission problems on *nix (global configuration).                        |
+| showInstalledVersions                        | Perform `pip list` after installation. By default use global configuration value                                                               |
+| alwaysInstallModules                         | Call `pip install module` for all declared modules, even if it is already installed with correct version. By default use global configuration value |
+| useCache                                     | Can be used to disable pip cache (--no-cache-dir)                                                                                              |
+| indexUrl                                     | Override default pip repository (--index-url)                                                                                                 |
+| extraIndexUrls                               | Additional pip repositories (--extra-index-url)                                                                                                |
 | trustedHosts / trusted hosts (--trusted-host) |
-| options                                       | additional pip install options                                                                                                                      |
-| requirements                                  | Requirements file to use                                                                                                                            |
-| strictRequirements                            | Strict or native requirements file processing mode                                                                                                  |
-| envPath                                       | Virtual environment path (require to chown dir inside docker)                                                                                       | 
+| options                                      | additional pip install options                                                                                                                 |
+| requirements                                 | Requirements file to use                                                                                                                       |
+| strictRequirements                           | Strict or native requirements file processing mode                                                                                             |
+| envPath                                      | Virtual environment path (require to chown dir inside docker)                                                                                  | 
 
 And, as shown above, custom methods:
 

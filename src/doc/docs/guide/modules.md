@@ -116,6 +116,30 @@ disable it with `python.alwaysInstallModules = true` (pip always called). But th
     it is possible to disable cache (for all modules) with `python.usePipCache=false` configuration
     (applies [--no-cache-dir](https://pip.pypa.io/en/stable/reference/pip_install/#caching) pip flag)
 
+## Custom pip repository
+
+To override default pip repository (https://pypi.org/simple) (for example, to seld-hosted):
+
+```groovy
+python {
+    indexUrl = "http://custom-url.com"
+}
+```
+
+or with shortcut method
+
+```groovy
+python {
+    indexUrl "http://custom-url.com"
+}
+```
+
+Index url will be applied as [--index-url](https://pip.pypa.io/en/stable/cli/pip_install/#cmdoption-i)
+flag for pip commands supporting it: install, download, list and wheel. By default, it only affects `pipInstall` and `pipList` tasks.
+Applied for all `BasePipTask`, so if you have custom pip tasks, it would be affected too.
+
+In case of ssl problems (stale or self-signed certificated), mark domains as trusted (see example below)
+
 ## Extra pip repositories
 
 To add additional pip repositories (probably self-hosted):
@@ -134,7 +158,7 @@ python {
 }
 ```
 
-Extra urls will be applied as [--extra-index-url](https://pip.pypa.io/en/stable/reference/pip_install/#install-extra-index-url)
+Extra urls will be applied as [--extra-index-url](https://pip.pypa.io/en/stable/cli/pip_install/#cmdoption-extra-index-url)
 flag for pip commands supporting it: install, download, list and wheel. By default, it only affects `pipInstall` and `pipList` tasks.
 Applied for all `BasePipTask`, so if you have custom pip tasks, it would be affected too.
 

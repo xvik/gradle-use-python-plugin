@@ -1,3 +1,6 @@
+* Hide password inside --index-url pip parameter in console output (#146)
+* Add python.indexUrl configuration option (to override default pip repository)
+
 ### 4.0.0 (2024-04-13)
 * (breaking) Drop gradle 5 and 6 support
 * (breaking) All plugin tasks become abstract, so any custom task types should be abstract too

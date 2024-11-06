@@ -122,6 +122,32 @@ class PipInstallTaskKitTest extends AbstractKitTest {
         result.output =~ /python(3)? -m pip list/
     }
 
+    def "Check custom index url option "() {
+
+        setup:
+        build """
+            plugins {
+                id 'ru.vyarus.use-python'
+            }
+            
+            python {
+                scope = USER
+                pip 'extract-msg:0.28.0'
+                alwaysInstallModules = true
+                indexUrl "http://extra-url.com"
+            }
+        """
+
+        when: "run task"
+        BuildResult result = run('pipInstall')
+
+        then: "arguments applied"
+        result.task(':checkPython').outcome == TaskOutcome.SUCCESS
+        result.task(':pipInstall').outcome == TaskOutcome.SUCCESS
+        result.output =~ /python(3)? -m pip install extract-msg==0.28.0 --user --index-url http:\/\/extra-url.com/
+    }
+
+
     def "Check extra index urls and trusted hosts options "() {
 
         setup:

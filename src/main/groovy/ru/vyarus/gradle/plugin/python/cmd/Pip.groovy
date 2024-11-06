@@ -30,7 +30,7 @@ class Pip {
     private static final String INSTALL_TASK = 'install'
     private static final String LIST_TASK = 'list'
     private static final List<String> USER_AWARE_COMMANDS = [INSTALL_TASK, LIST_TASK, 'freeze']
-    private static final List<String> EXTRA_INDEX_AWARE_COMMANDS = [INSTALL_TASK, LIST_TASK, 'download', 'wheel']
+    private static final List<String> INDEX_AWARE_COMMANDS = [INSTALL_TASK, LIST_TASK, 'download', 'wheel']
 
     private final Python python
     // --user for install, list and freeze tasks
@@ -40,6 +40,8 @@ class Pip {
     boolean useCache = true
     // --break-system-packages for install task
     boolean breakSystemPackages = false
+    // --index-url
+    String indexUrl
     // --extra-index-url
     List<String> extraIndexUrls = []
     // --trusted-host
@@ -139,6 +141,18 @@ class Pip {
      */
     Pip environment(Map<String, Object> env) {
         python.environment(env)
+        return this
+    }
+
+    /**
+     * Set default pip repository (--index-url). Applies only for commands supporting it.
+     *
+     * @param url url to default pip repository
+     * @return pip instance for chained calls
+     * @see ru.vyarus.gradle.plugin.python.PythonExtension#indexUrl
+     */
+    Pip indexUrl(String url) {
+        indexUrl = url
         return this
     }
 
@@ -302,9 +316,11 @@ class Pip {
     }
 
     private String applyFlags(String cmd) {
+        String command = extractCommand(cmd)
+
         // -- user
         // explicit virtualenv check is required because flag will fail under virtualenv
-        if (!cmd.contains(USER) && userScope && USER_AWARE_COMMANDS.contains(extractCommand(cmd))
+        if (!cmd.contains(USER) && userScope && USER_AWARE_COMMANDS.contains(command)
                 && !python.virtualenv) {
             cmd += " $USER"
         }
@@ -318,7 +334,11 @@ class Pip {
             cmd += " $BREAK_SYSTEM_PACKAGES"
         }
 
-        if (extraIndexUrls && EXTRA_INDEX_AWARE_COMMANDS.contains(extractCommand(cmd))) {
+        if (indexUrl && INDEX_AWARE_COMMANDS.contains(command)) {
+            cmd += " --index-url $indexUrl"
+        }
+
+        if (extraIndexUrls && INDEX_AWARE_COMMANDS.contains(command)) {
             extraIndexUrls.each { extraIndexUrl ->
                 cmd += " --extra-index-url $extraIndexUrl"
             }

@@ -72,6 +72,17 @@ abstract class BasePipTask extends BasePythonTask {
 
     /**
      * Affects only {@code pip install}, {@code pip download}, {@code pip list} and {@code pip wheel} by applying
+     * {@code --index-url}.
+     * <p>
+     * By default, global pip repository used (see
+     * {@link ru.vyarus.gradle.plugin.python.PythonExtension#indexUrl})
+     */
+    @Input
+    @Optional
+    abstract Property<String> getIndexUrl()
+
+    /**
+     * Affects only {@code pip install}, {@code pip download}, {@code pip list} and {@code pip wheel} by applying
      * {@code --extra-index-url}.
      * <p>
      * No extra index urls are given by default (see
@@ -224,6 +235,7 @@ abstract class BasePipTask extends BasePythonTask {
                     .useCache(useCache.get())
                     .breakSystemPackages(breakSystemPackages.get())
                     .trustedHosts(trustedHosts.get())
+                    .indexUrl(indexUrl.present ? indexUrl.get() : null)
                     .extraIndexUrls(extraIndexUrls.get())
         }
         return pipCache

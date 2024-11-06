@@ -199,6 +199,7 @@ abstract class PythonPlugin implements Plugin<Project> {
             task.useCache.convention(extension.usePipCache)
             task.breakSystemPackages.convention(extension.breakSystemPackages)
             task.trustedHosts.convention(extension.trustedHosts)
+            task.indexUrl.convention(extension.indexUrl)
             task.extraIndexUrls.convention(extension.extraIndexUrls)
             task.requirements.convention(RequirementsReader.find(task.gradleEnv.get(), extension.requirements))
             task.strictRequirements.convention(extension.requirements.strict)

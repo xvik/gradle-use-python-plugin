@@ -13,7 +13,7 @@ import ru.vyarus.gradle.plugin.python.task.pip.module.ModuleFactory
  * @since 11.11.2017
  */
 @CompileStatic
-@SuppressWarnings('ConfusingMethodName')
+@SuppressWarnings(['ConfusingMethodName', 'ClassSize'])
 class PythonExtension {
 
     /**
@@ -107,6 +107,14 @@ class PythonExtension {
      *     --break-system-packages</a>
      */
     boolean breakSystemPackages = false
+
+    /**
+     * This can be used if you want to use your own pypi instead of default global one.
+     * Applies to {@code pip install}, {@code pip download}, {@code pip list} and {@code pip wheel}.
+     *
+     * @see <a href="https://pip.pypa.io/en/stable/cli/pip_install/#cmdoption-i">--index-url</a>
+     */
+    String indexUrl
 
     /**
      * This can be used to if you host your own pypi besides the default global one.
@@ -271,6 +279,15 @@ class PythonExtension {
      */
     void pip(Iterable<String> modules) {
         this.modules.addAll(modules)
+    }
+
+    /**
+     * Change default pypi repository. Applies only for some pip tasks (see {@link #indexUrl}).
+     *
+     * @param url default pip repository
+     */
+    void indexUrl(String url) {
+        this.indexUrl = url
     }
 
     /**

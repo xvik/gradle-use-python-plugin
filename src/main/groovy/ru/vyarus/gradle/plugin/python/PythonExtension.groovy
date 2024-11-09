@@ -477,7 +477,7 @@ class PythonExtension {
          *
          * @see <a href="https://hub.docker.com/_/python">python image</a>
          */
-        String image = 'python:3.11.8-alpine3.19'
+        String image = 'python:3.12.7-alpine3.20'
 
         /**
          * Use host network instead of custom isolated network. This might be useful to speed up execution in some

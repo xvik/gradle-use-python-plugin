@@ -1,5 +1,7 @@
+### [4.1.0](http://xvik.github.io/gradle-use-python-plugin/4.1.0) (2024-11-09)
 * Hide password inside --index-url pip parameter in console output (#146)
 * Add python.indexUrl configuration option (to override default pip repository)
+* Changed default docker image (python.docker.image) from python:3.11.8-alpine3.19 to python:3.12.7-alpine3.20
 
 ### [4.0.0](http://xvik.github.io/gradle-use-python-plugin/4.0.0) (2024-04-13)
 * (breaking) Drop gradle 5 and 6 support

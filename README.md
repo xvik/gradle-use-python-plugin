@@ -53,7 +53,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'ru.vyarus:gradle-use-python-plugin:4.0.0'
+        classpath 'ru.vyarus:gradle-use-python-plugin:4.1.0'
     }
 }
 apply plugin: 'ru.vyarus.use-python'
@@ -63,7 +63,7 @@ OR
 
 ```groovy
 plugins {
-    id 'ru.vyarus.use-python' version '4.0.0'
+    id 'ru.vyarus.use-python' version '4.1.0'
 }
 ```  
 
@@ -74,7 +74,7 @@ Supports python 2 (not tested anymore, but should work) and 3 on windows and lin
 
 Gradle | Version
 --------|-------
-7.0     | 4.0.0
+7-8     | 4.1.0
 5.3     | [3.0.0](https://xvik.github.io/gradle-use-python-plugin/3.0.0/)
 5-5.2   | [2.3.0](https://xvik.github.io/gradle-use-python-plugin/2.3.0/)
 4.x     | [1.2.0](https://github.com/xvik/gradle-use-python-plugin/tree/1.2.0)

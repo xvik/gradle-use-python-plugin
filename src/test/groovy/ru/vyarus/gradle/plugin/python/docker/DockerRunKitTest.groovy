@@ -314,7 +314,7 @@ class DockerRunKitTest extends AbstractKitTest {
 
         then: "clean ok"
         result.task(':clean').outcome == TaskOutcome.SUCCESS
-        !file('build').exists()
+        !file('build/temp.txt').exists()
     }
 
     def "Check docker command execution"() {

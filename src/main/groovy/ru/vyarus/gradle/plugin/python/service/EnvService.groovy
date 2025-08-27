@@ -115,7 +115,7 @@ abstract class EnvService implements BuildService<Params>, OperationCompletionLi
     @Override
     @SuppressWarnings('EmptyMethodInAbstractClass')
     void onFinish(FinishEvent finishEvent) {
-        // not used - jus a way to prevent killing service too early
+        // not used - just a way to prevent killing service too early
     }
 
     @Override

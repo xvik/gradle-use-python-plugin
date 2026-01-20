@@ -140,6 +140,19 @@ Applied for all `BasePipTask`, so if you have custom pip tasks, it would be affe
 
 In case of ssl problems (stale or self-signed certificated), mark domains as trusted (see example below)
 
+!!! note
+    If authorization is used in repository url `indexUrl "http://user:pass@custom-url.com"`
+    password would be hidden in gradle logs.   
+    Be aware that when gradle `--info` logs enabled **password would be shown** 
+    (because in this case gradle logs all command line arguments).
+
+    As an alternative, [PIP_INDEX_URL](https://pip.pypa.io/en/stable/cli/pip_install/#cmdoption-i) environment variable could be used:
+    ```java
+    python {
+        environment('PIP_INDEX_URL', 'http://user:pass@custom-url.com')
+    }
+    ```
+
 ## Extra pip repositories
 
 To add additional pip repositories (probably self-hosted):
@@ -161,6 +174,21 @@ python {
 Extra urls will be applied as [--extra-index-url](https://pip.pypa.io/en/stable/cli/pip_install/#cmdoption-extra-index-url)
 flag for pip commands supporting it: install, download, list and wheel. By default, it only affects `pipInstall` and `pipList` tasks.
 Applied for all `BasePipTask`, so if you have custom pip tasks, it would be affected too.
+
+!!! note
+    If authorization is used in repository url `indexUrl "http://user:pass@extra-url.com"`
+    password would be hidden in gradle logs.  
+    Be aware that when gradle `--info` logs enabled **password would be shown**
+    (because in this case gradle logs all command line arguments).
+
+    As an alternative, [PIP_EXTRA_INDEX_URL](https://pip.pypa.io/en/stable/cli/pip_install/#cmdoption-extra-index-url) environment variable could be used:
+    ```java
+    python {
+        environment('PIP_EXTRA_INDEX_URL', 'http://user:pass@extra-url.com')
+    }
+    ```
+    
+    Multiple urls could be separated with space.
 
 In case of ssl problems (stale or self-signed certificated), mark domains as trusted:
 

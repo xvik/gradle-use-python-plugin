@@ -239,6 +239,24 @@ python {
 Note that in case of multi-module project envPath is set to '.gradle/python' inside the root project,
 even if plugin is activated inside module (see [multi-module setup](multimodule.md)).
 
+!!! hint
+    Plugin use pip [cli options](https://pip.pypa.io/en/stable/cli/pip_install/#options)
+    to apply configuration. All options are logged into gradle console. 
+    
+    `indexUrl` and `extraIndexUrls` may contain repository passwords.
+    Plugin hides these passwords from console output on **default logs level**, but
+    if you enable `--info` logs, passwords will be visible (because gradle logs all command 
+    line arguments on info level).
+    
+    Pip also support configuration with environment variables and in case like this it might be used
+    to hide configuration from logs on info level:
+
+    ```java
+    python {
+        environment('PIP_EXTRA_INDEX_URL', 'http://user:pass@extra-url.com')
+    }
+    ``` 
+
 ### PythonTask
 
 PythonTask configuration:

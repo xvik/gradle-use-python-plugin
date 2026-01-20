@@ -1068,6 +1068,18 @@ it is possible to disable cache (for all modules) with <code>python.usePipCache=
 flag for pip commands supporting it: install, download, list and wheel. By default, it only affects <code>pipInstall</code> and <code>pipList</code> tasks.
 Applied for all <code>BasePipTask</code>, so if you have custom pip tasks, it would be affected too.</p>
 <p>In case of ssl problems (stale or self-signed certificated), mark domains as trusted (see example below)</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If authorization is used in repository url <code>indexUrl "http://user:pass@custom-url.com"</code>
+password would be hidden in gradle logs. <br />
+Be aware that when gradle <code>--info</code> logs enabled <strong>password would be shown</strong> 
+(because in this case gradle logs all command line arguments).</p>
+<p>As an alternative, <a href="https://pip.pypa.io/en/stable/cli/pip_install/#cmdoption-i">PIP_INDEX_URL</a> environment variable could be used:
+<div class="highlight"><pre><span></span><code><span class="n">python</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">environment</span><span class="p">(</span><span class="err">&#39;</span><span class="n">PIP_INDEX_URL</span><span class="err">&#39;</span><span class="p">,</span><span class="w"> </span><span class="err">&#39;</span><span class="n">http</span><span class="p">:</span><span class="c1">//user:pass@custom-url.com&#39;)</span>
+<span class="p">}</span>
+</code></pre></div></p>
+</div>
 <h2 id="extra-pip-repositories">Extra pip repositories<a class="headerlink" href="#extra-pip-repositories" title="Permanent link">&para;</a></h2>
 <p>To add additional pip repositories (probably self-hosted):</p>
 <div class="highlight"><pre><span></span><code><span class="n">python</span><span class="w"> </span><span class="o">{</span>
@@ -1082,6 +1094,19 @@ Applied for all <code>BasePipTask</code>, so if you have custom pip tasks, it wo
 <p>Extra urls will be applied as <a href="https://pip.pypa.io/en/stable/cli/pip_install/#cmdoption-extra-index-url">--extra-index-url</a>
 flag for pip commands supporting it: install, download, list and wheel. By default, it only affects <code>pipInstall</code> and <code>pipList</code> tasks.
 Applied for all <code>BasePipTask</code>, so if you have custom pip tasks, it would be affected too.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If authorization is used in repository url <code>indexUrl "http://user:pass@extra-url.com"</code>
+password would be hidden in gradle logs.<br />
+Be aware that when gradle <code>--info</code> logs enabled <strong>password would be shown</strong>
+(because in this case gradle logs all command line arguments).</p>
+<p>As an alternative, <a href="https://pip.pypa.io/en/stable/cli/pip_install/#cmdoption-extra-index-url">PIP_EXTRA_INDEX_URL</a> environment variable could be used:
+<div class="highlight"><pre><span></span><code><span class="n">python</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">environment</span><span class="p">(</span><span class="err">&#39;</span><span class="n">PIP_EXTRA_INDEX_URL</span><span class="err">&#39;</span><span class="p">,</span><span class="w"> </span><span class="err">&#39;</span><span class="n">http</span><span class="p">:</span><span class="c1">//user:pass@extra-url.com&#39;)</span>
+<span class="p">}</span>
+</code></pre></div></p>
+<p>Multiple urls could be separated with space.</p>
+</div>
 <p>In case of ssl problems (stale or self-signed certificated), mark domains as trusted:</p>
 <div class="highlight"><pre><span></span><code><span class="n">python</span><span class="w"> </span><span class="o">{</span>
 <span class="w">    </span><span class="n">trustedHosts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[</span><span class="s2">&quot;extra-url.com&quot;</span><span class="o">]</span>
@@ -1283,7 +1308,7 @@ for modules specified directly in <code>python.pip</code>.</p>
       <div class="md-copyright">
   
     <div class="md-copyright__highlight">
-      Copyright &copy; 2017-2024 Vyacheslav Rusakov
+      Copyright &copy; 2017-2026 Vyacheslav Rusakov
     </div>
   
   

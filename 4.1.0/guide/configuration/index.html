@@ -1044,6 +1044,21 @@ then force installation:</p>
 </code></pre></div>
 <p>Note that in case of multi-module project envPath is set to '.gradle/python' inside the root project,
 even if plugin is activated inside module (see <a href="../multimodule/">multi-module setup</a>).</p>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>Plugin use pip <a href="https://pip.pypa.io/en/stable/cli/pip_install/#options">cli options</a>
+to apply configuration. All options are logged into gradle console. </p>
+<p><code>indexUrl</code> and <code>extraIndexUrls</code> may contain repository passwords.
+Plugin hides these passwords from console output on <strong>default logs level</strong>, but
+if you enable <code>--info</code> logs, passwords will be visible (because gradle logs all command 
+line arguments on info level).</p>
+<p>Pip also support configuration with environment variables and in case like this it might be used
+to hide configuration from logs on info level:</p>
+<div class="highlight"><pre><span></span><code><span class="n">python</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">environment</span><span class="p">(</span><span class="err">&#39;</span><span class="n">PIP_EXTRA_INDEX_URL</span><span class="err">&#39;</span><span class="p">,</span><span class="w"> </span><span class="err">&#39;</span><span class="n">http</span><span class="p">:</span><span class="c1">//user:pass@extra-url.com&#39;)</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
 <h3 id="pythontask">PythonTask<a class="headerlink" href="#pythontask" title="Permanent link">&para;</a></h3>
 <p>PythonTask configuration:</p>
 <table>
@@ -1273,7 +1288,7 @@ Custom task(s) may be used, if required:</p>
       <div class="md-copyright">
   
     <div class="md-copyright__highlight">
-      Copyright &copy; 2017-2024 Vyacheslav Rusakov
+      Copyright &copy; 2017-2026 Vyacheslav Rusakov
     </div>
   
   

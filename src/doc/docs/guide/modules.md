@@ -176,7 +176,7 @@ flag for pip commands supporting it: install, download, list and wheel. By defau
 Applied for all `BasePipTask`, so if you have custom pip tasks, it would be affected too.
 
 !!! note
-    If authorization is used in repository url `indexUrl "http://user:pass@extra-url.com"`
+    If authorization is used in repository url `extraIndexUrls "http://user:pass@extra-url.com"`
     password would be hidden in gradle logs.  
     Be aware that when gradle `--info` logs enabled **password would be shown**
     (because in this case gradle logs all command line arguments).

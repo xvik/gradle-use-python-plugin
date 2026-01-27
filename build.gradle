@@ -31,7 +31,7 @@ dependencies {
         exclude group: 'org.codehaus.groovy'
     }
     testImplementation 'net.bytebuddy:byte-buddy:1.18.4'
-    testImplementation 'org.objenesis:objenesis:3.4'
+    testImplementation 'org.objenesis:objenesis:3.5'
 
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
